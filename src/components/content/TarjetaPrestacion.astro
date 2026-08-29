@@ -3,38 +3,96 @@
    "axis" es hematología, el eje. "orbit" son las tres que giran alrededor.
    La jerarquía se resuelve con superficie y tamaño, no con color de borde:
    esa decisión viene del design system y se respeta tal cual. */
+import { Picture } from 'astro:assets';
 import Icono from '../core/Icono.astro';
 import Chip from './Chip.astro';
+
+/* Añadido respecto del design system: una imagen opcional arriba de la tarjeta.
+   El original resuelve la jerarquía solo con superficie y tamaño; la fotografía
+   la refuerza sin contradecirla, porque la tarjeta eje sigue recibiendo más
+   superficie, más padding y un tipo mayor. Sin `imagen`, la tarjeta se ve
+   exactamente como en el design system. */
 interface Props {
   nivel?: 'axis' | 'orbit';
   titulo: string;
   resumen: string;
   href: string;
   icono?: string | undefined;
+  imagen?: ImageMetadata | undefined;
+  altImagen?: string | undefined;
   chips?: ('telemedicina' | 'presencial' | 'sabado')[];
 }
-const { nivel = 'orbit', titulo, resumen, href, icono, chips = [] } = Astro.props;
+const {
+  nivel = 'orbit',
+  titulo,
+  resumen,
+  href,
+  icono,
+  imagen,
+  altImagen,
+  chips = [],
+} = Astro.props;
 const eje = nivel === 'axis';
 ---
-<a class="prestacion" data-nivel={nivel} href={href}>
-  {icono && <Icono nombre={icono} tam={eje ? 32 : 24} color="var(--color-blue)" />}
-  {eje && <span class="eyebrow">Unidad principal</span>}
-  <h3>{titulo}</h3>
-  <p>{resumen}</p>
-  {chips.length > 0 && <div class="chips">{chips.map((c) => <Chip tipo={c} />)}</div>}
-  <span class="cta">Ver {eje ? 'la unidad' : 'prestación'}<Icono nombre="arrow-right" tam={16} /></span>
+
+<a class="prestacion" data-nivel={nivel} data-con-imagen={imagen ? 'si' : undefined} href={href}>
+  {
+    imagen && (
+      <span class="foto">
+        <Picture
+          src={imagen}
+          alt={altImagen ?? ''}
+          widths={[400, 700, 1000]}
+          sizes="(min-width: 1100px) 500px, (min-width: 700px) 50vw, 100vw"
+          formats={['avif', 'webp']}
+          loading="lazy"
+        />
+      </span>
+    )
+  }
+  <span class="cuerpo">
+    {icono && <Icono nombre={icono} tam={eje ? 32 : 24} color="var(--color-blue)" />}
+    {eje && <span class="eyebrow">Unidad principal</span>}
+    <h3>{titulo}</h3>
+    <p>{resumen}</p>
+    {chips.length > 0 && <span class="chips">{chips.map((c) => <Chip tipo={c} />)}</span>}
+    <span class="cta">
+      Ver {eje ? 'la unidad' : 'prestación'}<Icono nombre="arrow-right" tam={16} />
+    </span>
+  </span>
 </a>
 <style>
   .prestacion {
     display: flex; flex-direction: column; height: 100%; text-decoration: none;
     color: var(--color-ink); border-radius: var(--radius-lg);
     border: var(--border-width) solid var(--color-line); background: var(--surface-card);
-    box-shadow: var(--shadow-1); padding: 24px; gap: 12px;
+    box-shadow: var(--shadow-1); padding: 24px; gap: 12px; overflow: hidden;
     transition: border-color var(--dur-fast) var(--ease-out), background-color var(--dur-fast) var(--ease-out);
   }
   .prestacion[data-nivel='axis'] {
     padding: 32px; gap: 16px; background: var(--surface-alt);
     border-color: transparent; box-shadow: none;
+  }
+
+  /* Con imagen, el padding pasa al cuerpo: la foto llega hasta el borde. */
+  .prestacion[data-con-imagen] { padding: 0; gap: 0; }
+  .cuerpo {
+    display: flex; flex-direction: column; gap: 12px; flex: 1;
+  }
+  .prestacion[data-con-imagen] .cuerpo { padding: 24px; }
+  .prestacion[data-nivel='axis'] .cuerpo { gap: 16px; }
+  .prestacion[data-nivel='axis'][data-con-imagen] .cuerpo { padding: 32px; }
+
+  .foto { display: block; overflow: hidden; background: var(--surface-alt); }
+  .foto :global(img) {
+    width: 100%; height: 100%; display: block; object-fit: cover;
+    aspect-ratio: 3 / 2;
+    transition: transform var(--dur-slow) var(--ease-out);
+  }
+  .prestacion[data-nivel='axis'] .foto :global(img) { aspect-ratio: 16 / 9; }
+  .prestacion:hover .foto :global(img) { transform: scale(1.02); }
+  @media (prefers-reduced-motion: reduce) {
+    .prestacion:hover .foto :global(img) { transform: none; }
   }
   .prestacion:hover { border-color: var(--color-blue); }
   .prestacion:focus-visible { outline: var(--focus-ring); outline-offset: var(--focus-offset); }

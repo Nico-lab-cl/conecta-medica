@@ -1,60 +1,49 @@
 ---
-/* Logo. Portado de design-system/components/brand/ConectaLogo.jsx.
-   Cada variante es una ventana sobre el mismo archivo original: no se redibuja
-   la marca. Los recortes son los del design system.
-   PENDIENTE-CARLOS: logo en vectorial. Con el SVG estos recortes se reemplazan
-   por tres archivos limpios y desaparece el truco del background-position. */
+/* Logo. Ahora vectorial.
+
+   Hasta acá el logo era un recorte del JPG original con background-position, que
+   a 44px de alto perdía casi toda la legibilidad de "Clinica". Ahora son SVG
+   trazados del mismo archivo (ver scripts/logo-vector.mjs): la misma marca, sin
+   redibujar nada, nítida a cualquier tamaño.
+
+   Dos versiones porque el pie de página es azul profundo: la de color y una
+   monocroma blanca. No se recolorea por CSS —son dos tintas distintas— así que
+   son dos archivos. */
 interface Props {
-  variante?: 'full' | 'lockup' | 'isotype';
+  variante?: 'lockup' | 'isotipo';
   alto?: number;
-  placa?: boolean;
+  tono?: 'color' | 'blanco';
   alt?: string;
+  clase?: string | undefined;
 }
-const { variante = 'lockup', alto = 44, placa = false, alt = 'Clínica Conecta' } = Astro.props;
+const {
+  variante = 'lockup',
+  alto = 44,
+  tono = 'color',
+  alt = 'Clínica Conecta',
+  clase,
+} = Astro.props;
 
-const RECORTES = {
-  full: { x: 0, y: 0, w: 1, h: 1 },
-  /* Caja real de la tinta del archivo original, medida píxel a píxel:
-     x 0.096–0.908, y 0.310–0.628. El recorte del design system
-     ({ x: 0.09, y: 0.29, w: 0.82, h: 0.365 }) incluye un 15% de aire vertical
-     de más, que a 44 px de alto en la cabecera deja "Clinica" casi ilegible.
-     Este ajusta a la tinta con un margen mínimo. Misma marca, sin redibujar. */
-  lockup: { x: 0.09, y: 0.303, w: 0.824, h: 0.332 },
-  isotype: { x: 0.5, y: 0.29, w: 0.075, h: 0.09 },
-} as const;
-
-const c = RECORTES[variante];
-const src = '/assets/logo-conecta-original.jpg';
-const estilo = [
-  `height:${alto}px`,
-  `width:${alto * (c.w / c.h)}px`,
-  `background-image:url(${src})`,
-  `background-size:${100 / c.w}% ${100 / c.h}%`,
-  `background-position:${(c.x / (1 - c.w || 1)) * 100}% ${(c.y / (1 - c.h || 1)) * 100}%`,
-].join(';');
+// Proporciones reales de los archivos trazados.
+const PROPORCION = { lockup: 2472 / 996, isotipo: 186 / 210 } as const;
+const archivo = `/marca/${variante}${tono === 'blanco' ? '-blanco' : ''}.svg`;
+const ancho = Math.round(alto * PROPORCION[variante]);
 ---
 
-{
-  placa ? (
-    <span class="placa">
-      <span class="marca" role="img" aria-label={alt} style={estilo} />
-    </span>
-  ) : (
-    <span class="marca" role="img" aria-label={alt} style={estilo} />
-  )
-}
+<img
+  class:list={['logo', clase]}
+  src={archivo}
+  alt={alt}
+  width={ancho}
+  height={alto}
+  style={`height:${alto}px;width:${ancho}px`}
+  loading="eager"
+  decoding="async"
+/>
 
 <style>
-  .marca {
+  .logo {
     display: block;
-    background-repeat: no-repeat;
     flex-shrink: 0;
-  }
-  .placa {
-    background: var(--color-white);
-    border-radius: var(--radius-md);
-    padding: 10px 14px;
-    display: inline-flex;
-    align-items: center;
   }
 </style>

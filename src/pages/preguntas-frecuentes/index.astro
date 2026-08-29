@@ -1,4 +1,5 @@
 ---
+import { FOTO_PAGINA } from '../../lib/imagenes';
 import Pagina from '../../layouts/Pagina.astro';
 import Icono from '../../components/core/Icono.astro';
 import DescargoClinico from '../../components/notices/DescargoClinico.astro';
@@ -40,8 +41,11 @@ const fmt = new Intl.DateTimeFormat('es-CL', { day: 'numeric', month: 'long', ye
   h1="Lo que más nos preguntan"
   bajada="Respuestas directas, en lenguaje simple, con una indicación clara de cuándo conviene consultar. Son información general y no reemplazan una evaluación médica."
   migas={ruta}
+  foto={FOTO_PAGINA.preguntas}
+  imagenOg="/og/preguntas.jpg"
   jsonLd={[faqJsonLd(todas.map((f) => f.data))]}
 >
+
   <div class="contenedor indice">
     <nav aria-labelledby="indice-titulo">
       <p class="eyebrow" id="indice-titulo">En esta página</p>

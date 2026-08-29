@@ -1,4 +1,5 @@
 ---
+import { FOTO_PAGINA, FOTO_PRESTACION } from '../../lib/imagenes';
 import Pagina from '../../layouts/Pagina.astro';
 import TarjetaPrestacion from '../../components/content/TarjetaPrestacion.astro';
 import Hilo from '../../components/brand/Hilo.astro';
@@ -25,7 +26,10 @@ const ruta = migas({ label: 'Conecta Hematología' });
   h1={unidad.data.hero.titulo}
   bajada={unidad.data.hero.bajada}
   migas={ruta}
+  foto={FOTO_PAGINA.unidad}
+  imagenOg="/og/unidad.jpg"
 >
+
   <section class="seccion">
     <div class="contenedor prosa contenido-mdx"><Content /></div>
   </section>
@@ -43,6 +47,8 @@ const ruta = migas({ label: 'Conecta Hematología' });
             resumen={s.data.resumen}
             href={RUTAS.prestacion(s.data.slug)}
             icono={s.data.icono}
+            imagen={FOTO_PRESTACION[s.data.slug]?.src}
+            altImagen={FOTO_PRESTACION[s.data.slug]?.alt}
             chips={s.data.modalidades}
           />
         ))}

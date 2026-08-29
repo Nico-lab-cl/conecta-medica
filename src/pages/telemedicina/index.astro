@@ -1,6 +1,5 @@
 ---
-import { Picture } from 'astro:assets';
-import telemedImg from '../../assets/imagenes/telemedicina.png';
+import { FOTO_PAGINA } from '../../lib/imagenes';
 import Pagina from '../../layouts/Pagina.astro';
 import Icono from '../../components/core/Icono.astro';
 import BloquePaso from '../../components/content/BloquePaso.astro';
@@ -45,17 +44,9 @@ const PASOS = [
   h1="Hematología a distancia, en todo Chile"
   bajada="Decimos qué se resuelve por videollamada y qué no. Una consulta a distancia que debía ser presencial no le sirve a nadie."
   migas={ruta}
+  foto={FOTO_PAGINA.telemedicina}
+  imagenOg="/og/telemedicina.jpg"
 >
-  <div class="contenedor figura-intro">
-    <Picture
-      src={telemedImg}
-      alt="Notebook cerrado sobre una mesa de madera junto a una ventana, con luz de tarde."
-      widths={[700, 1100, 1600]}
-      sizes="(min-width: 900px) 1100px, 100vw"
-      formats={['avif', 'webp']}
-      loading="lazy"
-    />
-  </div>
 
   <section class="seccion">
     <div class="contenedor dos">
@@ -151,15 +142,6 @@ const PASOS = [
 </Pagina>
 
 <style>
-  .figura-intro {
-    margin-top: var(--space-10);
-  }
-  .figura-intro :global(img) {
-    width: 100%;
-    aspect-ratio: 21 / 9;
-    object-fit: cover;
-    border-radius: var(--radius-lg);
-  }
   .dos {
     display: grid;
     gap: var(--space-10);

@@ -5,6 +5,7 @@
    se está preparando y ofrece las preguntas frecuentes, que sí existen. No se
    publican tarjetas de relleno ni títulos falsos "próximamente" que no llevan a
    ninguna parte. */
+import { FOTO_PAGINA } from '../../lib/imagenes';
 import Pagina from '../../layouts/Pagina.astro';
 import Boton from '../../components/actions/Boton.astro';
 import Icono from '../../components/core/Icono.astro';
@@ -28,7 +29,10 @@ const ruta = migas({ label: 'Información para pacientes' });
   h1="Entender lo que te está pasando"
   bajada="Material escrito y revisado por el equipo médico, en lenguaje simple. Es información general: no reemplaza una evaluación."
   migas={ruta}
+  foto={FOTO_PAGINA.pacientes}
+  imagenOg="/og/pacientes.jpg"
 >
+
   <section class="seccion">
     <div class="contenedor">
       {

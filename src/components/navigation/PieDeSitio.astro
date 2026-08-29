@@ -31,7 +31,9 @@ const anio = new Date().getFullYear();
 
   <div class="contenedor rejilla">
     <div>
-      <Logo variante="lockup" alto={34} placa />
+      {/* Ya no hace falta la placa blanca detrás: existe una versión monocroma
+          blanca del lockup, trazada del mismo archivo. Ver scripts/logo-vector.mjs */}
+      <Logo variante="lockup" alto={38} tono="blanco" />
       <address class="datos">
         <span class="fuerte">{a.razonSocial}</span>
         <span>{d.edificio}</span>

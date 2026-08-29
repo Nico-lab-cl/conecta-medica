@@ -1,4 +1,5 @@
 ---
+import { FOTO_PAGINA, FOTO_PRESTACION } from '../../../lib/imagenes';
 import Pagina from '../../../layouts/Pagina.astro';
 import TarjetaPrestacion from '../../../components/content/TarjetaPrestacion.astro';
 import Hilo from '../../../components/brand/Hilo.astro';
@@ -18,7 +19,10 @@ const ruta = migas({ label: 'Conecta Hematología', href: RUTAS.unidad }, { labe
   h1="Prestaciones"
   bajada="Cada ficha explica cómo esa prestación aporta a la evaluación, el tratamiento o el seguimiento del paciente hematológico. Ninguna se ofrece como especialidad suelta."
   migas={ruta}
+  foto={FOTO_PAGINA.prestaciones}
+  imagenOg="/og/prestaciones.jpg"
 >
+
   <section class="seccion">
     <div class="contenedor">
       <div class="hilo" aria-hidden="true"><Hilo nodos={4} /></div>
@@ -31,6 +35,8 @@ const ruta = migas({ label: 'Conecta Hematología', href: RUTAS.unidad }, { labe
               resumen={s.data.resumen}
               href={RUTAS.prestacion(s.data.slug)}
               icono={s.data.icono}
+              imagen={FOTO_PRESTACION[s.data.slug]?.src}
+              altImagen={FOTO_PRESTACION[s.data.slug]?.alt}
               chips={s.data.modalidades}
             />
           ))

@@ -1,4 +1,5 @@
 ---
+import { FOTO_PAGINA } from '../../lib/imagenes';
 import Pagina from '../../layouts/Pagina.astro';
 import BloquePrecio from '../../components/content/BloquePrecio.astro';
 import NotaInfo from '../../components/notices/NotaInfo.astro';
@@ -34,7 +35,10 @@ const noIncluye = [
   h1="Un solo precio, publicado"
   bajada="Publicamos el valor porque saber cuánto vas a pagar antes de llegar es parte de una atención decente, no un detalle administrativo."
   migas={ruta}
+  foto={FOTO_PAGINA.precios}
+  imagenOg="/og/precios.jpg"
 >
+
   <section class="seccion">
     <div class="contenedor">
       <BloquePrecio nota="Consulta hematología" />

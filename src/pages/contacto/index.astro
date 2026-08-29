@@ -1,4 +1,5 @@
 ---
+import { FOTO_PAGINA } from '../../lib/imagenes';
 import { Picture } from 'astro:assets';
 import calleImg from '../../assets/imagenes/calle-nunoa.png';
 import Pagina from '../../layouts/Pagina.astro';
@@ -35,6 +36,8 @@ const mapa = `https://www.google.com/maps/search/?api=1&query=${consulta}`;
   h1="Pide tu hora"
   bajada="Completa el formulario y te contactamos dentro del próximo día hábil. No pedimos síntomas ni antecedentes: eso se conversa en la consulta."
   migas={ruta}
+  foto={FOTO_PAGINA.contacto}
+  imagenOg="/og/contacto.jpg"
 >
   <section class="seccion">
     <div class="contenedor columnas">

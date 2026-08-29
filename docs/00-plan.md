@@ -295,3 +295,69 @@ clínicas, no en "hematólogo Santiago"; no hay hematología chilena en esos
 resultados; y AI Overview ocupa la primera posición, lo que convierte la
 estructura *respuesta corta arriba* de preferencia editorial en requisito
 técnico.
+
+---
+
+## 7. Rediseño contra la referencia del cliente (2026-08-29, segunda ronda)
+
+El cliente rechazó la primera versión: *"muy genérica, las imágenes ni siquiera
+conectan con la wea, el hero es un espacio blanco con texto y CTA y abajo sale un
+botón, está todo muy desordenado"*. Puso `laverocktx.com` como referencia de UX.
+
+Tenía razón, y en cosas concretas.
+
+### Qué estaba mal
+
+| Problema | Diagnóstico |
+|---|---|
+| Hero | Texto sobre blanco con la fotografía **debajo**: dos bloques que no se leían como uno. La referencia pone la imagen a pantalla completa con el titular encima. |
+| Imágenes | Un vaso de agua, unos porotos, una lámina de vidrio esmerilado. Bonitas y mudas. Evitar inventar terminó en no comunicar, que tampoco sirve. |
+| Ritmo | Blanco y azul nube, nada más. La referencia alterna blanco, gris y **azul marino profundo**. Sin oscuro, un sitio se lee plano por más cuidada que esté la tipografía. |
+| Jerarquía de CTA | Dos botones del mismo peso compitiendo en una fila. |
+
+### Qué se decidió, y qué reglas del brief levanta
+
+El cliente autorizó explícitamente cuatro cosas que el brief maestro prohibía:
+
+1. **Personas fotorrealistas generadas.** Con una condición que puse yo y que se
+   respeta en las nueve imágenes: **siempre anónimas** —de espaldas, solo manos, o
+   fuera de foco— y ningún pie de foto que las presente como el Dr. Flores o como
+   pacientes suyos. El retrato del médico sigue esperando el suyo real.
+2. **Secciones oscuras.** `#0A2B5E`, que ya estaba en los tokens, alternando con
+   blanco y azul nube. Resuelto en `.seccion-oscura`, que redefine los alias
+   semánticos: ningún componente necesita saber sobre qué fondo está.
+3. **Hero a pantalla completa** con la cabecera transparente encima.
+4. **El presupuesto de rendimiento cede ante la referencia.** En la práctica no
+   hizo falta gastarlo: los efectos de scroll se resolvieron con `position:sticky`
+   y `animation-timeline: view()`, ambos CSS puro. El sitio sigue en 1,0 KB de JS.
+
+Se mantiene una restricción del cliente que él **no** levantó: **cero sangre**. El
+modelo insistió dos veces en llenar los tubos de ensayo, así que esa imagen se
+descartó en vez de publicarla.
+
+### Qué se construyó
+
+- **`Hero.astro`** — fotografía a pantalla completa (`100svh`, no `vh`, que en
+  móvil corta por debajo del pliegue), titular encima abajo a la izquierda, velo
+  de tres capas: una para el pie, otra para el costado del texto y una franja
+  superior corta que le garantiza contraste a la cabecera transparente sin
+  oscurecer el resto de la imagen. Soporta video opcional que solo se monta si el
+  usuario no pidió movimiento reducido ni tiene ahorro de datos.
+- **Cabecera transparente sobre el hero**, con el lockup en blanco, que se vuelve
+  sólida al pasar el hero. El centinela del IntersectionObserver se corre a 78svh.
+- **`Pagina.astro` reescrito** — la fotografía dejó de ser una banda suelta después
+  del título y pasó a ser la cabecera. Sin `foto`, cae al bloque sobre blanco: los
+  textos legales no necesitan una imagen y ponérsela sería relleno.
+- **Bloque oscuro de declaración** para "el problema", que es el momento de mayor
+  peso narrativo de la portada.
+- **Columna fija** en "cómo funciona": el título y el hilo se quedan quietos
+  mientras los cuatro pasos scrollean al lado. Es el recurso de la referencia,
+  con `position: sticky` y cero JavaScript.
+- **Sección partida** para telemedicina: media pantalla de fotografía, media de
+  texto.
+- **Logo vectorizado** — `scripts/logo-vector.mjs` traza el JPG real con potrace y
+  produce cuatro SVG: lockup en color y en blanco, isotipo en color y en blanco.
+  No genera un logo nuevo: un modelo generativo habría dibujado otra marca, y una
+  marca aproximada es peor que un JPG. La O de CONECTA, que es un anillo con un
+  guión dentro, exigió `fill-rule="evenodd"`: sin eso se rellenaba sólida y se
+  perdía el elemento más distintivo del logotipo.

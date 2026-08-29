@@ -26,8 +26,13 @@ import {
 
 interface Props {
   actual?: string;
+  /* La portada abre con un hero a pantalla completa. La cabecera se monta
+     ENCIMA de esa imagen, transparente y en blanco, y se vuelve sólida al
+     pasar el hero. Es lo que hace que el hero se sienta de borde a borde en
+     vez de empezar debajo de una barra. */
+  sobreHero?: boolean;
 }
-const { actual = '' } = Astro.props;
+const { actual = '', sobreHero = false } = Astro.props;
 
 const a = await ajustes();
 const desplegable = await menuUsaDesplegable();
@@ -61,12 +66,13 @@ const itemsMovil = [
 ];
 ---
 
-<span id="centinela-cabecera" aria-hidden="true"></span>
+<span id="centinela-cabecera" data-sobre-hero={sobreHero ? 'si' : undefined} aria-hidden="true"></span>
 
-<header class="cabecera" id="cabecera">
+<header class="cabecera" id="cabecera" data-sobre-hero={sobreHero ? 'si' : undefined}>
   <div class="barra contenedor">
     <a class="marca" href={RUTAS.inicio} aria-label="Clínica Conecta, inicio">
-      <Logo variante="lockup" alto={44} />
+      <Logo variante="lockup" alto={40} clase="marca-color" />
+      {sobreHero && <Logo variante="lockup" alto={40} tono="blanco" clase="marca-blanca" />}
     </a>
 
     <nav class="nav-escritorio" aria-label="Principal">
@@ -148,6 +154,11 @@ const itemsMovil = [
     height: 1px;
     width: 1px;
   }
+  /* Con hero a pantalla completa, el centinela se corre casi hasta el final del
+     hero: la cabecera recién se vuelve sólida cuando el titular ya salió. */
+  #centinela-cabecera[data-sobre-hero] {
+    top: 78svh;
+  }
 
   .cabecera {
     position: sticky;
@@ -155,11 +166,49 @@ const itemsMovil = [
     z-index: 30;
     background: var(--color-white);
     border-bottom: var(--border-width) solid var(--color-line);
-    transition: box-shadow var(--dur-mid) var(--ease-standard);
+    transition:
+      background-color var(--dur-mid) var(--ease-standard),
+      border-color var(--dur-mid) var(--ease-standard),
+      box-shadow var(--dur-mid) var(--ease-standard);
   }
   .cabecera[data-comprimida] {
     border-bottom-color: transparent;
     box-shadow: var(--shadow-1);
+  }
+
+  /* ---- Cabecera montada sobre el hero ---- */
+  .cabecera[data-sobre-hero] {
+    position: fixed;
+    left: 0;
+    right: 0;
+    background: transparent;
+    border-bottom-color: transparent;
+  }
+  .cabecera[data-sobre-hero]:not([data-comprimida]) {
+    box-shadow: none;
+  }
+  .cabecera[data-sobre-hero][data-comprimida] {
+    background: var(--color-white);
+  }
+
+  .marca :global(.marca-blanca) {
+    display: none;
+  }
+  .cabecera[data-sobre-hero]:not([data-comprimida]) .marca :global(.marca-color) {
+    display: none;
+  }
+  .cabecera[data-sobre-hero]:not([data-comprimida]) .marca :global(.marca-blanca) {
+    display: block;
+  }
+  .cabecera[data-sobre-hero]:not([data-comprimida]) .nav-item,
+  .cabecera[data-sobre-hero]:not([data-comprimida]) .hamburguesa {
+    color: #fff;
+  }
+  .cabecera[data-sobre-hero]:not([data-comprimida]) .nav-item:hover {
+    color: #d6e3f7;
+  }
+  .cabecera[data-sobre-hero]:not([data-comprimida]) .nav-item[aria-current='page']::after {
+    background: #fff;
   }
 
   .barra {

@@ -16,6 +16,8 @@ interface Props {
   migas?: Miga[];
   jsonLd?: unknown[];
   imagenOg?: string | undefined;
+  /** La página abre con un hero a pantalla completa: la cabecera va encima. */
+  heroSuelto?: boolean;
 }
 
 const {
@@ -27,6 +29,7 @@ const {
   migas = [],
   jsonLd = [],
   imagenOg,
+  heroSuelto = false,
 } = Astro.props;
 
 const a = await ajustes();
@@ -58,7 +61,7 @@ if (migas.length > 1) bloques.push(migasJsonLd(migas, sitio));
   </head>
   <body>
     <a class="salto-contenido" href="#contenido">Saltar al contenido</a>
-    <Encabezado actual={actual} />
+    <Encabezado actual={actual} sobreHero={heroSuelto} />
     <main id="contenido">
       <slot />
     </main>

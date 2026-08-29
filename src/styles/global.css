@@ -241,3 +241,120 @@ video {
 .contenido-mdx strong {
   font-weight: var(--weight-semibold);
 }
+
+/* ===========================================================================
+   SECCIONES OSCURAS
+
+   El brief original decía "mucho blanco, color solo en botones y títulos". Al
+   contrastarlo con la referencia que pidió el cliente (laverocktx.com), quedó
+   claro que un sitio de blanco sobre blanco se lee plano por más cuidada que
+   esté la tipografía. Lo que da ritmo es alternar tres superficies: blanco,
+   azul nube y azul profundo.
+
+   Una sección oscura no es "invertir los colores": cambia el texto, los enlaces,
+   los bordes, los chips y los botones. Se resuelve redefiniendo los alias
+   semánticos dentro de `.seccion-oscura`, así ningún componente necesita saber
+   sobre qué fondo está.
+   =========================================================================== */
+
+.seccion-oscura {
+  --text-primary: #ffffff;
+  --text-secondary: #b8cbe8;
+  --text-heading: #ffffff;
+  --text-link: #ffffff;
+  --text-link-hover: #d6e3f7;
+  --surface-page: var(--color-blue-deep);
+  --surface-alt: #0d3572;
+  --surface-card: #0d3572;
+  --border-hairline: rgba(255, 255, 255, 0.16);
+  --border-control: rgba(255, 255, 255, 0.42);
+  --action-primary-bg: #ffffff;
+  --action-primary-bg-hover: #d6e3f7;
+  --action-primary-fg: var(--color-blue-deep);
+  --action-secondary-fg: #ffffff;
+  --thread-stroke: #ffffff;
+  --thread-stroke-muted: rgba(255, 255, 255, 0.28);
+
+  background: var(--color-blue-deep);
+  color: #fff;
+}
+
+.seccion-oscura h1,
+.seccion-oscura h2,
+.seccion-oscura h3,
+.seccion-oscura h4 {
+  color: #fff;
+}
+
+.seccion-oscura .eyebrow {
+  color: #8fb0dc;
+}
+
+/* El botón secundario sobre oscuro necesita su propio borde. */
+.seccion-oscura :global(.btn[data-variante='secondary']) {
+  border-color: rgba(255, 255, 255, 0.55);
+}
+.seccion-oscura :global(.btn[data-variante='secondary']:hover) {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* ===========================================================================
+   TIPOGRAFÍA DE IMPACTO
+
+   El hero necesita un tamaño que la escala del design system no contempla: allá
+   el máximo es --text-display, 68px. Un titular sobre fotografía a pantalla
+   completa pide más peso visual, y con menos caracteres por línea.
+   =========================================================================== */
+
+.titular-hero {
+  font-family: var(--font-serif);
+  font-weight: var(--weight-semibold);
+  font-size: clamp(2.75rem, 1.6rem + 4.6vw, 5.5rem);
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
+/* ===========================================================================
+   REVELADO AL SCROLL
+
+   Dos gestos, ambos en CSS puro con animation-timeline, que es lo que permite
+   ligar una animación al scroll sin JavaScript. Donde el navegador no lo
+   soporta, el contenido se ve completo desde el principio: la mejora es
+   progresiva, nunca un requisito para leer.
+   =========================================================================== */
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .revelar {
+      animation: revelar-entrada linear both;
+      animation-timeline: view();
+      animation-range: entry 10% cover 32%;
+    }
+    .revelar-tenue {
+      animation: revelar-tenue linear both;
+      animation-timeline: view();
+      animation-range: entry 5% cover 40%;
+    }
+  }
+}
+
+@keyframes revelar-entrada {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes revelar-tenue {
+  from {
+    opacity: 0.18;
+  }
+  to {
+    opacity: 1;
+  }
+}

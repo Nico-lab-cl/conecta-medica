@@ -1,12 +1,25 @@
 ---
+/* Portada.
+
+   Reescrita después de contrastarla con laverocktx.com, que el cliente puso
+   como referencia. Cuatro cambios estructurales respecto de la versión anterior:
+
+   1. El hero es la fotografía a pantalla completa con el titular encima, no
+      texto sobre blanco con una imagen debajo.
+   2. El ritmo alterna tres superficies —blanco, azul nube, azul profundo— en vez
+      de blanco sobre blanco todo el camino.
+   3. "El problema" pasa a ser un bloque oscuro de declaración, no tres párrafos
+      sueltos: es el momento de mayor peso narrativo de la página.
+   4. Los cuatro pasos usan un gráfico fijo mientras la lista scrollea al lado,
+      como en la referencia.
+*/
 import { Picture } from 'astro:assets';
-import heroImg from '../assets/imagenes/hero-corredor.png';
 import Base from '../layouts/Base.astro';
+import Hero from '../components/brand/Hero.astro';
 import Hilo from '../components/brand/Hilo.astro';
 import BotonAgendar from '../components/actions/BotonAgendar.astro';
 import Boton from '../components/actions/Boton.astro';
 import Chip from '../components/content/Chip.astro';
-import BloquePaso from '../components/content/BloquePaso.astro';
 import TarjetaPrestacion from '../components/content/TarjetaPrestacion.astro';
 import Acordeon from '../components/content/Acordeon.astro';
 import Icono from '../components/core/Icono.astro';
@@ -20,6 +33,7 @@ import {
   precioCLP,
 } from '../lib/contenido';
 import { faqJsonLd } from '../lib/schema';
+import { FOTO_PRESTACION, FOTO_PAGINA } from '../lib/imagenes';
 
 const a = await ajustes();
 const cl = (await pais('cl')).data;
@@ -29,8 +43,7 @@ const destacadas = await faqsDestacadas(4);
 const PASOS = [
   {
     titulo: 'Solicitas tu hora',
-    texto:
-      'Por el formulario o por WhatsApp. Te confirmamos día y hora por el canal que prefieras.',
+    texto: 'Por el formulario o por WhatsApp. Te confirmamos día y hora por el canal que prefieras.',
   },
   {
     titulo: 'Te evaluamos con tiempo',
@@ -61,81 +74,80 @@ const faqItems = destacadas.map((f) => ({
   descripcion="Atención hematológica coordinada en Ñuñoa y por telemedicina en todo Chile. Consulta particular $50.000. Atención de sábado."
   ruta={RUTAS.inicio}
   actual={RUTAS.inicio}
+  imagenOg="/og/inicio.jpg"
+  heroSuelto
   jsonLd={destacadas.length ? [faqJsonLd(destacadas.map((f) => f.data))] : []}
 >
-  <!-- ===================== HERO ===================== -->
-  <section class="hero">
-    <div class="contenedor hero-rejilla">
-      <div class="hero-texto">
-        <p class="eyebrow">Clínica Conecta · Unidad de hematología</p>
-        <h1>Atención hematológica coordinada, presencial y a distancia.</h1>
-        <p class="bajada">{a.tagline}.</p>
+  <Hero
+    imagen={FOTO_PAGINA.inicio.src}
+    alt={FOTO_PAGINA.inicio.alt}
+    eyebrow="Unidad de hematología · Ñuñoa, Santiago"
+    titulo="Atención hematológica coordinada."
+    bajada={`${a.tagline}. Presencial en Ñuñoa y por telemedicina en todo Chile.`}
+  >
+    <BotonAgendar tam="lg" />
+    <Boton href="#como-funciona" variante="secondary" tam="lg" icono="arrow-right">
+      Cómo funciona la atención
+    </Boton>
+  </Hero>
 
-        <div class="hero-acciones">
-          <BotonAgendar tam="lg" />
-          <Boton href="#como-funciona" variante="secondary" tam="lg" icono="arrow-right">
-            Cómo funciona la atención
-          </Boton>
-        </div>
-
-        <ul class="hero-chips">
-          <li><Chip tipo="telemedicina" etiqueta="Telemedicina en todo Chile" /></li>
-          <li><Chip tipo="presencial" etiqueta={`Consulta ${precioCLP(a.precioConsulta)}`} /></li>
-          <li><Chip tipo="sabado" etiqueta="Atención de sábado" /></li>
-        </ul>
-      </div>
-
-      <div class="hero-figura">
-        <Picture
-          src={heroImg}
-          alt="Corredor luminoso de un edificio de oficinas en Santiago, con ventanales de piso a techo y la cordillera al fondo."
-          widths={[400, 600, 900, 1200]}
-          sizes="(min-width: 900px) 40vw, calc(100vw - 40px)"
-          formats={['avif', 'webp']}
-          loading="lazy"
-          class="hero-imagen"
-        />
-      </div>
+  <!-- ============ Barra de datos duros, pegada bajo el hero ============ -->
+  <section class="datos">
+    <div class="contenedor datos-fila">
+      <span><Chip tipo="telemedicina" etiqueta="Telemedicina en todo Chile" /></span>
+      <span><Chip tipo="presencial" etiqueta={`Consulta ${precioCLP(a.precioConsulta)}`} /></span>
+      <span><Chip tipo="sabado" etiqueta="Atención de sábado" /></span>
+      <span class="sin-derivacion">Sin derivación previa</span>
     </div>
-    <div class="contenedor"><Hilo nodos={5} /></div>
   </section>
 
-  <!-- ===================== EL PROBLEMA ===================== -->
-  <section class="seccion seccion-alt">
+  <!-- ===================== EL PROBLEMA, en oscuro ===================== -->
+  <section class="seccion seccion-oscura problema">
     <div class="contenedor">
       <p class="eyebrow">El problema</p>
-      <div class="problema">
-        <p>
-          El paciente hematológico recorre consultas que no se hablan entre sí. Cuenta su historia
-          desde el principio en cada una.
-        </p>
-        <p>
-          Repite exámenes que ya se hizo, porque el resultado quedó en otro sistema o nadie lo
-          revisó.
-        </p>
-        <p>
-          Y si vive fuera de Santiago, suma horas de viaje a un problema que muchas veces se podía
-          resolver mirando bien los exámenes que ya tenía.
-        </p>
+      <p class="declaracion revelar-tenue">
+        El paciente hematológico recorre consultas que no se hablan entre sí, repite exámenes que ya
+        se hizo, y si vive fuera de Santiago suma horas de viaje a un problema que muchas veces se
+        resolvía mirando bien lo que ya tenía.
+      </p>
+      <div class="problema-detalle">
+        <div class="revelar">
+          <span class="cifra">01</span>
+          <p>Cuenta su historia desde el principio en cada consulta nueva.</p>
+        </div>
+        <div class="revelar">
+          <span class="cifra">02</span>
+          <p>Repite exámenes porque el resultado quedó en otro sistema.</p>
+        </div>
+        <div class="revelar">
+          <span class="cifra">03</span>
+          <p>Viaja a Santiago porque la hematología está concentrada en pocos centros.</p>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- ===================== CÓMO FUNCIONA ===================== -->
-  <section class="seccion" id="como-funciona">
-    <div class="contenedor">
-      <p class="eyebrow">Cómo funciona la atención</p>
-      <h2>Un recorrido que no se corta entre un especialista y otro</h2>
-
-      <div class="pasos-hilo" aria-hidden="true"><Hilo nodos={4} /></div>
+  <!-- ================= CÓMO FUNCIONA · gráfico fijo ================= -->
+  <section class="seccion como" id="como-funciona">
+    <div class="contenedor como-rejilla">
+      <div class="como-fijo">
+        <p class="eyebrow">Cómo funciona la atención</p>
+        <h2>Un recorrido que no se corta entre un especialista y otro</h2>
+        <div class="como-hilo" aria-hidden="true">
+          <Hilo orientacion="vertical" nodos={4} />
+        </div>
+        <div class="como-acciones"><BotonAgendar /></div>
+      </div>
 
       <ol class="pasos">
         {
           PASOS.map((p, i) => (
-            <li>
-              <BloquePaso numero={i + 1} titulo={p.titulo}>
-                {p.texto}
-              </BloquePaso>
+            <li class="revelar">
+              <span class="paso-num">{String(i + 1).padStart(2, '0')}</span>
+              <div>
+                <h3>{p.titulo}</h3>
+                <p>{p.texto}</p>
+              </div>
             </li>
           ))
         }
@@ -147,7 +159,9 @@ const faqItems = destacadas.map((f) => ({
   <section class="seccion seccion-alt">
     <div class="contenedor">
       <p class="eyebrow">Conecta Hematología</p>
-      <h2>La hematología es el eje. Lo demás entra cuando tu caso lo necesita.</h2>
+      <h2 class="titulo-seccion">
+        La hematología es el eje. Lo demás entra cuando tu caso lo necesita.
+      </h2>
       <p class="intro prosa">
         Gastroenterología, nutrición e imágenes no son especialidades sueltas ofrecidas en el mismo
         lugar: entran cuando el estudio hematológico las necesita, y las coordina el mismo médico
@@ -163,6 +177,8 @@ const faqItems = destacadas.map((f) => ({
               resumen={s.data.resumen}
               href={RUTAS.prestacion(s.data.slug)}
               icono={s.data.icono}
+              imagen={FOTO_PRESTACION[s.data.slug]?.src}
+              altImagen={FOTO_PRESTACION[s.data.slug]?.alt}
               chips={s.data.modalidades}
             />
           ))
@@ -171,50 +187,60 @@ const faqItems = destacadas.map((f) => ({
     </div>
   </section>
 
-  <!-- ===================== TELEMEDICINA ===================== -->
-  <section class="seccion">
-    <div class="contenedor dos-columnas">
-      <div>
+  <!-- ===================== TELEMEDICINA, imagen partida ===================== -->
+  <section class="partida">
+    <figure class="partida-foto">
+      <Picture
+        src={FOTO_PAGINA.telemedicina.src}
+        alt={FOTO_PAGINA.telemedicina.alt}
+        widths={[600, 1000, 1400]}
+        sizes="(min-width: 1000px) 50vw, 100vw"
+        formats={['avif', 'webp']}
+        loading="lazy"
+      />
+    </figure>
+    <div class="partida-texto">
+      <div class="partida-caja">
         <p class="eyebrow">Telemedicina</p>
         <h2>Qué se resuelve a distancia, y qué no</h2>
         <p class="intro">
           Decimos las dos cosas, porque una consulta a distancia que debía ser presencial no le
           sirve a nadie.
         </p>
+        <ul class="lista si">
+          <li>
+            <Icono nombre="check" tam={18} color="var(--color-blue)" />Interpretar un hemograma o un
+            perfil de hierro
+          </li>
+          <li>
+            <Icono nombre="check" tam={18} color="var(--color-blue)" />Revisar y ajustar un
+            tratamiento en curso
+          </li>
+          <li>
+            <Icono nombre="check" tam={18} color="var(--color-blue)" />Segunda opinión sobre un
+            estudio ya hecho
+          </li>
+          <li>
+            <Icono nombre="minus" tam={18} color="var(--color-gray)" />
+            <span class="tenue">Examinar un ganglio o el bazo necesita ser presencial</span>
+          </li>
+        </ul>
         <Boton href={RUTAS.telemedicina} variante="secondary" icono="arrow-right">
           Ver cómo funciona
         </Boton>
       </div>
-      <div class="listas">
-        <div>
-          <h3 class="lista-titulo">Sí, a distancia</h3>
-          <ul class="lista si">
-            <li><Icono nombre="check" tam={18} color="var(--color-blue)" />Interpretar un hemograma o un perfil de hierro</li>
-            <li><Icono nombre="check" tam={18} color="var(--color-blue)" />Revisar y ajustar un tratamiento en curso</li>
-            <li><Icono nombre="check" tam={18} color="var(--color-blue)" />Controles de seguimiento</li>
-            <li><Icono nombre="check" tam={18} color="var(--color-blue)" />Segunda opinión sobre un estudio ya hecho</li>
-          </ul>
-        </div>
-        <div>
-          <h3 class="lista-titulo">Necesita ser presencial</h3>
-          <ul class="lista no">
-            <li><Icono nombre="minus" tam={18} color="var(--color-gray)" />Examinar un ganglio, el bazo o el abdomen</li>
-            <li><Icono nombre="minus" tam={18} color="var(--color-gray)" />Primera evaluación donde el examen físico decide</li>
-          </ul>
-        </div>
-      </div>
     </div>
   </section>
 
-  <!-- ===================== COMPROMISOS ===================== -->
-  <section class="seccion seccion-alt">
+  <!-- ===================== COMPROMISOS, en oscuro ===================== -->
+  <section class="seccion seccion-oscura">
     <div class="contenedor">
       <p class="eyebrow">Nuestros compromisos</p>
-      <h2>Cuatro cosas que puedes exigirnos</h2>
+      <h2 class="titulo-seccion">Cuatro cosas que puedes exigirnos</h2>
       <ul class="compromisos">
         {
           a.compromisos.map((c, i) => (
-            <li>
+            <li class="revelar">
               <span class="compromiso-num">{String(i + 1).padStart(2, '0')}</span>
               <span>{c}</span>
             </li>
@@ -228,23 +254,26 @@ const faqItems = destacadas.map((f) => ({
   {
     faqItems.length > 0 && (
       <section class="seccion">
-        <div class="contenedor">
-          <p class="eyebrow">Preguntas frecuentes</p>
-          <h2>Lo que más nos preguntan</h2>
-          <div class="faq-bloque">
-            <Acordeon items={faqItems} />
-            <Boton href={RUTAS.preguntas} variante="text" icono="arrow-right">
+        <div class="contenedor faq-rejilla">
+          <div>
+            <p class="eyebrow">Preguntas frecuentes</p>
+            <h2>Lo que más nos preguntan</h2>
+            <p class="intro">
+              Respuestas directas, con una indicación clara de cuándo conviene consultar.
+            </p>
+            <Boton href={RUTAS.preguntas} variante="secondary" icono="arrow-right">
               Ver todas las preguntas
             </Boton>
           </div>
+          <Acordeon items={faqItems} />
         </div>
       </section>
     )
   }
 
-  <!-- ===================== UBICACIÓN Y CTA ===================== -->
+  <!-- ===================== UBICACIÓN Y CIERRE ===================== -->
   <section class="seccion seccion-alt">
-    <div class="contenedor dos-columnas">
+    <div class="contenedor cierre-rejilla">
       <div>
         <p class="eyebrow">Dónde y cuándo</p>
         <h2>Ñuñoa, a pasos del Metro Plaza Egaña</h2>
@@ -254,17 +283,22 @@ const faqItems = destacadas.map((f) => ({
           {cl.direccion.comuna}, {cl.direccion.ciudad}
         </address>
         <ul class="horarios">
-          {cl.horarios.map((h) => <li><Icono nombre="clock" tam={18} color="var(--color-blue)" />{horarioLegible(h)}</li>)}
+          {
+            cl.horarios.map((h) => (
+              <li>
+                <Icono nombre="clock" tam={18} color="var(--color-blue)" />
+                {horarioLegible(h)}
+              </li>
+            ))
+          }
         </ul>
       </div>
       <div class="cta-final">
         <h2>¿Necesitas una hora?</h2>
-        <p>
-          Puedes pedirla sin derivación previa. Te confirmamos dentro del próximo día hábil.
-        </p>
+        <p>Puedes pedirla sin derivación previa. Te confirmamos dentro del próximo día hábil.</p>
         <div class="cta-acciones">
           <BotonAgendar tam="lg" />
-          <Boton href={RUTAS.contacto} variante="secondary" tam="lg">Ver formas de contacto</Boton>
+          <Boton href={RUTAS.contacto} variante="secondary" tam="lg">Formas de contacto</Boton>
         </div>
       </div>
     </div>
@@ -272,142 +306,154 @@ const faqItems = destacadas.map((f) => ({
 </Base>
 
 <style>
-  /* ---------- hero ---------- */
-  .hero {
-    padding-top: var(--space-12);
-    padding-bottom: var(--space-10);
+  /* ---------- barra de datos ---------- */
+  .datos {
+    background: var(--color-white);
+    border-bottom: var(--border-width) solid var(--color-line);
   }
-  .hero-rejilla {
-    display: grid;
-    gap: var(--space-10);
+  .datos-fila {
+    display: flex;
+    flex-wrap: wrap;
     align-items: center;
+    gap: var(--space-3) var(--space-5);
+    padding-block: var(--space-5);
   }
-  @media (min-width: 900px) {
-    .hero-rejilla {
-      grid-template-columns: 1.35fr 1fr;
-      gap: var(--space-16);
-    }
-    .hero {
-      padding-top: var(--space-16);
-    }
-  }
-  .hero h1 {
-    font-size: var(--text-display);
-    line-height: var(--text-display-lh);
-    letter-spacing: var(--text-display-ls);
-    margin-top: var(--space-4);
-    max-width: 18ch;
-  }
-  .bajada {
-    margin-top: var(--space-5);
-    font-size: var(--text-body-lg);
-    line-height: 1.6;
-    color: var(--color-ink);
-    max-width: 46ch;
-  }
-  .hero-acciones {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-4);
-    margin-top: var(--space-8);
-  }
-  .hero-chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-2);
-    list-style: none;
-    margin: var(--space-6) 0 0;
-    padding: 0;
-  }
-  /* En móvil la imagen va DESPUÉS del texto y los botones, no antes: así no es
-     el elemento LCP y no compite con el titular por el primer render. En
-     escritorio ocupa su columna del hero. */
-  .hero-figura {
-    order: 2;
-    margin-top: var(--space-8);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    background: var(--surface-alt);
-  }
-  .hero-rejilla {
-    display: flex;
-    flex-direction: column;
-  }
-  @media (min-width: 900px) {
-    .hero-rejilla {
-      display: grid;
-    }
-    .hero-figura {
-      order: 0;
-      margin-top: 0;
-    }
-  }
-  .hero-figura :global(.hero-imagen) {
-    width: 100%;
-    height: 100%;
-    aspect-ratio: 4 / 3;
-    object-fit: cover;
-    display: block;
+  .sin-derivacion {
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-gray);
   }
 
-  /* ---------- problema ---------- */
-  .problema {
-    display: grid;
-    gap: var(--space-6);
+  /* ---------- el problema ---------- */
+  .declaracion {
     margin-top: var(--space-6);
+    font-family: var(--font-serif);
+    font-size: clamp(1.5rem, 1.1rem + 1.7vw, 2.6rem);
+    line-height: 1.28;
+    letter-spacing: -0.015em;
+    max-width: 24ch;
   }
   @media (min-width: 900px) {
-    .problema {
+    .declaracion {
+      max-width: 30ch;
+    }
+  }
+  .problema-detalle {
+    display: grid;
+    gap: var(--space-8);
+    margin-top: var(--space-16);
+    border-top: 1px solid rgba(255, 255, 255, 0.16);
+    padding-top: var(--space-8);
+  }
+  @media (min-width: 800px) {
+    .problema-detalle {
       grid-template-columns: repeat(3, 1fr);
       gap: var(--space-10);
     }
   }
-  .problema p {
-    font-size: var(--text-body-lg);
+  .problema-detalle p {
+    margin-top: var(--space-3);
+    font-size: var(--text-body);
     line-height: 1.6;
-    color: var(--color-blue-deep);
+    color: #c9d9f0;
+    max-width: 32ch;
+  }
+  .cifra {
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    color: #7fa5d8;
   }
 
-  /* ---------- pasos ---------- */
-  h2 {
+  /* ---------- cómo funciona ---------- */
+  .como-rejilla {
+    display: grid;
+    gap: var(--space-12);
+  }
+  @media (min-width: 1000px) {
+    .como-rejilla {
+      grid-template-columns: 0.85fr 1fr;
+      gap: var(--space-20);
+      align-items: start;
+    }
+    /* El bloque de la izquierda se queda fijo mientras la lista scrollea.
+       Es el recurso de la referencia, y acá cuesta cero JavaScript. */
+    .como-fijo {
+      position: sticky;
+      top: 120px;
+    }
+  }
+  .como-fijo h2 {
     margin-top: var(--space-3);
-    max-width: 24ch;
+    max-width: 18ch;
+  }
+  .como-hilo {
+    display: none;
+  }
+  @media (min-width: 1000px) {
+    .como-hilo {
+      display: block;
+      height: 140px;
+      margin-top: var(--space-8);
+    }
+  }
+  .como-acciones {
+    margin-top: var(--space-8);
+  }
+
+  .pasos {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .pasos li {
+    display: flex;
+    gap: var(--space-5);
+    padding-block: var(--space-8);
+    border-bottom: var(--border-width) solid var(--color-line);
+  }
+  .pasos li:first-child {
+    padding-top: 0;
+  }
+  .pasos li:last-child {
+    border-bottom: 0;
+  }
+  .paso-num {
+    font-family: var(--font-mono);
+    font-size: var(--text-body-sm);
+    color: var(--color-blue);
+    padding-top: 6px;
+    flex-shrink: 0;
+  }
+  .pasos h3 {
+    font-size: var(--text-h3);
+  }
+  .pasos p {
+    margin-top: var(--space-3);
+    font-size: var(--text-body);
+    line-height: 1.65;
+    color: var(--color-gray);
+    max-width: 46ch;
+  }
+
+  /* ---------- prestaciones ---------- */
+  .titulo-seccion {
+    margin-top: var(--space-3);
+    max-width: 26ch;
   }
   .intro {
     margin-top: var(--space-5);
     font-size: var(--text-body-lg);
     line-height: 1.6;
-    color: var(--color-gray);
+    color: var(--text-secondary);
   }
-  .pasos-hilo {
-    margin-top: var(--space-12);
-    display: none;
-  }
-  @media (min-width: 900px) {
-    .pasos-hilo {
-      display: block;
-    }
-  }
-  .pasos {
-    display: grid;
-    gap: var(--space-10);
-    list-style: none;
-    margin: var(--space-8) 0 0;
-    padding: 0;
-  }
-  @media (min-width: 900px) {
-    .pasos {
-      grid-template-columns: repeat(4, 1fr);
-      gap: var(--space-8);
-      margin-top: var(--space-6);
-    }
-  }
-
-  /* ---------- prestaciones ---------- */
   .prestaciones {
     display: grid;
     gap: var(--space-5);
-    margin-top: var(--space-10);
+    margin-top: var(--space-12);
   }
   @media (min-width: 700px) {
     .prestaciones {
@@ -416,42 +462,60 @@ const faqItems = destacadas.map((f) => ({
   }
   @media (min-width: 1100px) {
     .prestaciones {
-      grid-template-columns: 1.5fr 1fr 1fr;
+      grid-template-columns: 1.4fr 1fr 1fr;
     }
     .prestaciones > :first-child {
       grid-row: span 2;
     }
   }
 
-  /* ---------- dos columnas ---------- */
-  .dos-columnas {
+  /* ---------- sección partida ---------- */
+  .partida {
     display: grid;
-    gap: var(--space-10);
+    background: var(--color-white);
   }
-  @media (min-width: 900px) {
-    .dos-columnas {
+  @media (min-width: 1000px) {
+    .partida {
       grid-template-columns: 1fr 1fr;
-      gap: var(--space-16);
+      align-items: stretch;
     }
   }
-  .listas {
-    display: grid;
-    gap: var(--space-8);
+  .partida-foto {
+    margin: 0;
   }
-  .lista-titulo {
-    font-family: var(--font-mono);
-    font-size: var(--text-eyebrow);
-    letter-spacing: var(--text-eyebrow-ls);
-    text-transform: uppercase;
-    color: var(--color-gray);
+  .partida-foto :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    aspect-ratio: 4 / 3;
+  }
+  @media (min-width: 1000px) {
+    .partida-foto :global(img) {
+      aspect-ratio: auto;
+      min-height: 100%;
+    }
+  }
+  .partida-texto {
+    display: flex;
+    align-items: center;
+    padding-block: var(--section-y);
+  }
+  .partida-caja {
+    padding-inline: var(--margin-x);
+    max-width: 620px;
+  }
+  @media (min-width: 1000px) {
+    .partida-caja {
+      padding-inline: var(--space-16) var(--space-10);
+    }
   }
   .lista {
     list-style: none;
-    margin: var(--space-4) 0 0;
+    margin: var(--space-8) 0;
     padding: 0;
     display: flex;
     flex-direction: column;
-    gap: var(--space-3);
+    gap: var(--space-4);
   }
   .lista li {
     display: flex;
@@ -460,47 +524,61 @@ const faqItems = destacadas.map((f) => ({
     font-size: var(--text-body);
     line-height: 1.6;
   }
-  .lista.no li {
+  .tenue {
     color: var(--color-gray);
   }
 
   /* ---------- compromisos ---------- */
   .compromisos {
     list-style: none;
-    margin: var(--space-10) 0 0;
+    margin: var(--space-12) 0 0;
     padding: 0;
     display: grid;
-    gap: var(--space-6);
+    gap: var(--space-8);
   }
   @media (min-width: 700px) {
     .compromisos {
       grid-template-columns: repeat(2, 1fr);
-      gap: var(--space-8);
+      gap: var(--space-10) var(--space-12);
     }
   }
   .compromisos li {
     display: flex;
     gap: var(--space-4);
     align-items: baseline;
-    font-size: var(--text-body-lg);
-    line-height: 1.5;
-    color: var(--color-blue-deep);
+    font-family: var(--font-serif);
+    font-size: var(--text-h3);
+    line-height: 1.35;
+    color: #fff;
+    padding-top: var(--space-5);
+    border-top: 1px solid rgba(255, 255, 255, 0.16);
   }
   .compromiso-num {
     font-family: var(--font-mono);
-    font-size: var(--text-body-sm);
-    color: var(--color-blue);
+    font-size: var(--text-caption);
+    color: #7fa5d8;
     flex-shrink: 0;
   }
 
-  /* ---------- faq + cierre ---------- */
-  .faq-bloque {
-    margin-top: var(--space-8);
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-5);
-    align-items: flex-start;
-    max-width: 860px;
+  /* ---------- faq y cierre ---------- */
+  .faq-rejilla,
+  .cierre-rejilla {
+    display: grid;
+    gap: var(--space-10);
+  }
+  @media (min-width: 1000px) {
+    .faq-rejilla {
+      grid-template-columns: 0.8fr 1.2fr;
+      gap: var(--space-16);
+      align-items: start;
+    }
+    .cierre-rejilla {
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-16);
+    }
+  }
+  .faq-rejilla .intro {
+    margin-bottom: var(--space-6);
   }
   .direccion {
     font-style: normal;
@@ -524,10 +602,11 @@ const faqItems = destacadas.map((f) => ({
     align-items: center;
   }
   .cta-final {
-    background: var(--surface-card);
+    background: var(--color-white);
     border-radius: var(--radius-lg);
     padding: var(--space-8);
     box-shadow: var(--shadow-1);
+    align-self: start;
   }
   .cta-final p {
     margin-top: var(--space-4);

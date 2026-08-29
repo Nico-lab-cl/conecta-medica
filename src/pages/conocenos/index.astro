@@ -7,8 +7,7 @@
    paciente quiere saber es quién lo va a atender. Ver docs/00-plan.md §5.3.
 
    De los 14 valores del brief se publican 6: listar 14 diluye el mensaje. */
-import { Picture } from 'astro:assets';
-import escritorioImg from '../../assets/imagenes/escritorio.png';
+import { FOTO_PAGINA } from '../../lib/imagenes';
 import Pagina from '../../layouts/Pagina.astro';
 import Icono from '../../components/core/Icono.astro';
 import Cita from '../../components/content/Cita.astro';
@@ -44,10 +43,13 @@ const VALORES = [
   h1="Una consulta que coordina, no que se suma a la lista"
   bajada="Conecta nace de una observación simple: el problema del paciente hematológico rara vez es la falta de especialistas. Es que ninguno se habla con el otro."
   migas={ruta}
+  foto={FOTO_PAGINA.conocenos}
+  imagenOg="/og/conocenos.jpg"
   jsonLd={fundador
     ? [medicoJsonLd(fundador.data, new URL(RUTAS.conocenos, sitio).toString(), sitio)]
     : []}
 >
+
   {
     fundador && (
       <section class="seccion">
@@ -129,16 +131,8 @@ const VALORES = [
         Santiago. Para quien vive en regiones, cada control significa un viaje.
       </p>
 
-      <figure class="escritorio">
-        <Picture
-          src={escritorioImg}
-          alt="Mesa de madera junto a una ventana, con un cuaderno cerrado, un lápiz y un vaso de agua."
-          widths={[600, 900]}
-          sizes="(min-width: 900px) 720px, 100vw"
-          formats={['avif', 'webp']}
-          loading="lazy"
-        />
-      </figure>
+      <div class="escritorio">
+      </div>
 
       <Cita fuente="La tesis del proyecto">
         Conecta existe para coordinar la atención, no para agregar otra consulta suelta.
@@ -260,11 +254,9 @@ const VALORES = [
   .escritorio {
     margin: var(--space-10) 0 0;
   }
-  .escritorio :global(img) {
-    width: 100%;
-    aspect-ratio: 16 / 10;
-    object-fit: cover;
-    border-radius: var(--radius-lg);
+  .escritorio :global(.banda) {
+    padding-inline: 0;
+    max-width: none;
   }
   .parrafo {
     margin-top: var(--space-5);

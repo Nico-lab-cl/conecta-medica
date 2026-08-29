@@ -1,9 +1,22 @@
 ---
-/* Layout de página interior: migas, encabezado y ranura de contenido.
-   Evita repetir la misma cabecera en trece páginas. */
+/* Layout de página interior.
+
+   Reescrito junto con la portada. Antes la cabecera de página era un bloque de
+   texto sobre blanco y la fotografía venía después, como una banda suelta: el
+   mismo error que tenía el hero de la portada, repetido trece veces.
+
+   Ahora la fotografía ES la cabecera. Migas, eyebrow, H1 y bajada van encima,
+   con el mismo tratamiento de velo y de cabecera transparente que la portada,
+   pero a media altura: una página interior no necesita ocupar toda la pantalla
+   antes de mostrar contenido.
+
+   Sin `foto`, cae al bloque de texto sobre blanco de antes. Los textos legales
+   no necesitan una fotografía, y ponerles una sería relleno. */
 import Base from './Base.astro';
 import Migas from '../components/navigation/Migas.astro';
+import { Picture } from 'astro:assets';
 import type { Miga } from '../lib/rutas';
+import type { Foto } from '../lib/imagenes';
 
 interface Props {
   titulo: string;
@@ -17,6 +30,8 @@ interface Props {
   jsonLd?: unknown[];
   anchoTexto?: boolean;
   noindex?: boolean;
+  imagenOg?: string | undefined;
+  foto?: Foto | undefined;
 }
 
 const {
@@ -31,6 +46,8 @@ const {
   jsonLd = [],
   anchoTexto = false,
   noindex = false,
+  imagenOg,
+  foto,
 } = Astro.props;
 ---
 
@@ -42,29 +59,150 @@ const {
   migas={migas}
   jsonLd={jsonLd}
   noindex={noindex}
+  imagenOg={imagenOg}
+  heroSuelto={Boolean(foto)}
 >
-  <div class="encabezado-pagina">
-    <div class="contenedor">
-      <Migas items={migas} />
-      {eyebrow && <p class="eyebrow arriba">{eyebrow}</p>}
-      <h1 class:list={['titulo', anchoTexto && 'angosto']}>{h1}</h1>
-      {bajada && <p class="bajada">{bajada}</p>}
-    </div>
-  </div>
+  {
+    foto ? (
+      <section class="portada">
+        <div class="fondo">
+          <Picture
+            src={foto.src}
+            alt={foto.alt}
+            widths={[800, 1280, 1920]}
+            sizes="100vw"
+            formats={['avif', 'webp']}
+            loading="eager"
+            fetchpriority="high"
+          />
+          <span class="velo" aria-hidden="true" />
+        </div>
+        <div class="texto contenedor">
+          <Migas items={migas} />
+          {eyebrow && <p class="eyebrow arriba">{eyebrow}</p>}
+          <h1 class:list={['titulo', anchoTexto && 'angosto']}>{h1}</h1>
+          {bajada && <p class="bajada">{bajada}</p>}
+        </div>
+        <span class="borde-inferior" aria-hidden="true" />
+      </section>
+    ) : (
+      <div class="encabezado-simple">
+        <div class="contenedor">
+          <Migas items={migas} />
+          {eyebrow && <p class="eyebrow arriba">{eyebrow}</p>}
+          <h1 class:list={['titulo', anchoTexto && 'angosto']}>{h1}</h1>
+          {bajada && <p class="bajada">{bajada}</p>}
+        </div>
+      </div>
+    )
+  }
 
   <slot />
 </Base>
 
 <style>
-  .encabezado-pagina {
+  /* ---------- cabecera con fotografía ---------- */
+  .portada {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    min-height: 62svh;
+    overflow: hidden;
+    background: var(--color-blue-deep);
+  }
+  @media (min-width: 900px) {
+    .portada {
+      min-height: 70svh;
+    }
+  }
+
+  .fondo {
+    position: absolute;
+    inset: 0;
+  }
+  .fondo :global(img) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .velo {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(
+        to top,
+        rgba(6, 24, 54, 0.88) 0%,
+        rgba(6, 24, 54, 0.58) 26%,
+        rgba(6, 24, 54, 0.1) 60%,
+        rgba(6, 24, 54, 0) 80%
+      ),
+      linear-gradient(
+        to right,
+        rgba(6, 24, 54, 0.6) 0%,
+        rgba(6, 24, 54, 0.12) 48%,
+        rgba(6, 24, 54, 0) 70%
+      ),
+      linear-gradient(to bottom, rgba(6, 24, 54, 0.5) 0%, rgba(6, 24, 54, 0) 20%);
+  }
+
+  .texto {
+    position: relative;
+    padding-block: var(--space-16) var(--space-12);
+    color: #fff;
+  }
+  @media (min-width: 900px) {
+    .texto {
+      padding-block: var(--space-20) var(--space-16);
+    }
+  }
+
+  /* Las migas sobre fotografía necesitan su propia tinta. */
+  .texto :global(.migas a) {
+    color: #d6e3f7;
+  }
+  .texto :global(.migas a:hover) {
+    color: #fff;
+  }
+  .texto :global(.migas span[aria-current]) {
+    color: #a9c4e8;
+  }
+
+  .portada .eyebrow {
+    color: #a9c4e8;
+  }
+  .portada .titulo {
+    color: #fff;
+    font-size: clamp(2.15rem, 1.5rem + 2.6vw, 3.6rem);
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+  }
+  .portada .bajada {
+    color: #dce7f7;
+  }
+
+  .borde-inferior {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 3px;
+    background: var(--color-blue);
+  }
+
+  /* ---------- cabecera sin fotografía ---------- */
+  .encabezado-simple {
     padding-block: var(--space-8) var(--space-10);
     border-bottom: var(--border-width) solid var(--color-line);
   }
   @media (min-width: 768px) {
-    .encabezado-pagina {
+    .encabezado-simple {
       padding-block: var(--space-10) var(--space-16);
     }
   }
+
+  /* ---------- común ---------- */
   .arriba {
     margin-top: var(--space-8);
   }

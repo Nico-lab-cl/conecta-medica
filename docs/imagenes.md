@@ -28,16 +28,48 @@ palette, editorial photography, not stock photography."*
 
 ## Inventario
 
-| Archivo | Uso | Formato |
-|---|---|---|
-| `hero-corredor.png` | Hero de la portada | 16:9 · 2048×1152 |
-| `calle-nunoa.png` | Cómo llegar, contacto | 4:3 · 2048×1536 |
-| `escritorio.png` | "Te evaluamos con tiempo" | 4:3 · 2048×1536 |
-| `examenes-previos.png` | "Revisamos tus exámenes previos" | 4:3 · 2048×1536 |
-| `telemedicina.png` | Página de telemedicina | 4:3 · 2048×1536 |
+Diecisiete imágenes, todas del mismo modelo y con la misma cola de estilo. Eso es
+lo que hace que se lean como un solo set y no como fotos sueltas de banco.
 
-Fuente en `src/assets/imagenes/`. Astro genera AVIF y WebP en el build, con
-`width`/`height` explícitos para no provocar saltos de maquetación.
+| Archivo | Dónde se usa | Formato |
+|---|---|---|
+| `hero-ancho` | Portada, banda a sangre | 21:9 |
+| `hero-corredor` | Unidad Conecta Hematología | 16:9 |
+| `edificio-nunoa` | Conócenos | 21:9 |
+| `calle-nunoa` | Contacto, cómo llegar | 4:3 |
+| `prestaciones-banda` | Listado de prestaciones | 21:9 |
+| `p-hematologia` | Prestación hematología + su tarjeta | 3:2 |
+| `p-gastroenterologia` | Prestación gastroenterología + su tarjeta | 3:2 |
+| `p-nutricion` | Prestación nutrición + su tarjeta | 3:2 |
+| `p-imagenes` | Prestación imágenes + su tarjeta | 3:2 |
+| `mesa-lectura` | Preguntas frecuentes | 21:9 |
+| `escritorio` | Precios | 4:3 |
+| `examenes-previos` | Conócenos, "por qué existe Conecta" | 4:3 |
+| `guias-impresas` | Información para pacientes | 3:2 |
+| `reloj-pared` | Agendar | 3:2 |
+| `telemedicina` | Telemedicina | 4:3 |
+| `textura-muro` | Reserva, fondo sutil | 16:9 |
+
+Fuente en `src/assets/imagenes/`. El registro de qué imagen va en qué página, con
+su texto alternativo, está en `src/lib/imagenes.ts`: el `alt` se escribe una vez
+junto a la imagen y no en cada página, para que no se contradiga ni se olvide.
+
+Astro genera AVIF y WebP en varios anchos durante el build, con dimensiones
+explícitas para no provocar saltos de maquetación.
+
+## Dos utilidades que acompañan al set
+
+**`scripts/recortar-bordes.mjs`** — Soul Location emula una copia analógica y a
+veces deja un marco negro de unos píxeles. En una foto suelta pasa por estilo; en
+una serie que se muestra junta, unas con marco y otras sin él se ve descuidado. El
+script detecta filas y columnas casi negras en los bordes y las recorta. Si no hay
+borde, no toca el archivo.
+
+**`scripts/og.mjs`** — arma las trece tarjetas de Open Graph, una por página,
+componiendo la fotografía de esa página con un degradado, el hilo Conecta, el
+lockup sobre placa blanca y el titular. Se ejecuta en local y **no gasta
+créditos**. Es lo que se ve cuando alguien comparte un enlace por WhatsApp, que en
+Chile es como circula de verdad la recomendación de un médico.
 
 ## Prompts exactos
 
@@ -87,6 +119,99 @@ Fuente en `src/assets/imagenes/`. Astro genera AVIF y WebP en el build, con
 > text, no logos, no medical objects. Shot on 35mm, natural light only, warm soft
 > shadows, subtle film grain, restrained neutral palette, calm and unhurried, editorial
 > photography, not stock photography.
+
+
+### p-hematologia · 3:2 · prestación de hematología
+
+> A pale oak desk beside a bright window on a clear morning, high key. An open
+> cream folder with a neat stack of printed pages, completely out of focus and
+> unreadable. Beside it a second smaller stack of older pages. A thin pen. Plain
+> white wall behind, soft even daylight filling the frame, very light and airy,
+> minimal shadows.
+
+### p-gastroenterologia · 3:2
+
+> A half-open pale door in a quiet bright hallway, late afternoon. Warm low
+> sunlight spills through the gap onto a smooth concrete floor, revealing part of
+> an empty room beyond. Plain white walls, one shadow line across the floor.
+> Nothing else in frame. A sense of looking for what is behind something.
+
+### p-nutricion · 3:2
+
+> Still life on a pale wooden kitchen table in soft north-facing daylight. Three
+> simple ceramic bowls holding dry brown lentils, dried white beans, and fresh
+> spinach leaves. A folded linen cloth. Nothing else on the table. Muted earthy
+> greens and browns against a plain off-white wall.
+
+### p-imagenes · 3:2
+
+> Several overlapping sheets of translucent frosted glass leaning against a large
+> window, seen from close range in flat overcast daylight. Light passes through
+> the layers creating soft grey gradients and faint edges where they overlap.
+> Abstract, cool grey and pale blue, no objects behind them, completely
+> non-clinical.
+
+### hero-ancho · 21:9 · banda de la portada
+
+> Interior of a quiet modern office building in Santiago de Chile, late afternoon.
+> A wide bright space with floor-to-ceiling windows along the right side, warm low
+> sunlight raking across a pale limestone floor and casting long window-frame
+> shadows. One low wooden bench, one large potted plant. Through the glass, the
+> hazy blue silhouette of the Andes mountains above low city rooftops. Completely
+> empty and still. Wide cinematic framing with generous negative space on the left
+> for text.
+
+### prestaciones-banda · 21:9
+
+> A long bright corridor with four tall windows in a row along one wall, seen
+> straight on, morning light. Four evenly spaced rectangles of sunlight fall
+> across a pale concrete floor. Plain white walls, completely empty, strong rhythm
+> and repetition. Wide cinematic framing.
+
+### edificio-nunoa · 21:9
+
+> Low angle exterior of a clean modern mid-rise office building in Ñuñoa, Santiago
+> de Chile, golden hour. Pale stone and glass façade, mature plane trees in front,
+> long soft shadows. The Andes mountains rising behind the building, hazy and
+> blue. Wide cinematic framing, empty street.
+
+### mesa-lectura · 21:9
+
+> A long empty light wood table beside a tall window in a quiet room, morning
+> light. A single glass of water and a closed grey notebook near one end, the rest
+> of the table bare. Plain white wall, a soft rectangle of sunlight across the
+> surface. Wide horizontal composition with generous empty space.
+
+### guias-impresas · 3:2
+
+> A small neat pile of thin printed booklets with plain uncoated covers, stacked
+> on a pale wooden surface near a window. Covers are blank and unbranded, no
+> readable text. Soft side light, gentle shadows, a shallow depth of field. Calm
+> and tactile.
+
+### reloj-pared · 3:2
+
+> A plain round white wall clock on a smooth pale plaster wall, photographed
+> slightly off-centre in soft afternoon light. The clock face is minimal with thin
+> black hands and no numerals or branding. A long diagonal shadow crosses the
+> wall. Generous empty space around it.
+
+### textura-muro · 16:9
+
+> Extreme close view of a smooth off-white plaster wall in raking daylight,
+> showing only the faintest surface texture and a soft gradient from light to
+> slightly darker. Almost entirely white, no objects, no edges, no corners.
+> Minimal and quiet.
+
+## Cola de estilo común
+
+Todos los prompts de la segunda tanda terminan con esta cola, que es la que
+mantiene la serie unida:
+
+> Shot on 35mm film, natural light only, subtle film grain, restrained neutral
+> palette with one cool blue accent, calm and unhurried, editorial photography.
+> No people, no faces, no hands, no text, no logos, no signage, no medical
+> instruments, no blood. Not stock photography.
 
 ## Cómo regenerar
 

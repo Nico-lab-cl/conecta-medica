@@ -10,6 +10,7 @@
    propia con instrucciones, la agenda, y debajo el WhatsApp como salida para
    quien se atasque. El flujo de RUT deja gente en el camino, sobre todo adultos
    mayores y pacientes extranjeros. */
+import { FOTO_PAGINA } from '../../lib/imagenes';
 import Pagina from '../../layouts/Pagina.astro';
 import FormularioHora from '../../components/forms/FormularioHora.astro';
 import EmbedAgenda from '../../components/agenda/EmbedAgenda.astro';
@@ -41,7 +42,10 @@ const conIframe = a.agendamiento.modo === 'iframe' && Boolean(a.agendamiento.src
       : 'Déjanos tus datos y te contactamos dentro del próximo día hábil para confirmar día y hora.'
   }
   migas={ruta}
+  foto={FOTO_PAGINA.agendar}
+  imagenOg="/og/agendar.jpg"
 >
+
   <section class="seccion">
     <div class="contenedor columnas">
       <div class="principal">

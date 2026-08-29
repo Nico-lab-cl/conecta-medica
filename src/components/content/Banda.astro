@@ -1,0 +1,78 @@
+---
+/* Banda fotográfica de página.
+
+   Un solo componente para todas las cabeceras con imagen, para que el
+   tratamiento sea idéntico en las diez páginas que la usan: mismo radio, misma
+   proporción por variante, misma carga diferida, mismo comportamiento
+   responsive. Diez implementaciones distintas de lo mismo es como un sitio
+   empieza a verse desprolijo.
+
+   `sangre` la lleva de borde a borde (portada); sin ella queda dentro del
+   contenedor con el radio de tarjeta del design system. */
+import { Picture } from 'astro:assets';
+import type { Foto } from '../../lib/imagenes';
+
+interface Props {
+  foto: Foto;
+  proporcion?: 'ancha' | 'media' | 'alta';
+  sangre?: boolean;
+  prioridad?: boolean;
+  pie?: string | undefined;
+}
+const { foto, proporcion = 'ancha', sangre = false, prioridad = false, pie } = Astro.props;
+---
+
+<figure class:list={['banda', !sangre && 'contenedor']} data-proporcion={proporcion}>
+  <Picture
+    src={foto.src}
+    alt={foto.alt}
+    widths={[600, 1000, 1600, 2200]}
+    sizes={sangre ? '100vw' : '(min-width: 1280px) 1200px, 100vw'}
+    formats={['avif', 'webp']}
+    loading={prioridad ? 'eager' : 'lazy'}
+    {...(prioridad ? { fetchpriority: 'high' as const } : {})}
+  />
+  {pie && <figcaption>{pie}</figcaption>}
+</figure>
+
+<style>
+  .banda {
+    margin: 0;
+  }
+  .banda :global(img) {
+    width: 100%;
+    display: block;
+    object-fit: cover;
+    background: var(--surface-alt);
+  }
+  .banda:not(.contenedor) :global(img) {
+    aspect-ratio: 3 / 2;
+  }
+  .contenedor :global(img) {
+    border-radius: var(--radius-lg);
+    aspect-ratio: 3 / 2;
+  }
+
+  @media (min-width: 700px) {
+    .banda[data-proporcion='ancha'] :global(img) {
+      aspect-ratio: 21 / 9;
+    }
+    .banda[data-proporcion='media'] :global(img) {
+      aspect-ratio: 16 / 7;
+    }
+    .banda[data-proporcion='alta'] :global(img) {
+      aspect-ratio: 3 / 2;
+    }
+  }
+
+  figcaption {
+    margin-top: var(--space-3);
+    font-size: var(--text-caption);
+    color: var(--color-gray);
+  }
+  .banda:not(.contenedor) figcaption {
+    max-width: var(--container-max);
+    margin-inline: auto;
+    padding-inline: var(--margin-x);
+  }
+</style>
