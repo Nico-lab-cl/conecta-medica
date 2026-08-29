@@ -1,7 +1,7 @@
 # Pendientes y preguntas — conectamedica.com
 
 Documento vivo. Cada ítem resuelto se marca `[x]` con la fecha y la fuente.
-Última actualización: 2026-08-29
+Última actualización: 2026-08-29 · sitio construido, despliegue pendiente
 
 ---
 
@@ -11,11 +11,11 @@ Documento vivo. Cada ítem resuelto se marca `[x]` con la fecha y la fuente.
 |---|---|---|---|
 | ~~A-1~~ | ~~Ejecutar `/design-login`~~ | **RESUELTO 2026-08-29** vía el export HTML de la guía de estilo. Tokens, 22 componentes, 24 íconos y el logo están en `design-system/`. Solo faltan los `.d.ts` y `.prompt.md`, que no son bloqueantes | — |
 | A-1b | `Conecta Web.dc.html` (el otro proyecto de Claude Design, `bf370b90…`) | Es la maqueta del sitio. Sin ella construyo las páginas desde el wireframe del brief, no desde tu diseño | Las páginas salen según mi interpretación, no según tu maqueta |
-| A-2 | Decisión sobre fotografía realista (ver §D) | El brief prohíbe personas fotorrealistas; el encargo pide fotos ultrarrealistas | Se paraliza la Fase 3 (imágenes) |
+| ~~A-2~~ | ~~Decisión sobre fotografía realista~~ | **EJECUTADO 2026-08-29** bajo la regla §D, que Nico no objetó tras plantearla dos veces. 5 imágenes generadas, todas sin personas ni instrumental. Prompts en `docs/imagenes.md`. Si la regla no era la correcta, se regeneran | — |
 | A-3 | Repositorio GitHub destino (crear nuevo u organización existente) + permiso de push | Keystatic en modo GitHub y el deploy de Cloudflare dependen del repo | Se puede construir local, pero no desplegar ni dejar el CMS operativo |
 | A-4 | Acceso a la cuenta de Cloudflare del dominio | Pages, Worker, Turnstile, Web Analytics, DNS y CSP | Fase 1 no cierra ("desplegado y editable") |
-| A-5 | Número de WhatsApp de la clínica | Todos los CTA de WhatsApp del sitio | Quedan deshabilitados, no con un número falso |
-| A-6 | Cuenta de Higgsfield con créditos (el CLI está instalado, no pude verificar saldo) | Generación de imágenes de Fase 3 | Fase 3 se posterga |
+| A-5 | Número de WhatsApp de la clínica | Todos los CTA de WhatsApp del sitio | **Estado actual:** los botones no se renderizan. El sitio funciona, pero pierde el canal que más usa la gente en Chile |
+| ~~A-6~~ | ~~Cuenta de Higgsfield~~ | **RESUELTO.** Autenticada. 5 imágenes generadas con Soul Location | — |
 
 ---
 
