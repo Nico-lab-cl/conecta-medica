@@ -232,3 +232,88 @@ no puede mostrar el nombre de una clínica que no existe.
 - **Fotos del local.** No existen todavía porque la clínica no ha abierto. Cuando el
   espacio esté habilitado, estas imágenes de ambiente se reemplazan por fotografía real.
 - **Portadas de recursos.** Se generarán cuando haya recursos escritos y revisados.
+
+---
+
+# Videos de fondo
+
+Generados con Higgsfield, modelo **Seedance 2.0 Mini** (`seedance_2_0_mini`), el
+2026-08-29. Seedance 2.0 completo requiere plan Pro o Ultimate, que esta cuenta
+no tiene; el Mini entrega 720p, que para un fondo bajo un velo es de sobra.
+
+## Cómo se generan: a partir de las fotografías que ya están en el sitio
+
+Cada video parte de una imagen del set —`--start-image`— y **termina en la misma
+imagen** —`--end-image`—. Eso hace dos cosas a la vez:
+
+1. **Coherencia.** El video no es una escena nueva: es la misma fotografía que ya
+   está en esa sección, moviéndose. No hay salto de estilo entre lo fijo y lo que
+   se mueve.
+2. **Bucle sin salto.** Al volver el clip exactamente a su punto de partida, el
+   `loop` no da el corte que delata a un video de fondo mal hecho.
+
+| Archivo | Nace de | Dónde va |
+|---|---|---|
+| `v-hero` | `c-hero` | Hero de la portada |
+| `v-problema` | `c-consulta` | Sección "El problema" |
+| `v-compromisos` | `c-microscopio` | Sección "Nuestros compromisos" |
+
+## Prompts
+
+Todos piden lo mismo en el fondo: **casi nada de movimiento**. Un fondo que se
+mueve mucho compite con el texto y marea; lo que se busca es que respire.
+
+### v-hero — desde `c-hero`
+
+> Almost still. The doctor's hand holding the pen shifts a few millimetres over
+> the printed report. Warm afternoon light drifts very slowly across the desk.
+> Locked-off camera, no zoom, no pan, no cuts. Extremely subtle, calm,
+> documentary.
+
+### v-problema — desde `c-consulta`
+
+> An empty consulting room at the end of the day. Nothing happens except light:
+> the warm rectangle of afternoon sun on the floor creeps a few centimetres, dust
+> drifts through the beam, the leaves of the plant move almost imperceptibly.
+> Locked-off camera, no zoom, no pan, no people entering. Still and quiet.
+
+### v-compromisos — desde `c-microscopio`
+
+> Hands at a microscope on a white bench. One hand turns the focus knob a quarter
+> turn, slowly and precisely, then rests. Daylight from the left stays constant.
+> Locked-off camera, no zoom, no pan, no face ever entering frame. Careful and
+> unhurried.
+
+## Postproducción: `scripts/video.mjs`
+
+Un video de fondo tiene un trabajo distinto al de un video que se mira: está
+detrás de un velo, en bucle, en mute y sin controles. Eso permite comprimirlo
+mucho más de lo que se podría con un video que el usuario mira de frente.
+
+De cada archivo crudo salen tres:
+
+- **MP4** (H.264, CRF 30, `faststart`) para compatibilidad universal.
+- **WebM** (VP9, CRF 38), que a la misma calidad pesa menos y que prefieren
+  Chrome, Firefox y Edge.
+- **Póster JPG** del primer fotograma.
+
+Se les quita la pista de audio: un fondo va siempre en mute.
+
+Resultado: **entre 108 y 211 KB por video**, 1,3 MB los tres con sus pósters.
+
+## Reglas de reproducción
+
+Están en `Hero.astro` y `SeccionMedia.astro`, y valen para los tres videos:
+
+- **Solo se reproducen en pantalla.** Un `IntersectionObserver` los pausa al
+  salir del viewport. Un video corriendo donde nadie lo ve gasta batería y CPU.
+- **No se descargan** si el usuario pidió movimiento reducido o si el navegador
+  declara ahorro de datos. Queda el póster, que es el primer fotograma del mismo
+  video: nadie nota que falta algo.
+- **El video solo tapa la fotografía mientras corre de verdad.** Si algo lo
+  pausa —una pestaña en segundo plano, una política de reproducción automática,
+  una red que se corta— reaparece la imagen que está debajo. Nunca queda un
+  rectángulo liso. Este comportamiento apareció probando en el navegador: la
+  primera versión dejaba un bloque azul cuando el video se pausaba.
+- **Nunca llevan audio** ni controles, y son `aria-hidden`: son fondo, no
+  contenido.

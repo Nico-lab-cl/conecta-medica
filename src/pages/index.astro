@@ -17,6 +17,7 @@ import { Picture } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import Hero from '../components/brand/Hero.astro';
 import Hilo from '../components/brand/Hilo.astro';
+import SeccionMedia from '../components/content/SeccionMedia.astro';
 import BotonAgendar from '../components/actions/BotonAgendar.astro';
 import Boton from '../components/actions/Boton.astro';
 import Chip from '../components/content/Chip.astro';
@@ -81,6 +82,7 @@ const faqItems = destacadas.map((f) => ({
   <Hero
     imagen={FOTO_PAGINA.inicio.src}
     alt={FOTO_PAGINA.inicio.alt}
+    video="v-hero"
     eyebrow="Unidad de hematología · Ñuñoa, Santiago"
     titulo="Atención hematológica coordinada."
     bajada={`${a.tagline}. Presencial en Ñuñoa y por telemedicina en todo Chile.`}
@@ -102,7 +104,7 @@ const faqItems = destacadas.map((f) => ({
   </section>
 
   <!-- ===================== EL PROBLEMA, en oscuro ===================== -->
-  <section class="seccion seccion-oscura problema">
+  <SeccionMedia video="v-problema" clase="seccion seccion-oscura problema">
     <div class="contenedor">
       <p class="eyebrow">El problema</p>
       <p class="declaracion revelar-tenue">
@@ -125,7 +127,7 @@ const faqItems = destacadas.map((f) => ({
         </div>
       </div>
     </div>
-  </section>
+  </SeccionMedia>
 
   <!-- ================= CÓMO FUNCIONA · gráfico fijo ================= -->
   <section class="seccion como" id="como-funciona">
@@ -133,9 +135,19 @@ const faqItems = destacadas.map((f) => ({
       <div class="como-fijo">
         <p class="eyebrow">Cómo funciona la atención</p>
         <h2>Un recorrido que no se corta entre un especialista y otro</h2>
-        <div class="como-hilo" aria-hidden="true">
-          <Hilo orientacion="vertical" nodos={4} />
-        </div>
+        <figure class="como-foto">
+          <Picture
+            src={FOTO_PRESTACION.hematologia.src}
+            alt={FOTO_PRESTACION.hematologia.alt}
+            widths={[500, 800]}
+            sizes="(min-width: 1000px) 420px, 100vw"
+            formats={['avif', 'webp']}
+            loading="lazy"
+          />
+          <span class="como-hilo" aria-hidden="true">
+            <Hilo orientacion="vertical" nodos={4} />
+          </span>
+        </figure>
         <div class="como-acciones"><BotonAgendar /></div>
       </div>
 
@@ -233,7 +245,7 @@ const faqItems = destacadas.map((f) => ({
   </section>
 
   <!-- ===================== COMPROMISOS, en oscuro ===================== -->
-  <section class="seccion seccion-oscura">
+  <SeccionMedia video="v-compromisos" clase="seccion seccion-oscura">
     <div class="contenedor">
       <p class="eyebrow">Nuestros compromisos</p>
       <h2 class="titulo-seccion">Cuatro cosas que puedes exigirnos</h2>
@@ -248,12 +260,12 @@ const faqItems = destacadas.map((f) => ({
         }
       </ul>
     </div>
-  </section>
+  </SeccionMedia>
 
   <!-- ===================== PREGUNTAS ===================== -->
   {
     faqItems.length > 0 && (
-      <section class="seccion">
+      <SeccionMedia imagen={FOTO_PAGINA.preguntas.src} velo="suave" clase="seccion">
         <div class="contenedor faq-rejilla">
           <div>
             <p class="eyebrow">Preguntas frecuentes</p>
@@ -267,12 +279,12 @@ const faqItems = destacadas.map((f) => ({
           </div>
           <Acordeon items={faqItems} />
         </div>
-      </section>
+      </SeccionMedia>
     )
   }
 
   <!-- ===================== UBICACIÓN Y CIERRE ===================== -->
-  <section class="seccion seccion-alt">
+  <SeccionMedia imagen={FOTO_PAGINA.contacto.src} velo="suave" clase="seccion">
     <div class="contenedor cierre-rejilla">
       <div>
         <p class="eyebrow">Dónde y cuándo</p>
@@ -302,7 +314,7 @@ const faqItems = destacadas.map((f) => ({
         </div>
       </div>
     </div>
-  </section>
+  </SeccionMedia>
 </Base>
 
 <style>
@@ -388,14 +400,30 @@ const faqItems = destacadas.map((f) => ({
     margin-top: var(--space-3);
     max-width: 18ch;
   }
+  /* La columna fija deja de ser solo tipografía: lleva la fotografía del
+     hemograma, con el hilo Conecta montado en el borde. */
+  .como-foto {
+    position: relative;
+    margin: var(--space-8) 0 0;
+  }
+  .como-foto :global(img) {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: var(--radius-lg);
+    display: block;
+  }
   .como-hilo {
     display: none;
   }
   @media (min-width: 1000px) {
     .como-hilo {
       display: block;
-      height: 140px;
-      margin-top: var(--space-8);
+      position: absolute;
+      left: calc(var(--space-6) * -1);
+      top: var(--space-6);
+      bottom: var(--space-6);
+      width: 14px;
     }
   }
   .como-acciones {

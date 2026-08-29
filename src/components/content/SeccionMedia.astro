@@ -1,0 +1,187 @@
+---
+/* Sección con fondo de video o fotografía.
+
+   Existe porque la crítica del cliente fue exacta: después del hero, una
+   sección blanca con solo tipografía se ve básica. Esto le da a las secciones
+   de más peso narrativo el mismo tratamiento del hero, sin repetir el código
+   cinco veces con cinco velos ligeramente distintos.
+
+   Sobre el video de fondo, tres cosas que no son opcionales:
+
+   1. Solo se reproduce cuando está en pantalla. Un video reproduciéndose fuera
+      del viewport gasta batería y CPU sin que nadie lo vea. IntersectionObserver
+      lo pausa al salir.
+   2. No se reproduce si el usuario pidió movimiento reducido, ni si el
+      navegador declara ahorro de datos. En esos casos queda el póster, que es
+      el primer fotograma del mismo video: nadie nota que falta algo.
+   3. `preload="none"` y `poster`. El video se pide recién cuando corresponde;
+      hasta entonces pesa cero.
+
+   El velo no es decorativo: sin él, el texto blanco sobre un fondo con zonas
+   claras deja de cumplir contraste. */
+import { Picture } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  /** Nombre base en /public/video (sin extensión). Se usan .webm, .mp4 y .jpg. */
+  video?: string | undefined;
+  /** Alternativa: una imagen del pipeline de Astro. */
+  imagen?: ImageMetadata | undefined;
+  alt?: string;
+  /** `fuerte` para texto blanco encima; `suave` para secciones claras. */
+  velo?: 'fuerte' | 'suave';
+  id?: string | undefined;
+  clase?: string | undefined;
+}
+const { video, imagen, alt = '', velo = 'fuerte', id, clase } = Astro.props;
+---
+
+<section class:list={['media', clase]} data-velo={velo} id={id}>
+  <div class="fondo" aria-hidden={alt ? undefined : 'true'}>
+    {
+      imagen && (
+        <Picture
+          src={imagen}
+          alt={alt}
+          widths={[800, 1280, 1920]}
+          sizes="100vw"
+          formats={['avif', 'webp']}
+          loading="lazy"
+        />
+      )
+    }
+    {
+      video && (
+        <video
+          class="video"
+          poster={`/video/${video}.jpg`}
+          preload="none"
+          muted
+          loop
+          playsinline
+          aria-hidden="true"
+        >
+          <source src={`/video/${video}.webm`} type="video/webm" />
+          <source src={`/video/${video}.mp4`} type="video/mp4" />
+        </video>
+      )
+    }
+    <span class="velo" aria-hidden="true"></span>
+  </div>
+
+  <div class="contenido"><slot /></div>
+</section>
+
+<script>
+  /* Un solo observador para todos los videos de fondo de la página. */
+  const videos = document.querySelectorAll<HTMLVideoElement>('.media .video');
+  if (videos.length > 0) {
+    const conexion = (navigator as { connection?: { saveData?: boolean } }).connection;
+    const quietud = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (quietud || conexion?.saveData) {
+      /* Se queda el póster —que es el primer fotograma del mismo video— y el
+         velo. No se descarga un solo byte del video. */
+      videos.forEach((v) => {
+        v.removeAttribute('preload');
+        v.classList.add('quieto');
+      });
+    } else if ('IntersectionObserver' in window) {
+      /* Mismo principio que en el hero: el video solo tapa el póster mientras
+         corre de verdad. Si se pausa por lo que sea, reaparece el póster, que es
+         el primer fotograma del mismo video. */
+      for (const v of videos) {
+        v.addEventListener('playing', () => v.classList.add('visible'));
+        for (const evento of ['pause', 'ended', 'error', 'stalled', 'emptied']) {
+          v.addEventListener(evento, () => v.classList.remove('visible'));
+        }
+      }
+
+      const obs = new IntersectionObserver(
+        (entradas) => {
+          for (const e of entradas) {
+            const v = e.target as HTMLVideoElement;
+            if (e.isIntersecting) {
+              if (v.preload === 'none') {
+                /* Igual que en el hero: cargar primero, reproducir al tener
+                   datos. Un play() sobre un video sin cargar se rechaza. */
+                v.muted = true;
+                v.preload = 'auto';
+                v.addEventListener(
+                  'canplay',
+                  () => v.play().then(() => v.classList.add('visible'), () => v.classList.add('quieto')),
+                  { once: true },
+                );
+                v.load();
+              } else {
+                v.play().catch(() => v.classList.add('quieto'));
+              }
+            } else {
+              v.pause();
+            }
+          }
+        },
+        { rootMargin: '15% 0px', threshold: 0.01 },
+      );
+      videos.forEach((v) => obs.observe(v));
+    }
+  }
+</script>
+
+<style>
+  .media {
+    position: relative;
+    overflow: hidden;
+    background: var(--color-blue-deep);
+  }
+
+  .fondo {
+    position: absolute;
+    inset: 0;
+  }
+  .fondo :global(img),
+  .video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  /* El video aparece encima del póster con una transición corta, para que el
+     cambio de imagen fija a movimiento no se note como un salto. */
+  /* El póster del video se muestra siempre; el video encima aparece solo
+     cuando está corriendo. Así nunca hay un hueco liso. */
+  .video {
+    opacity: 1;
+  }
+  .video:not(:global(.visible)):not(:global(.quieto)) {
+    opacity: 1;
+  }
+
+  .velo {
+    position: absolute;
+    inset: 0;
+  }
+  .media[data-velo='fuerte'] .velo {
+    background:
+      linear-gradient(
+        to right,
+        rgba(6, 24, 54, 0.94) 0%,
+        rgba(6, 24, 54, 0.86) 42%,
+        rgba(6, 24, 54, 0.62) 100%
+      ),
+      linear-gradient(to bottom, rgba(6, 24, 54, 0.55) 0%, rgba(6, 24, 54, 0.35) 100%);
+  }
+  .media[data-velo='suave'] .velo {
+    background: linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0.97) 0%,
+      rgba(255, 255, 255, 0.9) 46%,
+      rgba(255, 255, 255, 0.55) 100%
+    );
+  }
+
+  .contenido {
+    position: relative;
+  }
+</style>

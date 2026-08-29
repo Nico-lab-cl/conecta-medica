@@ -29,6 +29,7 @@ import type { ImageMetadata } from 'astro';
 interface Props {
   imagen: ImageMetadata;
   alt: string;
+  /** Nombre base en /public/video, sin extensión. Se usan .webm, .mp4 y .jpg. */
   video?: string | undefined;
   eyebrow?: string | undefined;
   titulo: string;
@@ -53,14 +54,17 @@ const { imagen, alt, video, eyebrow, titulo, bajada, alto = 'completo' } = Astro
       video && (
         <video
           class="video"
-          src={video}
+          poster={`/video/${video}.jpg`}
           autoplay
           muted
           loop
           playsinline
-          preload="none"
+          preload="metadata"
           aria-hidden="true"
-        />
+        >
+          <source src={`/video/${video}.webm`} type="video/webm" />
+          <source src={`/video/${video}.mp4`} type="video/mp4" />
+        </video>
       )
     }
     <span class="velo" aria-hidden="true"></span>
@@ -77,19 +81,35 @@ const { imagen, alt, video, eyebrow, titulo, bajada, alto = 'completo' } = Astro
 </section>
 
 <script>
-  /* El video solo se reproduce si el usuario no pidió movimiento reducido y la
-     conexión no está marcada como ahorro de datos. En cualquier otro caso se
-     queda la fotografía, que ya está cargada. */
+  /* El hero está en pantalla desde el primer píxel, así que el video usa
+     `autoplay` nativo: es bastante más confiable que orquestar play() a mano,
+     que Chrome rechaza o revierte según en qué estado de carga lo pillas.
+
+     Este script solo hace dos cosas: sacar el video cuando el usuario pidió
+     movimiento reducido o tiene ahorro de datos, y marcarlo visible cuando
+     efectivamente empieza a correr. Debajo siempre está la fotografía, que es
+     la misma escena, así que nunca se ve un rectángulo negro. */
   const video = document.querySelector<HTMLVideoElement>('.hero .video');
   if (video) {
     const conexion = (navigator as { connection?: { saveData?: boolean } }).connection;
     const quietud = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     if (quietud || conexion?.saveData) {
+      video.removeAttribute('autoplay');
       video.remove();
     } else {
-      video.preload = 'auto';
-      video.addEventListener('canplay', () => video.classList.add('visible'), { once: true });
-      video.play().catch(() => video.remove());
+      /* El video solo tapa la fotografía MIENTRAS está corriendo.
+
+         Sin esto, cualquier cosa que lo pause —una pestaña en segundo plano, una
+         política de reproducción automática, una red que se corta, el ahorro de
+         energía de un móvil— deja al usuario mirando un rectángulo liso en vez
+         de la escena. La fotografía queda debajo y reaparece sola. */
+      const mostrar = () => video.classList.add('visible');
+      const ocultar = () => video.classList.remove('visible');
+      video.addEventListener('playing', mostrar);
+      for (const evento of ['pause', 'ended', 'error', 'stalled', 'emptied']) {
+        video.addEventListener(evento, ocultar);
+      }
     }
   }
 </script>
