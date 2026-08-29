@@ -1,0 +1,67 @@
+---
+import '../styles/global.css';
+import Meta from '../components/seo/Meta.astro';
+import Encabezado from '../components/navigation/Encabezado.astro';
+import PieDeSitio from '../components/navigation/PieDeSitio.astro';
+import { ajustes, pais } from '../lib/contenido';
+import { clinicaJsonLd, migasJsonLd } from '../lib/schema';
+import type { Miga } from '../lib/rutas';
+
+interface Props {
+  titulo: string;
+  descripcion: string;
+  ruta: string;
+  actual?: string;
+  noindex?: boolean;
+  migas?: Miga[];
+  jsonLd?: unknown[];
+  imagenOg?: string | undefined;
+}
+
+const {
+  titulo,
+  descripcion,
+  ruta,
+  actual,
+  noindex = false,
+  migas = [],
+  jsonLd = [],
+  imagenOg,
+} = Astro.props;
+
+const a = await ajustes();
+const cl = (await pais('cl')).data;
+const sitio = Astro.site?.toString() ?? 'https://conectamedica.com/';
+
+// La ficha de la clínica va en todas las páginas: es la entidad del sitio.
+const bloques: unknown[] = [clinicaJsonLd(a, cl, sitio), ...jsonLd];
+if (migas.length > 1) bloques.push(migasJsonLd(migas, sitio));
+---
+
+<!doctype html>
+<html lang="es-CL">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#12489E" />
+    <Meta
+      titulo={titulo}
+      descripcion={descripcion}
+      ruta={ruta}
+      noindex={noindex}
+      jsonLd={bloques}
+      imagenOg={imagenOg}
+    />
+  </head>
+  <body>
+    <a class="salto-contenido" href="#contenido">Saltar al contenido</a>
+    <Encabezado actual={actual} />
+    <main id="contenido">
+      <slot />
+    </main>
+    <PieDeSitio />
+  </body>
+</html>

@@ -1,0 +1,63 @@
+---
+/* Tarjeta de prestación. Portada de ServiceCard.jsx.
+   "axis" es hematología, el eje. "orbit" son las tres que giran alrededor.
+   La jerarquía se resuelve con superficie y tamaño, no con color de borde:
+   esa decisión viene del design system y se respeta tal cual. */
+import Icono from '../core/Icono.astro';
+import Chip from './Chip.astro';
+interface Props {
+  nivel?: 'axis' | 'orbit';
+  titulo: string;
+  resumen: string;
+  href: string;
+  icono?: string | undefined;
+  chips?: ('telemedicina' | 'presencial' | 'sabado')[];
+}
+const { nivel = 'orbit', titulo, resumen, href, icono, chips = [] } = Astro.props;
+const eje = nivel === 'axis';
+---
+<a class="prestacion" data-nivel={nivel} href={href}>
+  {icono && <Icono nombre={icono} tam={eje ? 32 : 24} color="var(--color-blue)" />}
+  {eje && <span class="eyebrow">Unidad principal</span>}
+  <h3>{titulo}</h3>
+  <p>{resumen}</p>
+  {chips.length > 0 && <div class="chips">{chips.map((c) => <Chip tipo={c} />)}</div>}
+  <span class="cta">Ver {eje ? 'la unidad' : 'prestación'}<Icono nombre="arrow-right" tam={16} /></span>
+</a>
+<style>
+  .prestacion {
+    display: flex; flex-direction: column; height: 100%; text-decoration: none;
+    color: var(--color-ink); border-radius: var(--radius-lg);
+    border: var(--border-width) solid var(--color-line); background: var(--surface-card);
+    box-shadow: var(--shadow-1); padding: 24px; gap: 12px;
+    transition: border-color var(--dur-fast) var(--ease-out), background-color var(--dur-fast) var(--ease-out);
+  }
+  .prestacion[data-nivel='axis'] {
+    padding: 32px; gap: 16px; background: var(--surface-alt);
+    border-color: transparent; box-shadow: none;
+  }
+  .prestacion:hover { border-color: var(--color-blue); }
+  .prestacion:focus-visible { outline: var(--focus-ring); outline-offset: var(--focus-offset); }
+  .prestacion h3 {
+    margin: 0; font-family: var(--font-serif); font-weight: var(--weight-semibold);
+    font-size: var(--text-h4); line-height: 1.4; color: var(--color-blue);
+  }
+  .prestacion[data-nivel='axis'] h3 {
+    font-size: var(--text-h2); line-height: 1.2; letter-spacing: -0.01em;
+  }
+  .prestacion p {
+    margin: 0; font-size: var(--text-body-sm); line-height: 1.6;
+    color: var(--color-gray); max-width: 44ch;
+  }
+  .prestacion[data-nivel='axis'] p {
+    font-size: var(--text-body-lg); color: var(--color-ink);
+  }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+  .cta {
+    margin-top: auto; display: inline-flex; align-items: center; gap: 6px;
+    color: var(--color-blue); font-weight: var(--weight-semibold);
+    font-size: var(--text-body-sm); text-decoration: underline;
+    text-underline-offset: 3px; text-decoration-thickness: 1px;
+  }
+  .prestacion:hover .cta { text-decoration-thickness: 2px; }
+</style>

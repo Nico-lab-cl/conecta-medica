@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# El CMS y su API no se indexan.
+Disallow: /admin
+Disallow: /keystatic
+Disallow: /api/
+
+Sitemap: https://conectamedica.com/sitemap-index.xml

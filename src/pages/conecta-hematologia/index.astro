@@ -1,0 +1,88 @@
+---
+import Pagina from '../../layouts/Pagina.astro';
+import TarjetaPrestacion from '../../components/content/TarjetaPrestacion.astro';
+import Hilo from '../../components/brand/Hilo.astro';
+import BotonAgendar from '../../components/actions/BotonAgendar.astro';
+import BotonWhatsApp from '../../components/actions/BotonWhatsApp.astro';
+import NotaInfo from '../../components/notices/NotaInfo.astro';
+import { RUTAS, migas } from '../../lib/rutas';
+import { unidadesActivas, serviciosActivos } from '../../lib/contenido';
+import { render } from 'astro:content';
+
+const unidades = await unidadesActivas();
+const unidad = unidades.find((u) => u.data.slug === 'conecta-hematologia');
+if (!unidad) throw new Error('La unidad Conecta Hematología no está activa');
+const { Content } = await render(unidad);
+const servicios = await serviciosActivos();
+const ruta = migas({ label: 'Conecta Hematología' });
+---
+<Pagina
+  titulo={unidad.data.seo?.title ?? unidad.data.nombre}
+  descripcion={unidad.data.seo?.description ?? unidad.data.resumen}
+  ruta={RUTAS.unidad}
+  actual={RUTAS.unidad}
+  eyebrow="Unidad"
+  h1={unidad.data.hero.titulo}
+  bajada={unidad.data.hero.bajada}
+  migas={ruta}
+>
+  <section class="seccion">
+    <div class="contenedor prosa contenido-mdx"><Content /></div>
+  </section>
+
+  <section class="seccion seccion-alt">
+    <div class="contenedor">
+      <p class="eyebrow">Las cuatro prestaciones</p>
+      <h2>Una sola unidad, cuatro miradas que se hablan</h2>
+      <div class="hilo-prestaciones" aria-hidden="true"><Hilo nodos={4} /></div>
+      <div class="rejilla">
+        {servicios.map((s) => (
+          <TarjetaPrestacion
+            nivel={s.data.nivel}
+            titulo={s.data.nombre}
+            resumen={s.data.resumen}
+            href={RUTAS.prestacion(s.data.slug)}
+            icono={s.data.icono}
+            chips={s.data.modalidades}
+          />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="seccion">
+    <div class="contenedor">
+      {unidad.data.condiciones.length > 0 ? (
+        <>
+          <p class="eyebrow">Qué condiciones aborda</p>
+          <ul class="condiciones">{unidad.data.condiciones.map((c) => <li>{c}</li>)}</ul>
+        </>
+      ) : (
+        <NotaInfo titulo="Listado de condiciones en preparación">
+          Estamos terminando de definir el detalle de condiciones que atiende la unidad. Si tienes
+          un examen alterado y no sabes si corresponde, escríbenos y te orientamos sin costo.
+        </NotaInfo>
+      )}
+
+      <div class="cierre">
+        <BotonAgendar tam="lg" />
+        <BotonWhatsApp origen="unidad" />
+      </div>
+    </div>
+  </section>
+</Pagina>
+<style>
+  .hilo-prestaciones { margin-block: var(--space-10) var(--space-8); }
+  .rejilla { display: grid; gap: var(--space-5); }
+  @media (min-width: 700px) { .rejilla { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1100px) {
+    .rejilla { grid-template-columns: 1.5fr 1fr 1fr; }
+    .rejilla > :first-child { grid-row: span 2; }
+  }
+  .condiciones {
+    display: grid; gap: var(--space-3); list-style: none; padding: 0;
+    margin: var(--space-6) 0 0; font-size: var(--text-body);
+  }
+  @media (min-width: 700px) { .condiciones { grid-template-columns: repeat(2, 1fr); } }
+  .cierre { display: flex; flex-wrap: wrap; gap: var(--space-4); margin-top: var(--space-12); }
+</style>

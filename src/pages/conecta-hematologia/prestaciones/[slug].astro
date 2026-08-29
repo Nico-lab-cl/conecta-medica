@@ -1,0 +1,231 @@
+---
+import Pagina from '../../../layouts/Pagina.astro';
+import Icono from '../../../components/core/Icono.astro';
+import Chip from '../../../components/content/Chip.astro';
+import Acordeon from '../../../components/content/Acordeon.astro';
+import TarjetaProfesional from '../../../components/content/TarjetaProfesional.astro';
+import BotonAgendar from '../../../components/actions/BotonAgendar.astro';
+import BotonWhatsApp from '../../../components/actions/BotonWhatsApp.astro';
+import DescargoClinico from '../../../components/notices/DescargoClinico.astro';
+import { RUTAS, migas } from '../../../lib/rutas';
+import {
+  serviciosActivos,
+  faqsDeServicio,
+  profesionalesDeServicio,
+  type Servicio,
+} from '../../../lib/contenido';
+import { render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const servicios = await serviciosActivos();
+  return servicios.map((servicio) => ({
+    params: { slug: servicio.data.slug },
+    props: { servicio },
+  }));
+}
+
+interface Props {
+  servicio: Servicio;
+}
+const { servicio } = Astro.props;
+
+const { Content } = await render(servicio);
+const faqs = await faqsDeServicio(servicio.id);
+const profesionales = await profesionalesDeServicio(servicio);
+const ruta = migas(
+  { label: 'Conecta Hematología', href: RUTAS.unidad },
+  { label: 'Prestaciones', href: RUTAS.prestaciones },
+  { label: servicio.data.nombre },
+);
+---
+
+<Pagina
+  titulo={servicio.data.seo?.title ?? servicio.data.nombre}
+  descripcion={servicio.data.seo?.description ?? servicio.data.resumen}
+  ruta={RUTAS.prestacion(servicio.data.slug)}
+  actual={RUTAS.prestaciones}
+  eyebrow={servicio.data.nivel === 'axis' ? 'Prestación · eje de la unidad' : 'Prestación'}
+  h1={servicio.data.titulo}
+  bajada={servicio.data.resumen}
+  migas={ruta}
+>
+  <div class="contenedor chips">
+    {servicio.data.modalidades.map((m) => <Chip tipo={m} />)}
+  </div>
+
+  {/*
+    El aporte hematológico va ARRIBA, antes de "qué incluye".
+    Es lo que separa esta ficha de una de directorio médico.
+    Ver docs/00-plan.md §5, punto 2.
+  */}
+  <section class="seccion">
+    <div class="contenedor">
+      <div class="aporte">
+        <p class="eyebrow">Cómo aporta a tu caso hematológico</p>
+        <p class="aporte-texto">{servicio.data.aporteHematologia}</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="seccion seccion-alt">
+    <div class="contenedor dos">
+      {
+        servicio.data.queIncluye.length > 0 && (
+          <div>
+            <h2>Qué incluye</h2>
+            <ul class="lista">
+              {servicio.data.queIncluye.map((i) => (
+                <li>
+                  <Icono nombre="check" tam={18} color="var(--color-blue)" />
+                  {i}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )
+      }
+      {
+        servicio.data.queEsperar.length > 0 && (
+          <div>
+            <h2>Qué esperar</h2>
+            <ul class="lista">
+              {servicio.data.queEsperar.map((i) => (
+                <li>
+                  <Icono nombre="arrow-right" tam={18} color="var(--color-blue)" />
+                  {i}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )
+      }
+    </div>
+  </section>
+
+  {
+    profesionales.length > 0 && (
+      <section class="seccion">
+        <div class="contenedor">
+          <p class="eyebrow">Quién atiende</p>
+          <div class="profesionales">
+            {profesionales.map((p) => (
+              <TarjetaProfesional
+                nombre={p.data.nombreCompleto}
+                rol={p.data.especialidad}
+                subtitulo={p.data.subespecialidad}
+                foto={p.data.foto}
+                href={RUTAS.perfil(p.data.slug)}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  {
+    faqs.length > 0 && (
+      <section class="seccion seccion-alt">
+        <div class="contenedor">
+          <p class="eyebrow">Preguntas sobre esta prestación</p>
+          <div class="faq">
+            <Acordeon
+              items={faqs.map((f) => ({
+                q: f.data.pregunta,
+                a: f.data.respuestaCorta.trim(),
+                href: RUTAS.preguntas + '#' + f.data.slug,
+              }))}
+            />
+          </div>
+          <DescargoClinico />
+        </div>
+      </section>
+    )
+  }
+
+  <div class="contenido-extra contenedor prosa contenido-mdx"><Content /></div>
+
+  <section class="seccion">
+    <div class="contenedor cierre">
+      <h2>¿Te sirve esta prestación?</h2>
+      <p>Puedes pedir hora sin derivación previa.</p>
+      <div class="acciones">
+        <BotonAgendar tam="lg" />
+        <BotonWhatsApp origen="prestacion" tema={servicio.data.nombre.toLowerCase()} />
+      </div>
+    </div>
+  </section>
+</Pagina>
+
+<style>
+  .chips {
+    display: flex;
+    gap: var(--space-2);
+    margin-top: var(--space-6);
+  }
+  .aporte {
+    border-left: var(--border-width-emph) solid var(--color-blue);
+    padding-left: var(--space-6);
+    max-width: var(--measure-prose);
+  }
+  .aporte-texto {
+    margin-top: var(--space-4);
+    font-family: var(--font-serif);
+    font-size: var(--text-h3);
+    line-height: 1.5;
+    color: var(--color-blue-deep);
+  }
+  .dos {
+    display: grid;
+    gap: var(--space-10);
+  }
+  @media (min-width: 900px) {
+    .dos {
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-16);
+    }
+  }
+  .lista {
+    list-style: none;
+    margin: var(--space-5) 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+  .lista li {
+    display: flex;
+    gap: var(--space-3);
+    align-items: flex-start;
+    font-size: var(--text-body);
+    line-height: 1.6;
+  }
+  .profesionales {
+    display: grid;
+    gap: var(--space-5);
+    margin-top: var(--space-6);
+  }
+  @media (min-width: 800px) {
+    .profesionales {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  .faq {
+    margin-top: var(--space-6);
+    max-width: 860px;
+  }
+  .contenido-extra:empty {
+    display: none;
+  }
+  .cierre p {
+    margin-top: var(--space-4);
+    font-size: var(--text-body-lg);
+    color: var(--color-gray);
+  }
+  .acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    margin-top: var(--space-6);
+  }
+</style>

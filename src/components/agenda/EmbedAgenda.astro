@@ -1,0 +1,148 @@
+---
+/* Agenda en línea de terceros embebida.
+
+   Decisiones que están acá y no en la página, porque son técnicas y no
+   editoriales:
+
+   1. El iframe NO se monta hasta que el usuario llega a la sección
+      (IntersectionObserver). Un iframe de terceros cargado de entrada arrastra
+      el rendimiento de toda la página.
+   2. Altura generosa: mínimo 900px en escritorio, 100vh en móvil, con scroll
+      habilitado. Un iframe de otro dominio no se puede medir ni estilar por
+      dentro; si el proveedor soporta postMessage para altura dinámica, se
+      conecta acá (queda el oyente listo y filtrado por origen).
+   3. `title` descriptivo, obligatorio para lectores de pantalla.
+   4. Se declara el proveedor y se enlaza su política de privacidad: el paciente
+      entrega su RUT en infraestructura de un tercero, y la Ley 21.719 obliga a
+      declararlo. */
+import NotaInfo from '../notices/NotaInfo.astro';
+import EnlaceTexto from '../actions/EnlaceTexto.astro';
+
+interface Props {
+  src: string;
+  altura: number;
+  proveedor: string | null;
+  politicaProveedor: string | null;
+}
+const { src, altura, proveedor, politicaProveedor } = Astro.props;
+const origen = new URL(src).origin;
+---
+
+<div class="agenda">
+  <NotaInfo titulo="Antes de empezar" icono="info">
+    Vas a necesitar tu <b>RUT</b> y un <b>correo electrónico</b>. Si no tienes RUT chileno o el
+    sistema no te deja avanzar, escríbenos por WhatsApp y coordinamos tu hora a mano.
+  </NotaInfo>
+
+  <div
+    class="marco"
+    id="marco-agenda"
+    data-src={src}
+    data-origen={origen}
+    style={`--altura:${Math.max(900, altura)}px`}
+  >
+    <p class="cargando">Cargando la agenda…</p>
+  </div>
+
+  {
+    proveedor && (
+      <p class="proveedor">
+        La agenda la opera <b>{proveedor}</b>. Los datos que ingreses ahí, incluido tu RUT, se
+        procesan en su plataforma.
+        {politicaProveedor && (
+          <>
+            {' '}
+            <EnlaceTexto href={politicaProveedor} externo>
+              Ver su política de privacidad
+            </EnlaceTexto>
+          </>
+        )}
+      </p>
+    )
+  }
+</div>
+
+<script>
+  const marco = document.getElementById('marco-agenda');
+  if (marco) {
+    const src = marco.dataset['src'];
+    const origen = marco.dataset['origen'];
+
+    const montar = () => {
+      if (!src || marco.querySelector('iframe')) return;
+      const iframe = document.createElement('iframe');
+      iframe.src = src;
+      iframe.title = 'Agenda de horas de Clínica Conecta';
+      iframe.loading = 'lazy';
+      iframe.referrerPolicy = 'no-referrer-when-downgrade';
+      iframe.setAttribute('scrolling', 'yes');
+      iframe.allow = 'payment';
+      marco.replaceChildren(iframe);
+    };
+
+    if ('IntersectionObserver' in window) {
+      const obs = new IntersectionObserver(
+        (entradas) => {
+          if (entradas.some((e) => e.isIntersecting)) {
+            montar();
+            obs.disconnect();
+          }
+        },
+        { rootMargin: '200px' },
+      );
+      obs.observe(marco);
+    } else {
+      montar();
+    }
+
+    // Altura dinámica, si el proveedor la envía. Se acepta solo desde su origen.
+    window.addEventListener('message', (ev) => {
+      if (ev.origin !== origen) return;
+      const alto = Number((ev.data as { height?: unknown } | null)?.height);
+      if (Number.isFinite(alto) && alto > 400) {
+        marco.style.setProperty('--altura', `${alto}px`);
+      }
+    });
+  }
+</script>
+
+<style>
+  .agenda {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+  .marco {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    border: var(--border-width) solid var(--color-line);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: var(--surface-alt);
+  }
+  @media (min-width: 768px) {
+    .marco {
+      min-height: var(--altura);
+    }
+  }
+  .marco :global(iframe) {
+    width: 100%;
+    height: 100%;
+    min-height: inherit;
+    border: 0;
+    display: block;
+  }
+  .cargando {
+    padding: var(--space-10);
+    text-align: center;
+    color: var(--color-gray);
+    font-size: var(--text-body-sm);
+  }
+  .proveedor {
+    font-size: var(--text-body-sm);
+    line-height: 1.6;
+    color: var(--color-gray);
+    max-width: var(--measure-prose);
+  }
+</style>

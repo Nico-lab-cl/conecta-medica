@@ -1,0 +1,38 @@
+---
+/* Cabeza del documento: canónica, Open Graph, hreflang y JSON-LD.
+   Los límites de largo se validan en el esquema de contenido, no acá. */
+interface Props {
+  titulo: string;
+  descripcion: string;
+  ruta: string;
+  imagenOg?: string | undefined;
+  noindex?: boolean;
+  jsonLd?: unknown[];
+}
+const { titulo, descripcion, ruta, imagenOg = '/og/og-default.jpg', noindex = false, jsonLd = [] } = Astro.props;
+const canonica = new URL(ruta, Astro.site).toString();
+const og = new URL(imagenOg, Astro.site).toString();
+---
+<title>{titulo}</title>
+<meta name="description" content={descripcion} />
+<link rel="canonical" href={canonica} />
+{noindex && <meta name="robots" content="noindex, nofollow" />}
+
+<link rel="alternate" hreflang="es-cl" href={canonica} />
+<link rel="alternate" hreflang="x-default" href={canonica} />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Clínica Conecta" />
+<meta property="og:locale" content="es_CL" />
+<meta property="og:title" content={titulo} />
+<meta property="og:description" content={descripcion} />
+<meta property="og:url" content={canonica} />
+<meta property="og:image" content={og} />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={titulo} />
+<meta name="twitter:description" content={descripcion} />
+<meta name="twitter:image" content={og} />
+
+{jsonLd.map((bloque) => (
+  <script type="application/ld+json" is:inline set:html={JSON.stringify(bloque)} />
+))}

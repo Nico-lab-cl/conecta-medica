@@ -1,0 +1,34 @@
+---
+/* Migas de pan. Portado de Breadcrumbs.jsx. */
+import Icono from '../core/Icono.astro';
+import type { Miga } from '../../lib/rutas';
+interface Props { items: Miga[] }
+const { items } = Astro.props;
+---
+<nav aria-label="Ruta" class="migas">
+  <ol>
+    {items.map((it, i) => (
+      <li>
+        {i === items.length - 1
+          ? <span aria-current="page">{it.label}</span>
+          : <a href={it.href}>{it.label}</a>}
+        {i < items.length - 1 && <Icono nombre="chevron-right" tam={14} color="var(--color-line-strong)" />}
+      </li>
+    ))}
+  </ol>
+</nav>
+<style>
+  .migas { font-size: var(--text-body-sm); }
+  .migas ol {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+    list-style: none; margin: 0; padding: 0;
+  }
+  .migas li { display: flex; align-items: center; gap: 8px; }
+  .migas span[aria-current] { color: var(--color-gray); }
+  .migas a {
+    color: var(--color-blue); text-decoration: underline;
+    text-underline-offset: 3px; text-decoration-thickness: 1px;
+  }
+  .migas a:hover { color: var(--color-blue-deep); }
+  .migas a:focus-visible { outline: var(--focus-ring); outline-offset: var(--focus-offset); border-radius: 2px; }
+</style>

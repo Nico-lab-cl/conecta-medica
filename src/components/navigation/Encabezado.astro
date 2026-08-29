@@ -1,0 +1,299 @@
+---
+/* Cabecera. Portado de design-system/components/navigation/SiteHeader.jsx.
+
+   Dos cambios respecto del original:
+   1. Las rutas del design system (/hematologia, /pacientes) se reemplazan por las
+      del brief, que son las que se posicionan (/conecta-hematologia/,
+      /informacion-para-pacientes/). Ver docs/00-plan.md §5.
+   2. El menú móvil NO es una isla de React. Montar React para alternar un
+      atributo cuesta ~40 KB comprimidos; este script son 12 líneas y no
+      necesita hidratación. El presupuesto de 60 KB es un criterio de
+      aceptación, no una aspiración.
+
+   El estado `compressed` del design system (80px → 64px al hacer scroll) se
+   resuelve con IntersectionObserver sobre un centinela, sin escuchar scroll. */
+import Logo from '../brand/Logo.astro';
+import BotonAgendar from '../actions/BotonAgendar.astro';
+import Icono from '../core/Icono.astro';
+import { RUTAS } from '../../lib/rutas';
+import {
+  ajustes,
+  precioCLP,
+  menuUsaDesplegable,
+  hayDirectorioDeEquipo,
+  recursosPublicables,
+} from '../../lib/contenido';
+
+interface Props {
+  actual?: string;
+}
+const { actual = '' } = Astro.props;
+
+const a = await ajustes();
+const desplegable = await menuUsaDesplegable();
+const conEquipo = await hayDirectorioDeEquipo();
+const conRecursos = (await recursosPublicables()).length > 0;
+
+/* El menú de escritorio se queda en cinco ítems, que es lo que cabe en una
+   línea a 1200px. Con siete se parte en dos y la cabecera crece de 80 a 104px.
+
+   Los que faltan no desaparecen: "Prestaciones" está dentro de la unidad, que
+   lista las cuatro; "Conócenos", "Preguntas" e "Información para pacientes"
+   están en el pie y enlazadas desde el contenido.
+
+   Dos ítems son condicionales y aparecen solos cuando exista el contenido:
+   equipo con dos o más profesionales, y recursos cuando haya material revisado. */
+const items = [
+  { label: desplegable ? 'Unidades' : 'Conecta Hematología', href: RUTAS.unidad },
+  { label: 'Telemedicina', href: RUTAS.telemedicina },
+  ...(conRecursos ? [{ label: 'Para pacientes', href: RUTAS.pacientes }] : []),
+  ...(conEquipo ? [{ label: 'Equipo', href: RUTAS.equipo }] : []),
+  { label: 'Preguntas', href: RUTAS.preguntas },
+  { label: 'Precios', href: RUTAS.precios },
+  { label: 'Contacto', href: RUTAS.contacto },
+];
+
+/* El menú móvil sí los lleva todos: ahí no hay problema de ancho. */
+const itemsMovil = [
+  ...items,
+  ...(conRecursos ? [] : [{ label: 'Información para pacientes', href: RUTAS.pacientes }]),
+  { label: 'Conócenos', href: RUTAS.conocenos },
+];
+---
+
+<span id="centinela-cabecera" aria-hidden="true"></span>
+
+<header class="cabecera" id="cabecera">
+  <div class="barra contenedor">
+    <a class="marca" href={RUTAS.inicio} aria-label="Clínica Conecta, inicio">
+      <Logo variante="lockup" alto={44} />
+    </a>
+
+    <nav class="nav-escritorio" aria-label="Principal">
+      {
+        items.map((it) => (
+          <a
+            class="nav-item"
+            href={it.href}
+            aria-current={actual === it.href ? 'page' : undefined}
+          >
+            {it.label}
+          </a>
+        ))
+      }
+    </nav>
+
+    <div class="acciones">
+      <div class="solo-escritorio"><BotonAgendar tam="md" /></div>
+      <div class="solo-movil"><BotonAgendar tam="sm" conIcono={false} /></div>
+      <button
+        class="hamburguesa"
+        id="btn-menu"
+        aria-label="Abrir menú"
+        aria-expanded="false"
+        aria-controls="menu-movil"
+      >
+        <Icono nombre="menu" tam={24} clase="icono-abrir" />
+        <Icono nombre="x" tam={24} clase="icono-cerrar" />
+      </button>
+    </div>
+  </div>
+
+  <div class="menu-movil" id="menu-movil" hidden>
+    <nav class="contenedor" aria-label="Principal">
+      {
+        itemsMovil.map((it) => (
+          <a
+            class="movil-item"
+            href={it.href}
+            aria-current={actual === it.href ? 'page' : undefined}
+          >
+            {it.label}
+          </a>
+        ))
+      }
+      <div class="movil-cta"><BotonAgendar tam="md" anchoCompleto /></div>
+      <p class="movil-nota">
+        Atención solo particular · consulta {precioCLP(a.precioConsulta)}
+      </p>
+    </nav>
+  </div>
+</header>
+
+<script>
+  const btn = document.getElementById('btn-menu');
+  const menu = document.getElementById('menu-movil');
+  btn?.addEventListener('click', () => {
+    const abierto = btn.getAttribute('aria-expanded') === 'true';
+    btn.setAttribute('aria-expanded', String(!abierto));
+    btn.setAttribute('aria-label', abierto ? 'Abrir menú' : 'Cerrar menú');
+    if (menu) menu.hidden = abierto;
+  });
+
+  // Compresión de la cabecera sin escuchar scroll.
+  const centinela = document.getElementById('centinela-cabecera');
+  const cabecera = document.getElementById('cabecera');
+  if (centinela && cabecera && 'IntersectionObserver' in window) {
+    new IntersectionObserver(
+      ([e]) => cabecera.toggleAttribute('data-comprimida', !e?.isIntersecting),
+      { rootMargin: '0px' },
+    ).observe(centinela);
+  }
+</script>
+
+<style>
+  #centinela-cabecera {
+    position: absolute;
+    top: 0;
+    height: 1px;
+    width: 1px;
+  }
+
+  .cabecera {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    background: var(--color-white);
+    border-bottom: var(--border-width) solid var(--color-line);
+    transition: box-shadow var(--dur-mid) var(--ease-standard);
+  }
+  .cabecera[data-comprimida] {
+    border-bottom-color: transparent;
+    box-shadow: var(--shadow-1);
+  }
+
+  .barra {
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    transition: height var(--dur-mid) var(--ease-standard);
+  }
+  .cabecera[data-comprimida] .barra {
+    height: 64px;
+  }
+
+  .marca {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .nav-escritorio {
+    display: none;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+  }
+  .nav-item {
+    position: relative;
+    font-family: var(--font-sans);
+    font-size: var(--text-body-sm);
+    font-weight: var(--weight-medium);
+    color: var(--color-ink);
+    text-decoration: none;
+    padding: 6px 0;
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+  .nav-item:hover {
+    color: var(--color-blue);
+  }
+  .nav-item:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: 4px;
+    border-radius: 2px;
+  }
+  .nav-item[aria-current='page'] {
+    color: var(--color-blue);
+  }
+  .nav-item[aria-current='page']::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -6px;
+    height: var(--border-width-emph);
+    background: var(--color-blue);
+  }
+
+  .acciones {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .solo-escritorio {
+    display: none;
+  }
+  .solo-movil {
+    display: block;
+  }
+
+  .hamburguesa {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--touch-min);
+    height: var(--touch-min);
+    background: none;
+    border: 0;
+    cursor: pointer;
+    color: var(--color-ink);
+  }
+  .hamburguesa:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: var(--focus-offset);
+    border-radius: var(--radius-sm);
+  }
+  .hamburguesa :global(.icono-cerrar) {
+    display: none;
+  }
+  .hamburguesa[aria-expanded='true'] :global(.icono-abrir) {
+    display: none;
+  }
+  .hamburguesa[aria-expanded='true'] :global(.icono-cerrar) {
+    display: inline-block;
+  }
+
+  .menu-movil {
+    border-top: var(--border-width) solid var(--color-line);
+    box-shadow: var(--shadow-2);
+    padding-block: 8px 24px;
+    background: var(--color-white);
+  }
+  .movil-item {
+    display: block;
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    font-weight: var(--weight-medium);
+    color: var(--color-ink);
+    text-decoration: none;
+    padding: 14px 0;
+    border-bottom: var(--border-width) solid var(--color-line);
+  }
+  .movil-item[aria-current='page'] {
+    color: var(--color-blue);
+  }
+  .movil-cta {
+    margin-top: 20px;
+  }
+  .movil-nota {
+    margin-top: 12px;
+    font-size: var(--text-body-sm);
+    color: var(--color-gray);
+  }
+
+  @media (min-width: 1100px) {
+    .nav-escritorio {
+      display: flex;
+    }
+    .solo-escritorio {
+      display: block;
+    }
+    .solo-movil,
+    .hamburguesa,
+    .menu-movil {
+      display: none;
+    }
+  }
+</style>

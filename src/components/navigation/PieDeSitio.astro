@@ -1,0 +1,200 @@
+---
+/* Pie de sitio. Portado de design-system/components/navigation/SiteFooter.jsx.
+
+   CORRECCIÓN IMPORTANTE respecto del original: el pie del design system trae
+   datos de relleno que son incorrectos y que no se pueden publicar:
+     · "+56 9 1234 5678"                → número inventado
+     · "contacto@conectamedica.com"     → el correo real es asistente@
+     · "Av. Américo Vespucio 1106"      → 1106 es la OFICINA, no el número de
+                                          la calle. Publicarlo así manda a los
+                                          pacientes a una dirección equivocada.
+     · "Lunes a viernes 09:00–18:00"    → contradice el horario real
+                                          (martes, miércoles, viernes y sábado)
+   Todo eso sale ahora del contenido, no del componente. Lo que no existe
+   todavía (teléfono, WhatsApp) simplemente no se renderiza. */
+import Logo from '../brand/Logo.astro';
+import Icono from '../core/Icono.astro';
+import Hilo from '../brand/Hilo.astro';
+import { RUTAS } from '../../lib/rutas';
+import { ajustes, pais, horarioLegible, precioCLP } from '../../lib/contenido';
+
+const a = await ajustes();
+const cl = (await pais('cl')).data;
+const d = cl.direccion;
+const anio = new Date().getFullYear();
+---
+
+<footer class="pie">
+  <div class="hilo-cierre" aria-hidden="true">
+    <Hilo nodos={3} animar={false} />
+  </div>
+
+  <div class="contenedor rejilla">
+    <div>
+      <Logo variante="lockup" alto={34} placa />
+      <address class="datos">
+        <span class="fuerte">{a.razonSocial}</span>
+        <span>{d.edificio}</span>
+        <span>{d.calle}, {d.oficina}</span>
+        <span>{d.comuna}, {d.ciudad}</span>
+        {d.referencia && <span class="tenue">{d.referencia}</span>}
+        {cl.telefono && <span class="mono">{cl.telefono}</span>}
+        <span class="mono">{a.correoAgenda}</span>
+      </address>
+    </div>
+
+    <nav aria-label="Secciones">
+      <p class="eyebrow claro">El sitio</p>
+      <ul>
+        <li><a class="enlace-pie" href={RUTAS.unidad}>Conecta Hematología</a></li>
+        <li><a class="enlace-pie" href={RUTAS.prestaciones}>Prestaciones</a></li>
+        <li><a class="enlace-pie" href={RUTAS.telemedicina}>Telemedicina</a></li>
+        <li><a class="enlace-pie" href={RUTAS.precios}>Precios</a></li>
+        <li><a class="enlace-pie" href={RUTAS.preguntas}>Preguntas frecuentes</a></li>
+        <li><a class="enlace-pie" href={RUTAS.conocenos}>Conócenos</a></li>
+        <li><a class="enlace-pie" href={RUTAS.contacto}>Contacto</a></li>
+      </ul>
+    </nav>
+
+    <div>
+      <p class="eyebrow claro">Horarios de atención</p>
+      <ul class="horarios">
+        {cl.horarios.map((h) => <li>{horarioLegible(h)}</li>)}
+        <li class="tenue">Domingo y festivos · cerrado</li>
+      </ul>
+      <p class="nota">Atención solo particular · {precioCLP(a.precioConsulta)}</p>
+    </div>
+  </div>
+
+  <div class="contenedor aviso">
+    <Icono nombre="triangle-alert" tam={20} color="#F0B4A4" style="margin-top:2px" />
+    <p>
+      <b>{a.avisoUrgencias.titulo}.</b>
+      {a.avisoUrgencias.cuerpo}
+    </p>
+  </div>
+
+  <div class="contenedor legal">
+    <span>© {anio} {a.razonSocial}</span>
+    <nav aria-label="Legal">
+      <a class="enlace-pie" href={RUTAS.privacidad}>Política de privacidad</a>
+      <a class="enlace-pie" href={RUTAS.terminos}>Términos de uso</a>
+      <a class="enlace-pie" href={RUTAS.avisoMedico}>Aviso médico</a>
+    </nav>
+  </div>
+</footer>
+
+<style>
+  .pie {
+    background: var(--surface-footer);
+    color: #fff;
+  }
+  .hilo-cierre {
+    padding-block: 0 var(--space-10);
+    padding-inline: var(--margin-x);
+    opacity: 0.5;
+  }
+  .rejilla {
+    display: grid;
+    gap: var(--space-10);
+    padding-block: 0 var(--space-8);
+  }
+  @media (min-width: 768px) {
+    .rejilla {
+      grid-template-columns: 1.4fr 1fr 1fr;
+      gap: var(--space-12);
+    }
+  }
+
+  .datos {
+    display: flex;
+    flex-direction: column;
+    margin-top: var(--space-5);
+    font-style: normal;
+    font-size: var(--text-body-sm);
+    line-height: 1.7;
+    color: #d6e3f7;
+  }
+  .fuerte {
+    color: #fff;
+    font-weight: var(--weight-semibold);
+  }
+  .tenue {
+    color: #a8bfe0;
+  }
+  .mono {
+    font-family: var(--font-mono);
+    margin-top: var(--space-2);
+  }
+
+  .eyebrow.claro {
+    color: #a8bfe0;
+    margin-bottom: var(--space-3);
+  }
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .horarios {
+    font-size: var(--text-body-sm);
+    line-height: 1.9;
+    color: #d6e3f7;
+  }
+  .nota {
+    margin-top: var(--space-4);
+    font-size: var(--text-body-sm);
+    color: #a8bfe0;
+  }
+
+  .enlace-pie {
+    color: #d6e3f7;
+    text-decoration: none;
+    font-size: var(--text-body-sm);
+    line-height: 1.9;
+  }
+  .enlace-pie:hover {
+    color: #fff;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .enlace-pie:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  .aviso {
+    display: flex;
+    gap: 12px;
+    padding-block: var(--space-6);
+    border-top: 1px solid rgba(255, 255, 255, 0.18);
+  }
+  .aviso p {
+    font-size: var(--text-body-sm);
+    line-height: 1.6;
+    color: #d6e3f7;
+    max-width: 78ch;
+  }
+  .aviso b {
+    color: #f0b4a4;
+  }
+
+  .legal {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4) var(--space-6);
+    justify-content: space-between;
+    align-items: center;
+    padding-block: var(--space-5) var(--space-10);
+    border-top: 1px solid rgba(255, 255, 255, 0.18);
+    font-size: var(--text-caption);
+    color: #a8bfe0;
+  }
+  .legal nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-5);
+  }
+</style>

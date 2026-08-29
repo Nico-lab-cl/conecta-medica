@@ -1,0 +1,36 @@
+---
+/* Punto único por donde pasa TODO CTA de agenda del sitio.
+
+   Ninguna página escribe el destino de "Agendar hora" a mano. Cuando la clínica
+   contrate Medinet, se cambia `agendamiento.modo` a "iframe" en el CMS y se pega
+   el enlace: el destino sigue siendo /agendar/, y esa página cambia sola.
+   Pasar de etapa 1 a etapa 2 no toca ni un archivo de código. */
+import Boton from './Boton.astro';
+import { RUTAS } from '../../lib/rutas';
+
+interface Props {
+  variante?: 'primary' | 'secondary' | 'text';
+  tam?: 'sm' | 'md' | 'lg';
+  anchoCompleto?: boolean;
+  conIcono?: boolean;
+  etiqueta?: string;
+}
+const {
+  variante = 'primary',
+  tam = 'md',
+  anchoCompleto = false,
+  conIcono = true,
+  etiqueta = 'Solicitar hora',
+} = Astro.props;
+---
+
+<Boton
+  href={RUTAS.agendar}
+  variante={variante}
+  tam={tam}
+  anchoCompleto={anchoCompleto}
+  icono={conIcono ? 'calendar' : undefined}
+  posicionIcono="left"
+>
+  {etiqueta}
+</Boton>

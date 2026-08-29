@@ -1,0 +1,9 @@
+/* Fuentes Conecta — en producción autoalojar desde Fontsource:
+   @fontsource-variable/source-serif-4, @fontsource-variable/inter, @fontsource/ibm-plex-mono
+
+   NOTA DE IMPORTACIÓN (2026-08-29): el archivo original del design system incluye aquí
+   un @import a Google Fonts, presente solo para que las fichas del panel de diseño
+   rendericen. No se pudo transportar por el filtro de salida del canal de importación,
+   y de todos modos NO debe usarse en producción: el brief exige fuentes autoalojadas.
+   El sitio carga las fuentes vía @fontsource-variable. */
+:root{--font-serif:"Source Serif 4",Georgia,"Times New Roman",serif;--font-sans:"Inter","Helvetica Neue",Arial,sans-serif;--font-mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace}

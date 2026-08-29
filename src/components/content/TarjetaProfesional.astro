@@ -1,0 +1,56 @@
+---
+/* Tarjeta de profesional. Portado de ProfessionalCard.jsx.
+   Sin foto se usa un monograma sobre azul nube: nunca una foto de archivo ni
+   un avatar generado. */
+import Icono from '../core/Icono.astro';
+interface Props {
+  nombre: string; rol: string; subtitulo?: string | null; foto?: string | null; href: string;
+}
+const { nombre, rol, subtitulo, foto, href } = Astro.props;
+const monograma = nombre.replace(/^Dr\.?a?\.?\s+/i, '').split(' ').slice(0, 2)
+  .map((p) => p.charAt(0)).join('').toUpperCase();
+---
+<article class="prof">
+  {foto
+    ? <img class="foto" src={foto} alt={`Retrato de ${nombre}`} width="88" height="88" loading="lazy" />
+    : <span class="foto mono" aria-hidden="true">{monograma}</span>}
+  <div class="datos">
+    <span class="nombre">{nombre}</span>
+    <span class="rol">{rol}</span>
+    {subtitulo && <span class="sub">{subtitulo}</span>}
+    <a class="perfil" href={href}>Ver perfil<Icono nombre="arrow-right" tam={16} /></a>
+  </div>
+</article>
+<style>
+  .prof {
+    display: flex; gap: 20px; padding: 24px; background: var(--surface-card);
+    border: var(--border-width) solid var(--color-line); border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-1);
+  }
+  .foto {
+    width: 88px; height: 88px; border-radius: var(--radius-pill); flex-shrink: 0;
+    object-fit: cover;
+  }
+  .mono {
+    display: flex; align-items: center; justify-content: center;
+    background: var(--surface-alt); color: var(--color-blue);
+    font-family: var(--font-serif); font-size: 30px; font-weight: var(--weight-semibold);
+  }
+  .datos { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .nombre {
+    font-family: var(--font-sans); font-weight: var(--weight-semibold);
+    font-size: var(--text-h4); color: var(--color-ink);
+  }
+  .rol {
+    font-family: var(--font-mono); font-size: 14px; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--color-blue);
+  }
+  .sub { font-size: var(--text-body-sm); line-height: 1.55; color: var(--color-gray); }
+  .perfil {
+    margin-top: 4px; display: inline-flex; align-items: center; gap: 6px; width: fit-content;
+    color: var(--color-blue); font-weight: var(--weight-medium); font-size: var(--text-body-sm);
+    text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px;
+  }
+  .perfil:hover { color: var(--color-blue-deep); }
+  .perfil:focus-visible { outline: var(--focus-ring); outline-offset: var(--focus-offset); border-radius: 2px; }
+</style>

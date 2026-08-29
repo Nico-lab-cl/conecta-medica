@@ -1,0 +1,243 @@
+@import "tailwindcss";
+
+/* Tokens del design system Conecta. Fuente: design-system/tokens/*.css
+   No editar los valores acá: se editan en el design system y se re-importan. */
+@import "./tokens/colors.css";
+@import "./tokens/typography.css";
+@import "./tokens/spacing.css";
+@import "./tokens/shape.css";
+@import "./tokens/motion.css";
+
+/* Fuentes autoalojadas (Fontsource). El design system carga Google Fonts solo
+   para renderizar sus fichas; en producción no se usa ningún CDN de fuentes. */
+@import "@fontsource-variable/source-serif-4";
+@import "@fontsource-variable/inter";
+@import "@fontsource/ibm-plex-mono/400.css";
+@import "@fontsource/ibm-plex-mono/500.css";
+
+:root {
+  --font-serif: "Source Serif 4 Variable", Georgia, "Times New Roman", serif;
+  --font-sans: "Inter Variable", "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+
+/* Puente hacia Tailwind v4: los utilitarios salen de los mismos tokens.
+   Si un valor cambia en el design system, cambia en todo el sitio. */
+/* Los tokens ya viven en :root con nombres que chocan con el espacio de nombres
+   de Tailwind (--color-*). Se exponen como utilitarios bajo el prefijo `conecta-`
+   para que `bg-conecta-blue` y `var(--color-blue)` sean siempre el mismo valor
+   y no exista una segunda fuente de verdad. */
+@theme inline {
+  --color-conecta-blue: var(--color-blue);
+  --color-conecta-deep: var(--color-blue-deep);
+  --color-conecta-cloud: var(--color-blue-cloud);
+  --color-conecta-ink: var(--color-ink);
+  --color-conecta-gray: var(--color-gray);
+  --color-conecta-line: var(--color-line);
+  --color-conecta-line-strong: var(--color-line-strong);
+  --color-conecta-alert: var(--color-alert);
+
+  --font-display: var(--font-serif);
+  --font-body: var(--font-sans);
+  --font-code: var(--font-mono);
+
+  --radius-conecta-sm: var(--radius-sm);
+  --radius-conecta-md: var(--radius-md);
+  --radius-conecta-lg: var(--radius-lg);
+
+  --shadow-conecta-1: var(--shadow-1);
+  --shadow-conecta-2: var(--shadow-2);
+
+  --breakpoint-mobile: 390px;
+  --breakpoint-tablet: 768px;
+  --breakpoint-notebook: 1366px;
+  --breakpoint-desktop: 1600px;
+  --breakpoint-wide: 1920px;
+}
+
+/* ---------- Base ---------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--surface-page);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  line-height: var(--text-body-lh);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-serif);
+  font-weight: var(--weight-semibold);
+  color: var(--text-heading);
+  margin: 0;
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: var(--text-h1);
+  line-height: var(--text-h1-lh);
+  letter-spacing: var(--text-h1-ls);
+}
+h2 {
+  font-size: var(--text-h2);
+  line-height: var(--text-h2-lh);
+  letter-spacing: var(--text-h2-ls);
+}
+h3 {
+  font-size: var(--text-h3);
+  line-height: var(--text-h3-lh);
+  letter-spacing: var(--text-h3-ls);
+}
+h4 {
+  font-size: var(--text-h4);
+  line-height: var(--text-h4-lh);
+}
+
+p {
+  margin: 0;
+  text-wrap: pretty;
+}
+
+img,
+svg,
+video {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Foco visible siempre. Requisito de accesibilidad, no negociable. */
+:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-offset);
+}
+
+/* Salto al contenido, para navegación por teclado y lector de pantalla. */
+.salto-contenido {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+  padding: 12px 20px;
+  background: var(--color-white);
+  color: var(--color-blue);
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-2);
+}
+.salto-contenido:focus {
+  left: 16px;
+  top: 16px;
+}
+
+/* ---------- Estructura ---------- */
+
+.contenedor {
+  width: 100%;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--margin-x);
+}
+@media (min-width: 768px) {
+  .contenedor {
+    padding-inline: var(--margin-x-md);
+  }
+}
+@media (min-width: 1366px) {
+  .contenedor {
+    padding-inline: var(--margin-x-lg);
+  }
+}
+
+.prosa {
+  max-width: var(--measure-prose);
+}
+
+.seccion {
+  padding-block: var(--section-y);
+}
+@media (min-width: 768px) {
+  .seccion {
+    padding-block: var(--section-y-md);
+  }
+}
+@media (min-width: 1366px) {
+  .seccion {
+    padding-block: var(--section-y-lg);
+  }
+}
+
+.seccion-alt {
+  background: var(--surface-alt);
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--text-eyebrow);
+  line-height: var(--text-eyebrow-lh);
+  letter-spacing: var(--text-eyebrow-ls);
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+/* Cuerpo de texto largo generado desde MDX. */
+.contenido-mdx > * + * {
+  margin-top: var(--space-5);
+}
+.contenido-mdx h2 {
+  margin-top: var(--space-12);
+}
+.contenido-mdx h3 {
+  margin-top: var(--space-8);
+}
+.contenido-mdx ul,
+.contenido-mdx ol {
+  padding-left: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.contenido-mdx a {
+  color: var(--text-link);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  font-weight: var(--weight-medium);
+}
+.contenido-mdx a:hover {
+  color: var(--text-link-hover);
+  text-decoration-thickness: 2px;
+}
+.contenido-mdx strong {
+  font-weight: var(--weight-semibold);
+}

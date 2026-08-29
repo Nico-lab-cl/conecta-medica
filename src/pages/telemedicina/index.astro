@@ -1,0 +1,237 @@
+---
+import { Picture } from 'astro:assets';
+import telemedImg from '../../assets/imagenes/telemedicina.png';
+import Pagina from '../../layouts/Pagina.astro';
+import Icono from '../../components/core/Icono.astro';
+import BloquePaso from '../../components/content/BloquePaso.astro';
+import Hilo from '../../components/brand/Hilo.astro';
+import NotaInfo from '../../components/notices/NotaInfo.astro';
+import AvisoUrgencias from '../../components/notices/AvisoUrgencias.astro';
+import BotonAgendar from '../../components/actions/BotonAgendar.astro';
+import BotonWhatsApp from '../../components/actions/BotonWhatsApp.astro';
+import { RUTAS, migas } from '../../lib/rutas';
+import { precioCLP, ajustes } from '../../lib/contenido';
+
+const a = await ajustes();
+const ruta = migas({ label: 'Telemedicina' });
+
+const SI = [
+  'Interpretar un hemograma, un perfil de hierro o una ferritina alterada',
+  'Revisar y ajustar un tratamiento que ya estás siguiendo',
+  'Controles de seguimiento cuando el caso está estable',
+  'Una segunda opinión sobre un estudio que ya te hicieron',
+  'Orientarte sobre qué estudiar y en qué orden',
+];
+const NO = [
+  'Examinar un ganglio, el bazo o el abdomen',
+  'Una primera evaluación donde el examen físico sea determinante',
+  'Procedimientos de cualquier tipo',
+];
+
+const PASOS = [
+  { t: 'Pides tu hora', d: 'Por el formulario o por WhatsApp, indicando que la quieres por telemedicina.' },
+  { t: 'Te confirmamos', d: 'Coordinamos día y hora, y te explicamos cómo conectarte.' },
+  { t: 'Preparas tus exámenes', d: 'Ten a mano tus exámenes y la lista de medicamentos, en papel o en pantalla.' },
+  { t: 'La consulta', d: 'El mismo tiempo y la misma revisión que la presencial. Si tu caso necesita ser visto en persona, te lo decimos ahí mismo.' },
+];
+---
+
+<Pagina
+  titulo="Hematología por telemedicina en todo Chile"
+  descripcion="Consulta hematológica a distancia: qué se puede resolver en línea, qué necesita ser presencial, y cómo se agenda desde regiones."
+  ruta={RUTAS.telemedicina}
+  actual={RUTAS.telemedicina}
+  eyebrow="Telemedicina"
+  h1="Hematología a distancia, en todo Chile"
+  bajada="Decimos qué se resuelve por videollamada y qué no. Una consulta a distancia que debía ser presencial no le sirve a nadie."
+  migas={ruta}
+>
+  <div class="contenedor figura-intro">
+    <Picture
+      src={telemedImg}
+      alt="Notebook cerrado sobre una mesa de madera junto a una ventana, con luz de tarde."
+      widths={[700, 1100, 1600]}
+      sizes="(min-width: 900px) 1100px, 100vw"
+      formats={['avif', 'webp']}
+      loading="lazy"
+    />
+  </div>
+
+  <section class="seccion">
+    <div class="contenedor dos">
+      <div>
+        <h2>Sí se resuelve a distancia</h2>
+        <ul class="lista">
+          {
+            SI.map((i) => (
+              <li>
+                <Icono nombre="check" tam={20} color="var(--color-blue)" />
+                {i}
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+      <div>
+        <h2>Necesita ser presencial</h2>
+        <ul class="lista tenue">
+          {
+            NO.map((i) => (
+              <li>
+                <Icono nombre="minus" tam={20} color="var(--color-gray)" />
+                {i}
+              </li>
+            ))
+          }
+        </ul>
+        <div class="aviso-cambio">
+          <NotaInfo titulo="Si tu caso necesita ser presencial">
+            Te lo decimos durante la videollamada, no después. La consulta no se cobra dos veces por
+            eso.
+          </NotaInfo>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="seccion seccion-alt">
+    <div class="contenedor">
+      <p class="eyebrow">Cómo funciona</p>
+      <h2>Cuatro pasos</h2>
+      <div class="hilo" aria-hidden="true"><Hilo nodos={4} /></div>
+      <ol class="pasos">
+        {
+          PASOS.map((p, i) => (
+            <li>
+              <BloquePaso numero={i + 1} titulo={p.t}>
+                {p.d}
+              </BloquePaso>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <section class="seccion">
+    <div class="contenedor prosa">
+      <h2>Si vives en regiones</h2>
+      <p class="parrafo">
+        La hematología está concentrada en pocos centros, casi todos en Santiago. Para muchos
+        pacientes eso significa viajar horas por una consulta que se resolvía revisando bien los
+        exámenes que ya tenían.
+      </p>
+      <p class="parrafo">
+        La telemedicina existe exactamente para eso: para que la distancia no sea el motivo por el
+        que un problema de la sangre queda sin estudiar.
+      </p>
+
+      <div class="pendiente">
+        <NotaInfo titulo="Plataforma, recetas y licencias">
+          Estamos terminando de definir la plataforma de videollamada y las condiciones para receta
+          electrónica y licencias en modalidad a distancia. Preferimos no prometerlo hasta tenerlo
+          confirmado. Cuando coordinemos tu hora te lo indicamos con precisión.
+        </NotaInfo>
+      </div>
+
+      <div class="urgencias"><AvisoUrgencias /></div>
+    </div>
+  </section>
+
+  <section class="seccion seccion-alt">
+    <div class="contenedor cierre">
+      <h2>Consulta por telemedicina: {precioCLP(a.precioConsulta)}</h2>
+      <p>El mismo valor que la presencial. Sin derivación previa.</p>
+      <div class="acciones">
+        <BotonAgendar tam="lg" />
+        <BotonWhatsApp origen="telemedicina" />
+      </div>
+    </div>
+  </section>
+</Pagina>
+
+<style>
+  .figura-intro {
+    margin-top: var(--space-10);
+  }
+  .figura-intro :global(img) {
+    width: 100%;
+    aspect-ratio: 21 / 9;
+    object-fit: cover;
+    border-radius: var(--radius-lg);
+  }
+  .dos {
+    display: grid;
+    gap: var(--space-10);
+  }
+  @media (min-width: 900px) {
+    .dos {
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-16);
+    }
+  }
+  .lista {
+    list-style: none;
+    margin: var(--space-6) 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+  .lista li {
+    display: flex;
+    gap: var(--space-3);
+    align-items: flex-start;
+    font-size: var(--text-body);
+    line-height: 1.6;
+  }
+  .lista.tenue li {
+    color: var(--color-gray);
+  }
+  .aviso-cambio {
+    margin-top: var(--space-8);
+  }
+  .hilo {
+    margin-block: var(--space-10) var(--space-8);
+    display: none;
+  }
+  @media (min-width: 900px) {
+    .hilo {
+      display: block;
+    }
+  }
+  .pasos {
+    display: grid;
+    gap: var(--space-10);
+    list-style: none;
+    margin: var(--space-8) 0 0;
+    padding: 0;
+  }
+  @media (min-width: 900px) {
+    .pasos {
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-8);
+      margin-top: var(--space-6);
+    }
+  }
+  .parrafo {
+    margin-top: var(--space-5);
+    font-size: var(--text-body);
+    line-height: 1.7;
+  }
+  .pendiente,
+  .urgencias {
+    margin-top: var(--space-10);
+  }
+  .cierre p {
+    margin-top: var(--space-4);
+    font-size: var(--text-body-lg);
+    color: var(--color-gray);
+  }
+  .acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    margin-top: var(--space-6);
+  }
+</style>

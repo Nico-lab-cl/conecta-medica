@@ -1,0 +1,73 @@
+---
+/* WhatsApp. Portado de design-system/components/actions/WhatsAppButton.jsx.
+
+   CAMBIO RESPECTO DEL ORIGINAL: el design system trae un número de ejemplo
+   ("56912345678") como valor por defecto. Acá NO hay valor por defecto: si la
+   clínica todavía no tiene número configurado, el componente no renderiza nada.
+   Un número falso en un sitio de salud es peor que no tener botón. */
+import Icono from '../core/Icono.astro';
+import { enlaceWhatsApp, type OrigenWhatsApp } from '../../lib/whatsapp';
+import { ajustes } from '../../lib/contenido';
+
+interface Props {
+  origen: OrigenWhatsApp;
+  tema?: string | undefined;
+  variante?: 'flotante' | 'inline';
+  etiqueta?: string;
+}
+const { origen, tema, variante = 'inline', etiqueta = 'Escribir por WhatsApp' } = Astro.props;
+
+const { whatsapp } = await ajustes();
+const href = enlaceWhatsApp(whatsapp, origen, tema);
+const flotante = variante === 'flotante';
+---
+
+{
+  href && (
+    <a
+      class="wa"
+      data-variante={variante}
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={etiqueta}
+    >
+      <Icono nombre="whatsapp" tam={22} color="#fff" />
+      <span>{flotante ? 'WhatsApp' : etiqueta}</span>
+    </a>
+  )
+}
+
+<style>
+  .wa {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 48px;
+    padding: 0 18px;
+    border-radius: var(--radius-md);
+    background: #0f7a46;
+    color: #fff;
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    font-weight: var(--weight-semibold);
+    line-height: 1;
+    text-decoration: none;
+    transition: background-color var(--dur-fast) var(--ease-out);
+  }
+  .wa[data-variante='flotante'] {
+    padding: 0 20px;
+    border-radius: var(--radius-pill);
+    box-shadow: var(--shadow-1);
+  }
+  .wa:hover {
+    background: #0b5f36;
+  }
+  .wa:active {
+    background: #094d2c;
+  }
+  .wa:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: var(--focus-offset);
+  }
+</style>

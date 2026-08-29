@@ -1,0 +1,64 @@
+---
+import Pagina from '../../../layouts/Pagina.astro';
+import TarjetaPrestacion from '../../../components/content/TarjetaPrestacion.astro';
+import Hilo from '../../../components/brand/Hilo.astro';
+import { RUTAS, migas } from '../../../lib/rutas';
+import { serviciosActivos } from '../../../lib/contenido';
+
+const servicios = await serviciosActivos();
+const ruta = migas({ label: 'Conecta Hematología', href: RUTAS.unidad }, { label: 'Prestaciones' });
+---
+
+<Pagina
+  titulo="Prestaciones de Conecta Hematología"
+  descripcion="Hematología como eje, con gastroenterología, nutrición e imágenes que entran cuando el estudio hematológico las necesita."
+  ruta={RUTAS.prestaciones}
+  actual={RUTAS.prestaciones}
+  eyebrow="Conecta Hematología"
+  h1="Prestaciones"
+  bajada="Cada ficha explica cómo esa prestación aporta a la evaluación, el tratamiento o el seguimiento del paciente hematológico. Ninguna se ofrece como especialidad suelta."
+  migas={ruta}
+>
+  <section class="seccion">
+    <div class="contenedor">
+      <div class="hilo" aria-hidden="true"><Hilo nodos={4} /></div>
+      <div class="rejilla">
+        {
+          servicios.map((s) => (
+            <TarjetaPrestacion
+              nivel={s.data.nivel}
+              titulo={s.data.nombre}
+              resumen={s.data.resumen}
+              href={RUTAS.prestacion(s.data.slug)}
+              icono={s.data.icono}
+              chips={s.data.modalidades}
+            />
+          ))
+        }
+      </div>
+    </div>
+  </section>
+</Pagina>
+
+<style>
+  .hilo {
+    margin-bottom: var(--space-10);
+  }
+  .rejilla {
+    display: grid;
+    gap: var(--space-5);
+  }
+  @media (min-width: 700px) {
+    .rejilla {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (min-width: 1100px) {
+    .rejilla {
+      grid-template-columns: 1.5fr 1fr 1fr;
+    }
+    .rejilla > :first-child {
+      grid-row: span 2;
+    }
+  }
+</style>

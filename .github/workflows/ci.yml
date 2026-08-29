@@ -1,0 +1,32 @@
+name: Verificación
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # Tipos estrictos: el esquema de contenido también valida largos de
+      # title y meta descripción, así que un texto mal escrito desde el CMS
+      # detiene el despliegue en vez de publicarse.
+      - name: Tipos y contenido
+        run: npx astro check
+
+      - name: Build
+        run: npm run build
+
+      # Peso real del JavaScript y ausencia de datos de relleno.
+      # Ver scripts/presupuesto.mjs.
+      - name: Presupuesto de rendimiento y honestidad
+        run: npm run presupuesto

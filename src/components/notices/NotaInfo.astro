@@ -1,0 +1,22 @@
+---
+/* Nota informativa neutra. Portado de InfoNote.jsx. Sin ícono de alerta. */
+import Icono from '../core/Icono.astro';
+interface Props { titulo?: string | undefined; icono?: string }
+const { titulo, icono = 'info' } = Astro.props;
+---
+<aside class="nota">
+  <Icono nombre={icono} tam={22} color="var(--color-blue)" style="margin-top:2px" />
+  <div class="cuerpo">
+    {titulo && <p class="titulo">{titulo}</p>}
+    <div class="texto"><slot /></div>
+  </div>
+</aside>
+<style>
+  .nota {
+    display: flex; gap: 14px; padding: 20px;
+    background: var(--surface-alt); border-radius: var(--radius-md);
+  }
+  .cuerpo { display: flex; flex-direction: column; gap: 4px; max-width: 62ch; }
+  .titulo { margin: 0; font-weight: var(--weight-semibold); font-size: var(--text-body); color: var(--color-ink); }
+  .texto { font-size: var(--text-body-sm); line-height: 1.6; color: var(--color-ink); }
+</style>

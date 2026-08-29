@@ -1,0 +1,24 @@
+---
+/* Chip de estado. Portado de StatusChip.jsx. Única píldora del sistema. */
+import Icono from '../core/Icono.astro';
+interface Props { tipo?: 'telemedicina' | 'presencial' | 'sabado'; etiqueta?: string | undefined }
+const { tipo = 'presencial', etiqueta } = Astro.props;
+const TIPOS = {
+  telemedicina: { label: 'Telemedicina', icono: 'video' },
+  presencial: { label: 'Presencial', icono: 'map-pin' },
+  sabado: { label: 'Sábado', icono: 'calendar' },
+} as const;
+const t = TIPOS[tipo];
+---
+<span class="chip">
+  <Icono nombre={t.icono} tam={14} color="var(--color-blue)" />
+  {etiqueta ?? t.label}
+</span>
+<style>
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 12px;
+    border-radius: var(--radius-pill); background: var(--surface-alt); border: 1px solid #D3E1F6;
+    color: var(--color-blue-deep); font-family: var(--font-sans); font-size: var(--text-caption);
+    font-weight: var(--weight-medium); line-height: 1; white-space: nowrap;
+  }
+</style>

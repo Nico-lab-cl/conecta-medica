@@ -1,0 +1,37 @@
+---
+/* Precio de la consulta. Portado de PriceBlock.jsx.
+   El texto sobre la boleta viene del design system; confirmar con Carlos
+   (docs/preguntas-carlos.md, punto B-9) antes de publicar. */
+import Icono from '../core/Icono.astro';
+import { ajustes, precioCLP } from '../../lib/contenido';
+interface Props { nota?: string }
+const { nota = 'Consulta hematología' } = Astro.props;
+const a = await ajustes();
+---
+<div class="precio">
+  <div class="monto">
+    <span class="eyebrow">{nota}</span>
+    <span class="cifra">{precioCLP(a.precioConsulta)}</span>
+  </div>
+  <div class="detalle">
+    <p><Icono nombre="info" tam={18} color="var(--color-blue)" style="margin-top:2px" />{a.precioNota}</p>
+    <p><Icono nombre="file-text" tam={18} color="var(--color-blue)" style="margin-top:2px" />Entregamos boleta para que la presentes a tu seguro complementario o isapre. El reembolso depende de tu plan.</p>
+  </div>
+</div>
+<style>
+  .precio {
+    display: flex; flex-wrap: wrap; gap: 24px; align-items: center;
+    justify-content: space-between; padding: 28px;
+    background: var(--surface-alt); border-radius: var(--radius-lg);
+  }
+  .monto { display: flex; flex-direction: column; gap: 6px; }
+  .cifra {
+    font-family: var(--font-mono); font-size: 40px; line-height: 1;
+    color: var(--color-blue-deep);
+  }
+  .detalle {
+    display: flex; flex-direction: column; gap: 8px; max-width: 34ch;
+    font-size: var(--text-body-sm); line-height: 1.55; color: var(--color-ink);
+  }
+  .detalle p { display: flex; gap: 8px; margin: 0; }
+</style>

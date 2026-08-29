@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Conecta · Guía de estilo</title>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+window.__resources = window.__resources || {};
+(function(){
+  var SPEC = [["lucide","clock","ic_lucide_clock"],["lucide","calendar","ic_lucide_calendar"],["lucide","map-pin","ic_lucide_map_pin"],["lucide","phone","ic_lucide_phone"],["lucide","message-circle","ic_lucide_message_circle"],["lucide","video","ic_lucide_video"],["lucide","file-text","ic_lucide_file_text"],["lucide","download","ic_lucide_download"],["lucide","arrow-right","ic_lucide_arrow_right"],["lucide","chevron-down","ic_lucide_chevron_down"],["lucide","chevron-right","ic_lucide_chevron_right"],["lucide","plus","ic_lucide_plus"],["lucide","minus","ic_lucide_minus"],["lucide","check","ic_lucide_check"],["lucide","triangle-alert","ic_lucide_triangle_alert"],["lucide","info","ic_lucide_info"],["lucide","play","ic_lucide_play"],["lucide","menu","ic_lucide_menu"],["lucide","x","ic_lucide_x"],["lucide","external-link","ic_lucide_external_link"],["lucide","activity","ic_lucide_activity"],["lucide","stethoscope","ic_lucide_stethoscope"],["lucide","salad","ic_lucide_salad"],["simple","whatsapp","ic_simple_whatsapp"]];
+  function build(){
+    var R = window.__resources || {}, icons = {}, byFile = {};
+    SPEC.forEach(function(s){
+      var url = R[s[2]];
+      if (!url) return;
+      icons[s[0] + ":" + s[1]] = url;
+      byFile[s[1] + ".svg"] = url;
+    });
+    window.__CONECTA_ICONS = icons;
+    return byFile;
+  }
+  var chevronDone = false;
+  function tick(){
+    var byFile = build();
+    document.querySelectorAll('[style*="unpkg.com"]').forEach(function(el){
+      var s = el.getAttribute('style') || '';
+      var out = s.replace(/url\(\s*["']?([^"')\s]*\/([^\/"')\s]+\.svg))["']?\s*\)/g, function(m, full, file){
+        return byFile[file] ? 'url("' + byFile[file] + '")' : m;
+      });
+      if (out !== s) el.setAttribute('style', out);
+    });
+    if (!chevronDone && byFile["chevron-down.svg"]) {
+      var st = document.createElement('style');
+      st.textContent = 'select.conecta-control{background-image:url("' + byFile["chevron-down.svg"] + '")!important}';
+      document.head.appendChild(st);
+      chevronDone = true;
+    }
+  }
+  setInterval(tick, 300);
+  document.addEventListener('DOMContentLoaded', tick);
+})();
+</script>
+<style>/* Fuentes Conecta — en producción autoalojar desde Fontsource:
+   @fontsource-variable/source-serif-4, @fontsource-variable/inter, @fontsource/ibm-plex-mono
+   Aquí se cargan desde Google Fonts para que las fichas rendericen. */
+/* cyrillic-ext */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("cbd15dd5-039f-439d-a08a-947bc190c750") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("c0cbab9b-e378-4876-b588-9a4fc6fb68eb") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("b3052cf1-547e-44bb-a6eb-938fb9343c7c") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("88fa6807-e0f5-467a-8fb1-2968848a3212") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("a91dcde5-cbcc-4150-8fe7-9d4ed9832506") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("7ba20583-c5c5-43f8-a0af-b520d50c797a") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("9e71d2c8-9cb7-4b13-8e04-d142597c2942") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("0168a88e-7fd6-43ea-b0a7-a11f15fba35a") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("702f8753-c38b-4651-bda0-e5fd4c56803b") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("ad21b590-6330-44c4-9fe0-6b80b4535b18") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("dd5d6d13-a7d8-4ec8-892f-971ce6c7ec71") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("ebd03764-e654-440f-afbe-640eef080810") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek-ext */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("47ec7cc7-e3b8-480d-b667-cd1cf358bcf8") format('woff2');
+  unicode-range: U+1F00-1FFF;
+}
+/* greek */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("4e00caa4-a458-4a39-9ebf-e6992145c37b") format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("ea6f8b95-e2c6-4e36-aaf7-d11ef74104ad") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("1c67ea3b-bba8-4b21-a7ea-d3687dca02e5") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("f9a52a44-5435-40af-8a4f-6236e9864681") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("dd5d6d13-a7d8-4ec8-892f-971ce6c7ec71") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("ebd03764-e654-440f-afbe-640eef080810") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek-ext */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("47ec7cc7-e3b8-480d-b667-cd1cf358bcf8") format('woff2');
+  unicode-range: U+1F00-1FFF;
+}
+/* greek */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("4e00caa4-a458-4a39-9ebf-e6992145c37b") format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("ea6f8b95-e2c6-4e36-aaf7-d11ef74104ad") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("1c67ea3b-bba8-4b21-a7ea-d3687dca02e5") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("f9a52a44-5435-40af-8a4f-6236e9864681") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("dd5d6d13-a7d8-4ec8-892f-971ce6c7ec71") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("ebd03764-e654-440f-afbe-640eef080810") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek-ext */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("47ec7cc7-e3b8-480d-b667-cd1cf358bcf8") format('woff2');
+  unicode-range: U+1F00-1FFF;
+}
+/* greek */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("4e00caa4-a458-4a39-9ebf-e6992145c37b") format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("ea6f8b95-e2c6-4e36-aaf7-d11ef74104ad") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("1c67ea3b-bba8-4b21-a7ea-d3687dca02e5") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("f9a52a44-5435-40af-8a4f-6236e9864681") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url("6378529b-a094-4008-9f27-a32c678f763a") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url("fef40e43-20ab-4867-9501-18711c21e3f0") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek */
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url("4559db5c-e4e4-4cec-a730-48aa4d069086") format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url("d316bfa3-c3c7-4e81-866f-84c4c0fab77c") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url("edfca889-6de9-414d-9778-746216c224f8") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url("fbe1bbfb-7f90-488a-a743-e0ffb747bc8e") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("01a5653b-5f36-455a-92f6-f9354835d5b0") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("1f67f376-8a91-45f3-8479-371f76fb0c36") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek */
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("f7184d51-180a-45cb-8581-010afe5b86e8") format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("8e3df9ed-84ff-4128-bfb1-ccedf491f0c9") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("b98faca3-4b9b-4727-b3f5-d3e23fc2a3d2") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("70806763-542e-46d4-8627-08450a32a6a5") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root{--font-serif:"Source Serif 4",Georgia,"Times New Roman",serif;--font-sans:"Inter","Helvetica Neue",Arial,sans-serif;--font-mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace}
+
+/* Paleta Conecta — 8 valores base + 1 borde interactivo. No expandir.
+   Contrastes verificados sobre blanco (#FFFFFF) y azul nube (#EDF3FC). */
+:root{
+--color-blue:#12489E;        /* azul Conecta — 8.35:1 sobre blanco (AAA) */
+--color-blue-deep:#0A2B5E;   /* azul profundo — 13.81:1 sobre blanco (AAA) */
+--color-blue-cloud:#EDF3FC;  /* azul nube — fondo, nunca texto */
+--color-ink:#14181D;         /* tinta — 17.82:1 sobre blanco (AAA) */
+--color-gray:#5B646E;        /* gris — 6.01:1 sobre blanco (AA) */
+--color-line:#E2E7EE;        /* línea — divisores decorativos */
+--color-line-strong:#78828E; /* línea fuerte — bordes de controles, 3.90:1 (AA no-texto) */
+--color-white:#FFFFFF;
+--color-alert:#B4472F;       /* alerta — 5.41:1 sobre blanco (AA). Solo error y urgencias */
+
+/* Alias semánticos */
+--text-primary:var(--color-ink);
+--text-secondary:var(--color-gray);
+--text-heading:var(--color-blue);
+--text-on-blue:var(--color-white);
+--text-link:var(--color-blue);
+--text-link-hover:var(--color-blue-deep);
+--text-error:var(--color-alert);
+
+--surface-page:var(--color-white);
+--surface-alt:var(--color-blue-cloud);
+--surface-card:var(--color-white);
+--surface-footer:var(--color-blue-deep);
+--surface-accent:var(--color-blue);
+
+--border-hairline:var(--color-line);
+--border-control:var(--color-line-strong);
+--border-focus:var(--color-blue);
+--border-error:var(--color-alert);
+
+--action-primary-bg:var(--color-blue);
+--action-primary-bg-hover:var(--color-blue-deep);
+--action-primary-fg:var(--color-white);
+--action-secondary-fg:var(--color-blue);
+--action-disabled-bg:var(--color-line);
+--action-disabled-fg:var(--color-gray);
+
+--thread-stroke:var(--color-blue);
+--thread-stroke-muted:#B9CCE8; /* hilo inactivo / pasos no alcanzados */
+}
+
+/* Escala fluida. Mínimos: cuerpo 17px, nada bajo 14px en toda la interfaz.
+   Medida de línea 62–70 caracteres (--measure-prose). */
+:root{
+--text-display:clamp(2.5rem,1.6rem + 3.2vw,4.25rem); /* @kind other */   /* 40 → 68 */
+--text-display-lh:1.05;--text-display-ls:-0.02em;
+--text-h1:clamp(2rem,1.45rem + 2vw,3rem); /* @kind other */              /* 32 → 48 */
+--text-h1-lh:1.12;--text-h1-ls:-0.015em;
+--text-h2:clamp(1.625rem,1.3rem + 1.15vw,2.25rem); /* @kind other */     /* 26 → 36 */
+--text-h2-lh:1.2;--text-h2-ls:-0.01em;
+--text-h3:clamp(1.3125rem,1.16rem + 0.55vw,1.625rem); /* @kind other */  /* 21 → 26 */
+--text-h3-lh:1.3;--text-h3-ls:-0.005em;
+--text-h4:clamp(1.125rem,1.07rem + 0.2vw,1.25rem); /* @kind other */     /* 18 → 20 */
+--text-h4-lh:1.4;--text-h4-ls:0em;
+--text-body-lg:clamp(1.125rem,1.06rem + 0.25vw,1.3125rem); /* @kind other */ /* 18 → 21 */
+--text-body-lg-lh:1.6;
+--text-body:clamp(1.0625rem,1.04rem + 0.12vw,1.125rem); /* @kind other *//* 17 → 18 */
+--text-body-lh:1.6;
+--text-body-sm:0.9375rem;--text-body-sm-lh:1.55;       /* 15 */
+--text-caption:0.875rem;--text-caption-lh:1.45;        /* 14 — piso absoluto */
+--text-eyebrow:0.875rem;--text-eyebrow-lh:1.2;--text-eyebrow-ls:0.12em; /* 14 mono mayúsculas */
+
+--weight-regular:400;--weight-medium:500;--weight-semibold:600;
+--measure-prose:66ch;
+}
+
+/* Escala de 8px, con 4px para ajustes finos. */
+:root{
+--space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--space-6:24px;
+--space-8:32px;--space-10:40px;--space-12:48px;--space-16:64px;--space-20:80px;
+--space-24:96px;--space-30:120px;--space-40:160px;
+
+/* Ritmo vertical entre secciones */
+--section-y:var(--space-16);        /* 390–767 */
+--section-y-md:var(--space-20);     /* 768–1365 */
+--section-y-lg:var(--space-24);     /* 1366+ */
+--section-y-hero:var(--space-30);
+
+/* Contenedores */
+--container-max:1200px;
+--container-prose:720px;
+--gutter:16px;--gutter-md:20px;--gutter-lg:24px;
+--margin-x:20px;--margin-x-md:32px;--margin-x-lg:48px;--margin-x-xl:64px;
+--grid-columns:12; /* @kind other */
+--touch-min:44px;
+
+/* Breakpoints (referencia; en Tailwind v4 se declaran como --breakpoint-*) */
+--bp-mobile:390px;--bp-tablet:768px;--bp-notebook:1366px;--bp-desktop:1600px;--bp-wide:1920px;
+}
+
+/* Tres radios. Sombras casi inexistentes: dos niveles y nada más. */
+:root{
+--radius-sm:4px;   /* chips, campos pequeños, celdas */
+--radius-md:8px;   /* botones, inputs, acordeón */
+--radius-lg:16px;  /* tarjetas, contenedor de agenda */
+--radius-pill:999px; /* única excepción: chips de estado */
+
+--border-width:1px;
+--border-width-emph:2px;   /* anillo de foco, subrayado activo */
+--focus-ring:2px solid var(--color-blue);
+--focus-offset:2px;
+
+--shadow-1:0 1px 2px rgba(20,24,29,.06);
+--shadow-2:0 4px 12px -2px rgba(20,24,29,.10),0 1px 2px rgba(20,24,29,.06);
+}
+
+/* Micro-interacciones de 150–200ms en hover y foco. Nada más se anima. */
+:root{
+--dur-fast:150ms; /* @kind other */
+--dur-mid:200ms; /* @kind other */
+--dur-slow:400ms; /* @kind other */
+--dur-thread:1400ms; /* @kind other */ /* hilo Conecta, una sola vez al cargar */
+--ease-standard:cubic-bezier(.4,0,.2,1); /* @kind other */
+--ease-out:cubic-bezier(0,0,.2,1); /* @kind other */
+--ease-thread:cubic-bezier(.65,0,.35,1); /* @kind other */
+}
+@media (prefers-reduced-motion:reduce){:root{
+--dur-fast:1ms; /* @kind other */
+--dur-mid:1ms; /* @kind other */
+--dur-slow:1ms; /* @kind other */
+--dur-thread:1ms; /* @kind other */
+}}
+
+</style>
+<script src="dbc473ac-6140-4800-94cf-f5bf393c7c6e" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="5cfea6a8-50ca-44fc-8609-74c494faba2d" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="867878a6-9c1f-4d43-8534-df39a7618763" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="290c9f34-ce6f-4e10-8f51-2bade3a6270b"></script>
+<style>*{box-sizing:border-box}body{margin:0;background:#F7F9FC;color:var(--color-ink);font-family:var(--font-sans);font-size:var(--text-body);line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:960px;margin:0 auto;padding:64px 32px 120px}
+header{border-bottom:1px solid var(--color-line);padding-bottom:32px}
+.eyebrow{font-family:var(--font-mono);font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-gray)}
+h1{font-family:var(--font-serif);font-weight:600;font-size:var(--text-h1);line-height:1.12;letter-spacing:-.015em;color:var(--color-blue);margin:12px 0}
+header p{max-width:66ch;margin:0}
+h2{font-family:var(--font-serif);font-weight:600;font-size:var(--text-h3);color:var(--color-blue);margin:64px 0 20px;padding-bottom:10px;border-bottom:1px solid var(--color-line)}
+figure{margin:0 0 28px}
+figcaption{display:flex;flex-direction:column;gap:2px;margin-bottom:8px}
+figcaption span{font-weight:600;font-size:var(--text-h4)}
+figcaption em{font-style:normal;font-size:var(--text-body-sm);color:var(--color-gray)}
+.spec{border:1px solid var(--color-line);border-radius:var(--radius-lg);background:#fff;box-shadow:var(--shadow-1);overflow:hidden}
+a{color:var(--color-blue)}a:hover{color:var(--color-blue-deep)}
+.note{background:var(--surface-alt);border-radius:var(--radius-lg);padding:20px 24px;margin-top:24px;font-size:var(--text-body-sm);max-width:66ch}
+.note b{color:var(--color-blue)}</style></head><body>
+
+<div class="wrap">
+<header><div class="eyebrow">Clínica Conecta SpA · Sistema de diseño</div><h1>Guía de estilo</h1>
+<p>Fundamentos, marca aplicada y componentes. Todo lo que aparece acá existe como token en <code>styles.css</code> o como componente en la librería; las fichas son la documentación que lo justifica.</p>
+<div class="note"><b>Archivo único, sin conexión.</b> Esta copia incluye los tokens, las fuentes y la librería de componentes embebidos. Los componentes son interactivos: el acordeón, el reproductor de video y el formulario responden al clic.
+<br><br><b>Pendiente:</b> el logo en vector o PNG con transparencia (desbloquea el footer monocromático) y la aprobación del cambio del negro de «CONECTA» a tinta.</div></header>
+<h2>01 · Color</h2><figure><figcaption><span>Azules</span><em>Títulos, botones, enlaces, íconos. El azul nube solo como fondo.</em></figcaption><style>.spec-colorsblues *{box-sizing:border-box}.spec-colorsblues{margin:0;padding:24px;background:var(--color-white);color:var(--color-ink);font-family:var(--font-sans);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}.spec-colorsblues .mono{font-family:var(--font-mono);font-size:12.5px;color:var(--color-gray);letter-spacing:.02em}.spec-colorsblues .lbl{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-gray)}.spec-colorsblues .row{display:flex;gap:16px;align-items:stretch}.spec-colorsblues .col{display:flex;flex-direction:column;gap:6px}.spec-colorsblues table{border-collapse:collapse;width:100%;font-size:13px}.spec-colorsblues th{text-align:left;font-family:var(--font-mono);font-weight:400;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-gray);padding:0 12px 8px 0;border-bottom:1px solid var(--color-line)}.spec-colorsblues td{padding:7px 12px 7px 0;border-bottom:1px solid var(--color-line);vertical-align:baseline}.spec-colorsblues .ok{font-family:var(--font-mono);font-size:12px;color:var(--color-blue)}.spec-colorsblues .no{font-family:var(--font-mono);font-size:12px;color:var(--color-alert)}</style><div class="spec spec-colorsblues"><div class="row">
+<div class="col" style="flex:1"><div style="height:56px;border-radius:var(--radius-sm);background:#12489E;"></div><div style="font-weight:600;font-size:13px">azul Conecta</div><div class="mono">#12489E</div><div style="font-size:12px;color:var(--color-gray);line-height:1.35">Títulos, botón primario, enlaces, íconos, hilo. 8.35:1 sobre blanco.</div></div>
+<div class="col" style="flex:1"><div style="height:56px;border-radius:var(--radius-sm);background:#0A2B5E;"></div><div style="font-weight:600;font-size:13px">azul profundo</div><div class="mono">#0A2B5E</div><div style="font-size:12px;color:var(--color-gray);line-height:1.35">Footer, hover del primario, texto sobre azul nube. 13.81:1.</div></div>
+<div class="col" style="flex:1"><div style="height:56px;border-radius:var(--radius-sm);background:#EDF3FC;"></div><div style="font-weight:600;font-size:13px">azul nube</div><div class="mono">#EDF3FC</div><div style="font-size:12px;color:var(--color-gray);line-height:1.35">Fondo de sección alterno y bloques informativos.</div><div style="font-size:12px;color:var(--color-alert);line-height:1.35">Nunca texto ni íconos.</div></div>
+</div></div></figure><figure><figcaption><span>Neutrales</span><em>Blanco dominante, tinta para texto, dos grises de línea.</em></figcaption><style>.spec-colorsneutrals *{box-sizing:border-box}.spec-colorsneutrals{margin:0;padding:24px;background:var(--color-white);color:var(--color-ink);font-family:var(--font-sans);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}.spec-colorsneutrals .mono{font-family:var(--font-mono);font-size:12.5px;color:var(--color-gray);letter-spacing:.02em}.spec-colorsneutrals .lbl{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-gray)}.spec-colorsneutrals .row{display:flex;gap:16px;align-items:stretch}.spec-colorsneutrals .col{display:flex;flex-direction:column;gap:6px}.spec-colorsneutrals table{border-collapse:collapse;width:100%;font-size:13px}.spec-colorsneutrals th{text-align:left;font-family:var(--font-mono);font-weight:400;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-gray);padding:0 12px 8px 0;border-bottom:1px solid var(--color-line)}.spec-colorsneutrals td{padding:7px 12px 7px 0;border-bottom:1px solid var(--color-line);vertical-align:baseline}.spec-colorsneutrals .ok{font-family:var(--font-mono);font-size:12px;color:var(--color-blue)}.spec-colorsneutrals .no{font-family:var(--font-mono);font-size:12px;color:var(--color-alert)}</style><div class="spec spec-colorsneutrals"><div class="row">
+<div class="col" style="flex:1"><div style="height:56px;border-radius:var(--radius-sm);background:#FFFFFF;border:1px solid var(--color-line)"></div><div style="font-weight:600;font-size:13px">blanco</div><div class="mono">#FFFFFF</div><div style="font-size:12px;color:var(--color-gray);line-height:1.35">Fondo dominante del sitio y de las tarjetas.</div></div>
+<div class="col" style="flex:1"><div style="height:56px;border-radius:var(--radius-sm);background:#14181D;"></div><div style="font-weight:600;font-size:13px">tinta</div><div class="mono">#14181D</div><div style="font-size:12px;color:var(--color-gray);line-height:1.35">Todo el texto corrido. Nunca negro puro. 17.82:1.</div></div>
+<div class="col" style="flex:1"><div style="height:56px;border-radius:var(--radius-sm);background:#5B646E;"></div><div style="font-weight:600;font-size:13px">gris</div><div class="mono">#5B646E</div><div style="font-size:12px;color:var(--color-gray);line-height:1.35">Metadatos y texto secundario corto, mínimo 16px.</div><div style="font-size:12px;color:var(--color-alert);line-height:1.35">No para texto largo (6.01:1, no AAA).</div></div>
+<div class="col" style="flex:1"><div style="height:56px;border-radius:var(--radius-sm);background:#E2E7EE;"></div><div style="font-weight:600;font-size:13px">línea</div><div class="mono">#E2E7EE</div><div style="font-size:12px;color:var(--color-gray);line-height:1.35">Divisores, bordes de tarjeta, separadores de tabla.</div><div style="font-size:12px;color:var(--color-alert);line-height:1.35">No para bordes de input (1.24:1).</div></div>
+<div class="col" style="flex:1"><div style="height:56px;border-radius:var(--radius-sm);background:#78828E;"></div><div style="font-weight:600;font-size:13px">línea fuerte</div><div class="mono">#78828E</div><div style="font-size:12px;color:var(--color-gray);line-height:1.35">Borde de inputs, selects, checkbox. 3.90:1.</div></div>
+</div></div></figure><figure><figcaption><span>Alerta</span><em>Único rojo del sistema: errores de formulario y aviso de urgencias.</em></figcaption><style>.spec-colorsalert *{box-sizing:border-box}.spec-colorsalert{margin:0;padding:24px;background:var(--color-white);color:var(--color-ink);font-family:var(--font-sans);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}.spec-colorsalert .mono{font-family:var(--font-mono);font-size:12.5px;color:var(--color-gray);letter-spacing:.02em}.spec-colorsalert .lbl{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-gray)}.spec-colorsalert .row{display:flex;gap:16px;align-items:stretch}.spec-colorsalert .col{display:flex;flex-direction:column;gap:6px}.spec-colorsalert table{border-collapse:collapse;width:100%;font-size:13px}.spec-colorsalert th{text-align:left;font-family:var(--font-mono);font-weight:400;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-gray);padding:0 12px 8px 0;border-bottom:1px solid var(--color-line)}.spec-colorsalert td{padding:7px 12px 7px 0;border-bottom:1px solid var(--color-line);vertical-align:baseline}.spec-colorsalert .ok{font-family:var(--font-mono);font-size:12px;color:var(--color-blue)}.spec-colorsalert .no{font-family:var(--font-mono);font-size:12px;color:var(--color-alert)}</style><div class="spec spec-colorsalert"><div class="row" style="align-items:flex-start">
+<div style="width:210px"><div class="col" style="flex:1"><div style="height:56px;border-radius:var(--radius-sm);background:#B4472F;"></div><div style="font-weight:600;font-size:13px">alerta</div><div class="mono">#B4472F</div><div style="font-size:12px;color:var(--color-gray);line-height:1.35">5.41:1 sobre blanco (AA). Texto de error, borde de campo inválido, ícono y título del aviso de urgencias.</div></div></div>
+<div class="col" style="flex:1;gap:10px;padding-left:8px;border-left:1px solid var(--color-line)">
+<div class="lbl">Así sí</div>
+<div style="font-size:13px;color:var(--color-gray);line-height:1.5">Texto y borde en alerta sobre fondo blanco o azul nube. Superficie tintada solo en el aviso de urgencias, al 6% de opacidad.</div>
+<div class="lbl" style="margin-top:6px">Así no</div>
+<div style="font-size:13px;color:var(--color-gray);line-height:1.5">Botones rojos, badges rojos, gotas, tubos ni agujas. Nunca para destacar contenido clínico ni para "importante".</div>
+</div></div></div></figure><figure><figcaption><span>Contraste verificado</span><em>Toda combinación de texto propuesta, con su ratio y nivel.</em></figcaption><style>.spec-colorscontrast *{box-sizing:border-box}.spec-colorscontrast{margin:0;padding:24px;background:var(--color-white);color:var(--color-ink);font-family:var(--font-sans);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}.spec-colorscontrast .mono{font-family:var(--font-mono);font-size:12.5px;color:var(--color-gray);letter-spacing:.02em}.spec-colorscontrast .lbl{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-gray)}.spec-colorscontrast .row{display:flex;gap:16px;align-items:stretch}.spec-colorscontrast .col{display:flex;flex-direction:column;gap:6px}.spec-colorscontrast table{border-collapse:collapse;width:100%;font-size:13px}.spec-colorscontrast th{text-align:left;font-family:var(--font-mono);font-weight:400;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-gray);padding:0 12px 8px 0;border-bottom:1px solid var(--color-line)}.spec-colorscontrast td{padding:7px 12px 7px 0;border-bottom:1px solid var(--color-line);vertical-align:baseline}.spec-colorscontrast .ok{font-family:var(--font-mono);font-size:12px;color:var(--color-blue)}.spec-colorscontrast .no{font-family:var(--font-mono);font-size:12px;color:var(--color-alert)}</style><div class="spec spec-colorscontrast"><table><thead><tr><th>Texto</th><th>Fondo</th><th>Ratio</th><th>Nivel</th><th>Uso</th></tr></thead><tbody>
+<tr><td>tinta</td><td>blanco</td><td class="mono">17.82:1</td><td class="ok">AAA</td><td>texto corrido</td></tr>
+<tr><td>tinta</td><td>azul nube</td><td class="mono">15.98:1</td><td class="ok">AAA</td><td>texto en sección alterna</td></tr>
+<tr><td>azul profundo</td><td>blanco</td><td class="mono">13.81:1</td><td class="ok">AAA</td><td>hover de enlace</td></tr>
+<tr><td>blanco</td><td>azul profundo</td><td class="mono">13.81:1</td><td class="ok">AAA</td><td>footer</td></tr>
+<tr><td>azul Conecta</td><td>blanco</td><td class="mono">8.35:1</td><td class="ok">AAA</td><td>títulos, enlaces</td></tr>
+<tr><td>blanco</td><td>azul Conecta</td><td class="mono">8.35:1</td><td class="ok">AAA</td><td>botón primario</td></tr>
+<tr><td>azul Conecta</td><td>azul nube</td><td class="mono">7.49:1</td><td class="ok">AAA</td><td>título sobre fondo alterno</td></tr>
+<tr><td>gris</td><td>blanco</td><td class="mono">6.01:1</td><td class="ok">AA</td><td>metadatos ≥16px</td></tr>
+<tr><td>alerta</td><td>blanco</td><td class="mono">5.41:1</td><td class="ok">AA</td><td>mensaje de error</td></tr>
+<tr><td>gris</td><td>azul nube</td><td class="mono">5.39:1</td><td class="ok">AA</td><td>metadatos ≥16px</td></tr>
+<tr><td>alerta</td><td>azul nube</td><td class="mono">4.85:1</td><td class="ok">AA</td><td>error dentro de bloque</td></tr>
+<tr><td>línea <span style="color:var(--color-gray)">(#E2E7EE)</span></td><td>blanco</td><td class="mono">1.24:1</td><td class="no">falla 1.4.11</td><td>solo divisor decorativo</td></tr>
+</tbody></table></div></figure><figure><figcaption><span>Fondos: dónde sí, dónde no</span><em>El blanco manda. El azul nube alterna secciones; el azul saturado solo en el footer.</em></figcaption><style>.spec-colorsbackgrounds *{box-sizing:border-box}.spec-colorsbackgrounds{margin:0;padding:24px;background:var(--color-white);color:var(--color-ink);font-family:var(--font-sans);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}.spec-colorsbackgrounds .mono{font-family:var(--font-mono);font-size:12.5px;color:var(--color-gray);letter-spacing:.02em}.spec-colorsbackgrounds .lbl{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-gray)}.spec-colorsbackgrounds .row{display:flex;gap:16px;align-items:stretch}.spec-colorsbackgrounds .col{display:flex;flex-direction:column;gap:6px}.spec-colorsbackgrounds table{border-collapse:collapse;width:100%;font-size:13px}.spec-colorsbackgrounds th{text-align:left;font-family:var(--font-mono);font-weight:400;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-gray);padding:0 12px 8px 0;border-bottom:1px solid var(--color-line)}.spec-colorsbackgrounds td{padding:7px 12px 7px 0;border-bottom:1px solid var(--color-line);vertical-align:baseline}.spec-colorsbackgrounds .ok{font-family:var(--font-mono);font-size:12px;color:var(--color-blue)}.spec-colorsbackgrounds .no{font-family:var(--font-mono);font-size:12px;color:var(--color-alert)}</style><div class="spec spec-colorsbackgrounds"><div class="row" style="gap:20px">
+<div class="col" style="flex:1;gap:8px">
+<div class="lbl">Así sí</div>
+<div style="background:var(--color-white);border:1px solid var(--color-line);border-radius:var(--radius-lg);padding:14px"><div style="font-family:var(--font-serif);color:var(--color-blue);font-size:17px">Sección sobre blanco</div><div style="font-size:12.5px;color:var(--color-gray)">Estado por defecto de todo el sitio.</div></div>
+<div style="background:var(--surface-alt);border-radius:var(--radius-lg);padding:14px"><div style="font-family:var(--font-serif);color:var(--color-blue);font-size:17px">Sección alterna</div><div style="font-size:12.5px;color:var(--color-gray)">Azul nube, máximo una de cada tres secciones.</div></div>
+<div style="background:var(--surface-footer);border-radius:var(--radius-lg);padding:14px"><div style="font-family:var(--font-serif);color:#fff;font-size:17px">Footer</div><div style="font-size:12.5px;color:#C7D6EC">Único bloque de azul profundo a sangre.</div></div>
+</div>
+<div class="col" style="flex:1;gap:8px">
+<div class="lbl">Así no</div>
+<div style="background:var(--color-blue);border-radius:var(--radius-lg);padding:14px"><div style="font-family:var(--font-serif);color:#fff;font-size:17px">Hero azul saturado</div><div style="font-size:12.5px;color:#D6E3F7">El azul Conecta no se usa como fondo de sección.</div></div>
+<div style="background:linear-gradient(135deg,#12489E,#3A7BD5);border-radius:var(--radius-lg);padding:14px"><div style="font-family:var(--font-serif);color:#fff;font-size:17px">Degradado de marca</div><div style="font-size:12.5px;color:#E4EDFA">No existe en el sistema.</div></div>
+<div style="background:var(--color-blue-cloud);border-radius:var(--radius-lg);padding:14px"><div style="font-size:12.5px;color:#8DA2BF">Texto gris claro sobre azul nube: cualquier combinación bajo 4.5:1 está prohibida.</div></div>
+</div></div></div></figure><h2>02 · Tipografía</h2><figure><figcaption><span>Display</span><em>Source Serif 4 600 · clamp(40 → 68px) · lh 1.05 · tracking -0.02em</em></figcaption><style>.spec-typedisplay *{box-sizing:border-box}.spec-typedisplay{margin:0;padding:24px;background:var(--color-white);color:var(--color-ink);font-family:var(--font-sans);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}.spec-typedisplay .mono{font-family:var(--font-mono);font-size:12.5px;color:var(--color-gray);letter-spacing:.02em}.spec-typedisplay .lbl{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-gray)}.spec-typedisplay .row{display:flex;gap:16px;align-items:stretch}.spec-typedisplay .col{display:flex;flex-direction:column;gap:6px}.spec-typedisplay table{border-collapse:collapse;width:100%;font-size:13px}.spec-typedisplay th{text-align:left;font-family:var(--font-mono);font-weight:400;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-gray);padding:0 12px 8px 0;border-bottom:1px solid var(--color-line)}.spec-typedisplay td{padding:7px 12px 7px 0;border-bottom:1px solid var(--color-line);vertical-align:baseline}.spec-typedisplay .ok{font-family:var(--font-mono);font-size:12px;color:var(--color-blue)}.spec-typedisplay .no{font-family:var(--font-mono);font-size:12px;color:var(--color-alert)}</style><div class="spec spec-typedisplay"><div class="lbl" style="margin-bottom:10px">display · una vez por página, solo en el hero</div>
+<div style="font-family:var(--font-serif);font-weight:600;font-size:var(--text-display);line-height:var(--text-display-lh);letter-spacing:var(--text-display-ls);color:var(--color-blue);max-width:16ch">Unimos el camino</div>
+<div class="mono" style="margin-top:12px">--text-display · clamp(2.5rem, 1.6rem + 3.2vw, 4.25rem)</div></div></figure><figure><figcaption><span>Títulos H1–H4</span><em>Serif del H1 al H3; el H4 pasa a Inter 600 porque ya es interfaz.</em></figcaption><style>.spec-typeheadings *{box-sizing:border-box}.spec-typeheadings{margin:0;padding:24px;background:var(--color-white);color:var(--color-ink);font-family:var(--font-sans);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}.spec-typeheadings .mono{font-family:var(--font-mono);font-size:12.5px;color:var(--color-gray);letter-spacing:.02em}.spec-typeheadings .lbl{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-gray)}.spec-typeheadings .row{display:flex;gap:16px;align-items:stretch}.spec-typeheadings .col{display:flex;flex-direction:column;gap:6px}.spec-typeheadings table{border-collapse:collapse;width:100%;font-size:13px}.spec-typeheadings th{text-align:left;font-family:var(--font-mono);font-weight:400;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-gray);padding:0 12px 8px 0;border-bottom:1px solid var(--color-line)}.spec-typeheadings td{padding:7px 12px 7px 0;border-bottom:1px solid var(--color-line);vertical-align:baseline}.spec-typeheadings .ok{font-family:var(--font-mono);font-size:12px;color:var(--color-blue)}.spec-typeheadings .no{font-family:var(--font-mono);font-size:12px;color:var(--color-alert)}</style><div class="spec spec-typeheadings"><div class="col" style="gap:14px">
+<div><div class="lbl">h1 · 32 → 48 · lh 1.12</div><div style="font-family:var(--font-serif);font-weight:600;font-size:var(--text-h1);line-height:var(--text-h1-lh);letter-spacing:var(--text-h1-ls);color:var(--color-blue)">Conecta Hematología</div></div>
+<div><div class="lbl">h2 · 26 → 36 · lh 1.2</div><div style="font-family:var(--font-serif);font-weight:600;font-size:var(--text-h2);line-height:var(--text-h2-lh);letter-spacing:var(--text-h2-ls);color:var(--color-blue)">Cómo funciona la atención</div></div>
+<div><div class="lbl">h3 · 21 → 26 · lh 1.3</div><div style="font-family:var(--font-serif);font-weight:600;font-size:var(--text-h3);line-height:var(--text-h3-lh);color:var(--color-blue)">Interpretación de imágenes</div></div>
+<div><div class="lbl">h4 · 18 → 20 · Inter 600 · lh 1.4</div><div style="font-family:var(--font-sans);font-weight:600;font-size:var(--text-h4);line-height:var(--text-h4-lh);color:var(--color-ink)">Antes de tu primera consulta</div></div>
+</div></div></figure><figure><figcaption><span>Cuerpo</span><em>Inter 400 · base 17 → 18px · interlineado 1.6 · piso absoluto 14px</em></figcaption><style>.spec-typebody *{box-sizing:border-box}.spec-typebody{margin:0;padding:24px;background:var(--color-white);color:var(--color-ink);font-family:var(--font-sans);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}.spec-typebody .mono{font-family:var(--font-mono);font-size:12.5px;color:var(--color-gray);letter-spacing:.02em}.spec-typebody .lbl{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-gray)}.spec-typebody .row{display:flex;gap:16px;align-items:stretch}.spec-typebody .col{display:flex;flex-direction:column;gap:6px}.spec-typebody table{border-collapse:collapse;width:100%;font-size:13px}.spec-typebody th{text-align:left;font-family:var(--font-mono);font-weight:400;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-gray);padding:0 12px 8px 0;border-bottom:1px solid var(--color-line)}.spec-typebody td{padding:7px 12px 7px 0;border-bottom:1px solid var(--color-line);vertical-align:baseline}.spec-typebody .ok{font-family:var(--font-mono);font-size:12px;color:var(--color-blue)}.spec-typebody .no{font-family:var(--font-mono);font-size:12px;color:var(--color-alert)}</style><div class="spec spec-typebody"><div class="col" style="gap:14px;max-width:66ch">
+<div><div class="lbl">cuerpo grande · 18 → 21 · bajada del hero</div><div style="font-size:var(--text-body-lg);line-height:var(--text-body-lg-lh);color:var(--color-ink)">Si acabas de recibir un hemograma alterado, aquí puedes agendar con un hematólogo en pocos días.</div></div>
+<div><div class="lbl">cuerpo · 17 → 18 · texto corrido</div><div style="font-size:var(--text-body);line-height:var(--text-body-lh);color:var(--color-ink)">La consulta dura 40 minutos. Revisamos tus exámenes previos, definimos qué falta y te explicamos el paso siguiente antes de que te vayas.</div></div>
+<div><div class="lbl">cuerpo chico · 15 · notas y ayuda de campo</div><div style="font-size:var(--text-body-sm);line-height:var(--text-body-sm-lh);color:var(--color-gray)">Usaremos tu teléfono solo para confirmar la hora.</div></div>
+<div><div class="lbl">caption · 14 · metadatos, pie de tabla</div><div style="font-size:var(--text-caption);line-height:var(--text-caption-lh);color:var(--color-gray)">Actualizado en agosto de 2026</div></div>
+</div></div></figure><figure><figcaption><span>Mono: eyebrow, etiqueta, dato</span><em>IBM Plex Mono 500 · 14px · tracking 0.12em. Nunca en texto corrido.</em></figcaption><style>.spec-typemono *{box-sizing:border-box}.spec-typemono{margin:0;padding:24px;background:var(--color-white);color:var(--color-ink);font-family:var(--font-sans);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}.spec-typemono .mono{font-family:var(--font-mono);font-size:12.5px;color:var(--color-gray);letter-spacing:.02em}.spec-typemono .lbl{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-gray)}.spec-typemono .row{display:flex;gap:16px;align-items:stretch}.spec-typemono .col{display:flex;flex-direction:column;gap:6px}.spec-typemono table{border-collapse:collapse;width:100%;font-size:13px}.spec-typemono th{text-align:left;font-family:var(--font-mono);font-weight:400;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-gray);padding:0 12px 8px 0;border-bottom:1px solid var(--color-line)}.spec-typemono td{padding:7px 12px 7px 0;border-bottom:1px solid var(--color-line);vertical-align:baseline}.spec-typemono .ok{font-family:var(--font-mono);font-size:12px;color:var(--color-blue)}.spec-typemono .no{font-family:var(--font-mono);font-size:12px;color:var(--color-alert)}</style><div class="spec spec-typemono"><div class="col" style="gap:16px">
+<div><div style="font-family:var(--font-mono);font-weight:500;font-size:var(--text-eyebrow);letter-spacing:var(--text-eyebrow-ls);text-transform:uppercase;color:var(--color-gray)">Unidad de hematología</div><div style="font-family:var(--font-serif);font-weight:600;font-size:var(--text-h2);color:var(--color-blue);line-height:1.2">Qué atendemos</div></div>
+<div class="row" style="gap:24px;align-items:baseline">
+<div><div class="lbl">etiqueta de campo</div><div style="font-family:var(--font-mono);font-size:14px;letter-spacing:.06em;text-transform:uppercase;color:var(--color-ink)">Comuna</div></div>
+<div><div class="lbl">dato</div><div style="font-family:var(--font-mono);font-size:20px;color:var(--color-ink)">$50.000</div></div>
+<div><div class="lbl">horario</div><div style="font-family:var(--font-mono);font-size:14px;color:var(--color-ink)">Lun a Vie · 09:00–18:00</div></div>
+</div></div></div></figure><figure><figcaption><span>Escala completa</span><em>Diez niveles: familia, peso, mín → máx, interlineado, tracking.</em></figcaption><style>.spec-typescale *{box-sizing:border-box}.spec-typescale{margin:0;padding:24px;background:var(--color-white);color:var(--color-ink);font-family:var(--font-sans);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}.spec-typescale .mono{font-family:var(--font-mono);font-size:12.5px;color:var(--color-gray);letter-spacing:.02em}.spec-typescale .lbl{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-gray)}.spec-typescale .row{display:flex;gap:16px;align-items:stretch}.spec-typescale .col{display:flex;flex-direction:column;gap:6px}.spec-typescale table{border-collapse:collapse;width:100%;font-size:13px}.spec-typescale th{text-align:left;font-family:var(--font-mono);font-weight:400;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-gray);padding:0 12px 8px 0;border-bottom:1px solid var(--color-line)}.spec-typescale td{padding:7px 12px 7px 0;border-bottom:1px solid var(--color-line);vertical-align:baseline}.spec-typescale .ok{font-family:var(--font-mono);font-size:12px;color:var(--color-blue)}.spec-typescale .no{font-family:var(--font-mono);font-size:12px;color:var(--color-alert)}</style><div class="spec spec-typescale"><table><thead><tr><th>Nivel</th><th>Familia</th><th>Peso</th><th>Mín → Máx</th><th>lh</th><th>tracking</th></tr></thead><tbody>
+<tr><td>display</td><td>Source Serif 4</td><td>600</td><td class="mono">40 → 68</td><td class="mono">1.05</td><td class="mono">-0.02em</td></tr>
+<tr><td>h1</td><td>Source Serif 4</td><td>600</td><td class="mono">32 → 48</td><td class="mono">1.12</td><td class="mono">-0.015em</td></tr>
+<tr><td>h2</td><td>Source Serif 4</td><td>600</td><td class="mono">26 → 36</td><td class="mono">1.2</td><td class="mono">-0.01em</td></tr>
+<tr><td>h3</td><td>Source Serif 4</td><td>600</td><td class="mono">21 → 26</td><td class="mono">1.3</td><td class="mono">-0.005em</td></tr>
+<tr><td>h4</td><td>Inter</td><td>600</td><td class="mono">18 → 20</td><td class="mono">1.4</td><td class="mono">0</td></tr>
+<tr><td>cuerpo grande</td><td>Inter</td><td>400</td><td class="mono">18 → 21</td><td class="mono">1.6</td><td class="mono">0</td></tr>
+<tr><td>cuerpo</td><td>Inter</td><td>400</td><td class="mono">17 → 18</td><td class="mono">1.6</td><td class="mono">0</td></tr>
+<tr><td>cuerpo chico</td><td>Inter</td><td>400</td><td class="mono">15</td><td class="mono">1.55</td><td class="mono">0</td></tr>
+<tr><td>caption</td><td>Inter</td><td>400</td><td class="mono">14</td><td class="mono">1.45</td><td class="mono">0.01em</td></tr>
+<tr><td>eyebrow</td><td>IBM Plex Mono</td><td>500</td><td class="mono">14</td><td class="mono">1.2</td><td class="mono">0.12em</td></tr>
+</tbody></table></div></figure><figure><figcaption><span>Medida de línea</span><em>66ch (62–70 caracteres). Texto largo nunca al ancho del contenedor.</em></figcaption><style>.spec-typemeasure *{box-sizing:border-box}.spec-typemeasure{margin:0;padding:24px;background:var(--color-white);color:var(--color-ink);font-family:var(--font-sans);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}.spec-typemeasure .mono{font-family:var(--font-mono);font-size:12.5px;color:var(--color-gray);letter-spacing:.02em}.spec-typemeasure .lbl{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-gray)}.spec-typemeasure .row{display:flex;gap:16px;align-items:stretch}.spec-typemeasure .col{display:flex;flex-direction:column;gap:6px}.spec-typemeasure table{border-collapse:collapse;width:100%;font-size:13px}.spec-typemeasure th{text-align:left;font-family:var(--font-mono);font-weight:400;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-gray);padding:0 12px 8px 0;border-bottom:1px solid var(--color-line)}.spec-typemeasure td{padding:7px 12px 7px 0;border-bottom:1px solid var(--color-line);vertical-align:baseline}.spec-typemeasure .ok{font-family:var(--font-mono);font-size:12px;color:var(--color-blue)}.spec-typemeasure .no{font-family:var(--font-mono);font-size:12px;color:var(--color-alert)}</style><div class="spec spec-typemeasure"><div class="row" style="gap:18px;align-items:flex-start">
+<div class="col" style="flex:1;gap:6px"><div class="lbl">66ch · así sí</div><div style="font-size:16px;line-height:1.6;max-width:44ch;color:var(--color-ink)">El paciente con una enfermedad de la sangre recorre un camino roto: consultas aisladas, exámenes repetidos, especialistas que no se hablan.</div></div>
+<div class="col" style="flex:1;gap:6px"><div class="lbl">ancho completo · así no</div><div style="font-size:16px;line-height:1.6;color:var(--color-gray)">El paciente con una enfermedad de la sangre recorre un camino roto: consultas aisladas, exámenes repetidos, especialistas que no se hablan, traslados largos y una explicación distinta en cada puerta.</div></div>
+</div>
+<div class="mono" style="margin-top:14px">--measure-prose: 66ch · --container-prose: 720px</div></div></figure><h2>03 · Espaciado y grilla</h2><figure><figcaption><span>Escala de 8px</span><em>Múltiplos de 8, con 4px como único ajuste fino.</em></figcaption><style>.spec-spacingscale *{box-sizing:border-box}.spec-spacingscale{margin:0;padding:24px;background:var(--color-white);color:var(--color-ink);font-family:var(--font-sans);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}.spec-spacingscale .mono{font-family:var(--font-mono);font-size:12.5px;color:var(--color-gray);letter-spacing:.02em}.spec-spacingscale .lbl{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-gray)}.spec-spacingscale .row{display:flex;gap:16px;align-items:stretch}.spec-spacingscale .col{display:flex;flex-direction:column;gap:6px}.spec-spacingscale table{border-collapse:collapse;width:100%;font-size:13px}.spec-spacingscale th{text-align:left;font-family:var(--font-mono);font-weight:400;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-gray);padding:0 12px 8px 0;border-bottom:1px solid var(--color-line)}.spec-spacingscale td{padding:7px 12px 7px 0;border-bottom:1px solid var(--color-line);vertical-align:baseline}.spec-spacingscale .ok{font-family:var(--font-mono);font-size:12px;color:var(--color-blue)}.spec-spacingscale .no{font-family:var(--font-mono);font-size:12px;color:var(--color-alert)}</style><div class="spec spec-spacingscale"><div class="col" style="gap:5px">
+<div class="row" style="gap:10px;align-items:center"><div class="mono" style="width:120px">--space-1</div><div class="mono" style="width:44px;text-align:right">4px</div><div style="height:8px;width:6px;background:var(--color-blue);border-radius:2px"></div></div><div class="row" style="gap:10px;align-items:center"><div class="mono" style="width:120px">--space-2</div><div class="mono" style="width:44px;text-align:right">8px</div><div style="height:8px;width:12px;background:var(--color-blue);border-radius:2px"></div></div><div class="row" style="gap:10px;align-items:center"><div class="mono" style="width:120px">--space-3</div><div class="mono" style="width:44px;text-align:right">12px</div><div style="height:8px;width:18px;background:var(--color-blue);border-radius:2px"></div></div><div class="row" style="gap:10px;align-items:center"><div class="mono" style="width:120px">--space-4</div><div class="mono" style="width:44px;text-align:right">16px</div><div style="height:8px;width:24px;background:var(--color-blue);border-radius:2px"></div></div><div class="row" style="gap:10px;align-items:center"><div class="mono" style="width:120px">--space-5</div><div class="mono" style="width:44px;text-align:right">20px</div><div style="height:8px;width:30px;background:var(--color-blue);border-radius:2px"></div></div><div class="row" style="gap:10px;align-items:center"><div class="mono" style="width:120px">--space-6</div><div class="mono" style="width:44px;text-align:right">24px</div><div style="height:8px;width:36px;background:var(--color-blue);border-radius:2px"></div></div><div class="row" style="gap:10px;align-items:center"><div class="mono" style="width:120px">--space-8</div><div class="mono" style="width:44px;text-align:right">32px</div><div style="height:8px;width:48px;background:var(--color-blue);border-radius:2px"></div></div><div class="row" style="gap:10px;align-items:center"><div class="mono" style="width:120px">--space-10</div><div class="mono" style="width:44px;text-align:right">40px</div><div style="height:8px;width:60px;background:var(--color-blue);border-radius:2px"></div></div><div class="row" style="gap:10px;align-items:center"><div class="mono" style="width:120px">--space-12</div><div class="mono" style="width:44px;text-align:right">48px</div><div style="height:8px;width:72px;background:var(--color-blue);border-radius:2px"></div></div><div class="row" style="gap:10px;align-items:center"><div class="mono" style="width:120px">--space-16</div><div class="mono" style="width:44px;text-align:right">64px</div><div style="height:8px;width:96px;background:var(--color-blue);border-radius:2px"></div></div><div class="row" style="gap:10px;align-items:center"><div class="mono" style="width:120px">--space-20</div><div class="mono" style="width:44px;text-align:right">80px</div><div style="height:8px;width:120px;background:var(--color-blue);border-radius:2px"></div></div><div class="row" style="gap:10px;align-items:center"><div class="mono" style="width:120px">--space-24</div><div class="mono" style="width:44px;text-align:right">96px</div><div style="height:8px;width:144px;background:var(--color-blue);border-radius:2px"></div></div><div class="row" style="gap:10px;align-items:center"><div class="mono" style="width:120px">--space-30</div><div class="mono" style="width:44px;text-align:right">120px</div><div style="height:8px;width:180px;background:var(--color-blue);border-radius:2px"></div></div>
+</div></div></figure><figure><figcaption><span>Ritmo vertical</span><em>64 / 80 / 96px de aire entre secciones según breakpoint; 120 solo bajo el hero.</em></figcaption><style>.spec-spacingrhythm *{box-sizing:border-box}.spec-spacingrhythm{margin:0;padding:24px;background:var(--color-white);color:var(--color-ink);font-family:var(--font-sans);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}.spec-spacingrhythm .mono{font-family:var(--font-mono);font-size:12.5px;color:var(--color-gray);letter-spacing:.02em}.spec-spacingrhythm .lbl{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-gray)}.spec-spacingrhythm .row{display:flex;gap:16px;align-items:stretch}.spec-spacingrhythm .col{display:flex;flex-direction:column;gap:6px}.spec-spacingrhythm table{border-collapse:collapse;width:100%;font-size:13px}.spec-spacingrhythm th{text-align:left;font-family:var(--font-mono);font-weight:400;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-gray);padding:0 12px 8px 0;border-bottom:1px solid var(--color-line)}.spec-spacingrhythm td{padding:7px 12px 7px 0;border-bottom:1px solid var(--color-line);vertical-align:baseline}.spec-spacingrhythm .ok{font-family:var(--font-mono);font-size:12px;color:var(--color-blue)}.spec-spacingrhythm .no{font-family:var(--font-mono);font-size:12px;color:var(--color-alert)}</style><div class="spec spec-spacingrhythm"><table><thead><tr><th>Token</th><th>Valor</th><th>Desde</th><th>Uso</th></tr></thead><tbody>
+<tr><td class="mono">--section-y</td><td class="mono">64px</td><td class="mono">390</td><td>separación entre secciones en móvil</td></tr>
+<tr><td class="mono">--section-y-md</td><td class="mono">80px</td><td class="mono">768</td><td>tablet</td></tr>
+<tr><td class="mono">--section-y-lg</td><td class="mono">96px</td><td class="mono">1366</td><td>notebook y superior</td></tr>
+<tr><td class="mono">--section-y-hero</td><td class="mono">120px</td><td class="mono">1366</td><td>solo el aire bajo el hero</td></tr>
+</tbody></table>
+<div style="margin-top:14px;font-size:13px;color:var(--color-gray);line-height:1.5">Dentro de una sección: 48px entre título y contenido, 24px entre tarjetas, 16px entre líneas de un mismo bloque, 8px entre etiqueta y campo.</div></div></figure><figure><figcaption><span>Contenedores y breakpoints</span><em>1200px de contenido, 720px de texto largo, márgenes por breakpoint.</em></figcaption><style>.spec-spacingcontainer *{box-sizing:border-box}.spec-spacingcontainer{margin:0;padding:24px;background:var(--color-white);color:var(--color-ink);font-family:var(--font-sans);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}.spec-spacingcontainer .mono{font-family:var(--font-mono);font-size:12.5px;color:var(--color-gray);letter-spacing:.02em}.spec-spacingcontainer .lbl{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-gray)}.spec-spacingcontainer .row{display:flex;gap:16px;align-items:stretch}.spec-spacingcontainer .col{display:flex;flex-direction:column;gap:6px}.spec-spacingcontainer table{border-collapse:collapse;width:100%;font-size:13px}.spec-spacingcontainer th{text-align:left;font-family:var(--font-mono);font-weight:400;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-gray);padding:0 12px 8px 0;border-bottom:1px solid var(--color-line)}.spec-spacingcontainer td{padding:7px 12px 7px 0;border-bottom:1px solid var(--color-line);vertical-align:baseline}.spec-spacingcontainer .ok{font-family:var(--font-mono);font-size:12px;color:var(--color-blue)}.spec-spacingcontainer .no{font-family:var(--font-mono);font-size:12px;color:var(--color-alert)}</style><div class="spec spec-spacingcontainer"><table><thead><tr><th>Breakpoint</th><th>Margen lateral</th><th>Gutter</th><th>Columnas útiles</th></tr></thead><tbody>
+<tr><td class="mono">390 móvil</td><td class="mono">20px</td><td class="mono">16px</td><td>1 (grilla colapsada)</td></tr>
+<tr><td class="mono">768 tablet</td><td class="mono">32px</td><td class="mono">20px</td><td>6 de 12</td></tr>
+<tr><td class="mono">1366 notebook</td><td class="mono">48px</td><td class="mono">24px</td><td>12</td></tr>
+<tr><td class="mono">1600</td><td class="mono">64px</td><td class="mono">24px</td><td>12, contenido centrado a 1200</td></tr>
+<tr><td class="mono">1920</td><td class="mono">64px</td><td class="mono">24px</td><td>12, contenido centrado a 1200</td></tr>
+</tbody></table>
+<div style="margin-top:12px;font-size:13px;color:var(--color-gray);line-height:1.5">El contenedor nunca pasa de <span class="mono">1200px</span>. El texto corrido nunca pasa de <span class="mono">720px</span>, aunque la sección sea ancha.</div></div></figure><figure><figcaption><span>Grilla de 12 columnas</span><em>Gutter 24px en escritorio. Las cuatro prestaciones no reparten 3+3+3+3.</em></figcaption><style>.spec-spacinggrid *{box-sizing:border-box}.spec-spacinggrid{margin:0;padding:24px;background:var(--color-white);color:var(--color-ink);font-family:var(--font-sans);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}.spec-spacinggrid .mono{font-family:var(--font-mono);font-size:12.5px;color:var(--color-gray);letter-spacing:.02em}.spec-spacinggrid .lbl{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-gray)}.spec-spacinggrid .row{display:flex;gap:16px;align-items:stretch}.spec-spacinggrid .col{display:flex;flex-direction:column;gap:6px}.spec-spacinggrid table{border-collapse:collapse;width:100%;font-size:13px}.spec-spacinggrid th{text-align:left;font-family:var(--font-mono);font-weight:400;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-gray);padding:0 12px 8px 0;border-bottom:1px solid var(--color-line)}.spec-spacinggrid td{padding:7px 12px 7px 0;border-bottom:1px solid var(--color-line);vertical-align:baseline}.spec-spacinggrid .ok{font-family:var(--font-mono);font-size:12px;color:var(--color-blue)}.spec-spacinggrid .no{font-family:var(--font-mono);font-size:12px;color:var(--color-alert)}</style><div class="spec spec-spacinggrid"><div style="display:grid;grid-template-columns:repeat(12,1fr);gap:24px;margin-bottom:14px"><div style="height:54px;background:var(--surface-alt);border-radius:var(--radius-sm)"></div><div style="height:54px;background:var(--surface-alt);border-radius:var(--radius-sm)"></div><div style="height:54px;background:var(--surface-alt);border-radius:var(--radius-sm)"></div><div style="height:54px;background:var(--surface-alt);border-radius:var(--radius-sm)"></div><div style="height:54px;background:var(--surface-alt);border-radius:var(--radius-sm)"></div><div style="height:54px;background:var(--surface-alt);border-radius:var(--radius-sm)"></div><div style="height:54px;background:var(--surface-alt);border-radius:var(--radius-sm)"></div><div style="height:54px;background:var(--surface-alt);border-radius:var(--radius-sm)"></div><div style="height:54px;background:var(--surface-alt);border-radius:var(--radius-sm)"></div><div style="height:54px;background:var(--surface-alt);border-radius:var(--radius-sm)"></div><div style="height:54px;background:var(--surface-alt);border-radius:var(--radius-sm)"></div><div style="height:54px;background:var(--surface-alt);border-radius:var(--radius-sm)"></div></div>
+<div style="display:grid;grid-template-columns:repeat(12,1fr);gap:24px">
+<div style="grid-column:span 6;height:34px;background:var(--color-blue);border-radius:var(--radius-sm)"></div>
+<div style="grid-column:span 2;height:34px;background:#B9CCE8;border-radius:var(--radius-sm)"></div>
+<div style="grid-column:span 2;height:34px;background:#B9CCE8;border-radius:var(--radius-sm)"></div>
+<div style="grid-column:span 2;height:34px;background:#B9CCE8;border-radius:var(--radius-sm)"></div>
+</div>
+<div class="mono" style="margin-top:10px">hematología 6 col · las otras tres 2 col cada una</div></div></figure><h2>04 · Forma</h2><figure><figcaption><span>Radios</span><em>Tres valores: 4 / 8 / 16. La píldora es excepción y solo para chips.</em></figcaption><style>.spec-shaperadius *{box-sizing:border-box}.spec-shaperadius{margin:0;padding:24px;background:var(--color-white);color:var(--color-ink);font-family:var(--font-sans);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}.spec-shaperadius .mono{font-family:var(--font-mono);font-size:12.5px;color:var(--color-gray);letter-spacing:.02em}.spec-shaperadius .lbl{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-gray)}.spec-shaperadius .row{display:flex;gap:16px;align-items:stretch}.spec-shaperadius .col{display:flex;flex-direction:column;gap:6px}.spec-shaperadius table{border-collapse:collapse;width:100%;font-size:13px}.spec-shaperadius th{text-align:left;font-family:var(--font-mono);font-weight:400;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-gray);padding:0 12px 8px 0;border-bottom:1px solid var(--color-line)}.spec-shaperadius td{padding:7px 12px 7px 0;border-bottom:1px solid var(--color-line);vertical-align:baseline}.spec-shaperadius .ok{font-family:var(--font-mono);font-size:12px;color:var(--color-blue)}.spec-shaperadius .no{font-family:var(--font-mono);font-size:12px;color:var(--color-alert)}</style><div class="spec spec-shaperadius"><div class="row" style="gap:20px">
+<div class="col" style="flex:1;gap:8px"><div style="height:56px;background:var(--surface-alt);border:1px solid var(--color-line);border-radius:4px"></div><div class="mono">--radius-sm</div><div style="font-size:12px;color:var(--color-gray);line-height:1.35">chips pequeños, celdas, campos densos</div></div><div class="col" style="flex:1;gap:8px"><div style="height:56px;background:var(--surface-alt);border:1px solid var(--color-line);border-radius:8px"></div><div class="mono">--radius-md</div><div style="font-size:12px;color:var(--color-gray);line-height:1.35">botones, inputs, acordeón</div></div><div class="col" style="flex:1;gap:8px"><div style="height:56px;background:var(--surface-alt);border:1px solid var(--color-line);border-radius:16px"></div><div class="mono">--radius-lg</div><div style="font-size:12px;color:var(--color-gray);line-height:1.35">tarjetas, contenedor de agenda</div></div><div class="col" style="flex:1;gap:8px"><div style="height:56px;background:var(--surface-alt);border:1px solid var(--color-line);border-radius:999px"></div><div class="mono">--radius-pill</div><div style="font-size:12px;color:var(--color-gray);line-height:1.35">solo chips de estado</div></div>
+</div></div></figure><figure><figcaption><span>Sombras</span><em>Dos niveles y nada más. La elevación 2 solo aparece en overlays.</em></figcaption><style>.spec-shapeshadow *{box-sizing:border-box}.spec-shapeshadow{margin:0;padding:24px;background:var(--color-white);color:var(--color-ink);font-family:var(--font-sans);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}.spec-shapeshadow .mono{font-family:var(--font-mono);font-size:12.5px;color:var(--color-gray);letter-spacing:.02em}.spec-shapeshadow .lbl{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-gray)}.spec-shapeshadow .row{display:flex;gap:16px;align-items:stretch}.spec-shapeshadow .col{display:flex;flex-direction:column;gap:6px}.spec-shapeshadow table{border-collapse:collapse;width:100%;font-size:13px}.spec-shapeshadow th{text-align:left;font-family:var(--font-mono);font-weight:400;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-gray);padding:0 12px 8px 0;border-bottom:1px solid var(--color-line)}.spec-shapeshadow td{padding:7px 12px 7px 0;border-bottom:1px solid var(--color-line);vertical-align:baseline}.spec-shapeshadow .ok{font-family:var(--font-mono);font-size:12px;color:var(--color-blue)}.spec-shapeshadow .no{font-family:var(--font-mono);font-size:12px;color:var(--color-alert)}</style><div class="spec spec-shapeshadow"><div class="row" style="gap:20px;padding:6px">
+<div class="col" style="flex:1;gap:8px"><div style="height:64px;background:#fff;border:1px solid var(--color-line);border-radius:var(--radius-lg);box-shadow:var(--shadow-1)"></div><div class="mono">--shadow-1</div><div style="font-size:12px;color:var(--color-gray);line-height:1.35">0 1px 2px rgba(20,24,29,.06) — tarjetas, header al hacer scroll.</div></div>
+<div class="col" style="flex:1;gap:8px"><div style="height:64px;background:#fff;border:1px solid var(--color-line);border-radius:var(--radius-lg);box-shadow:var(--shadow-2)"></div><div class="mono">--shadow-2</div><div style="font-size:12px;color:var(--color-gray);line-height:1.35">Menú móvil abierto y nada más. Sin sombras de color ni difusas.</div></div>
+<div class="col" style="flex:1;gap:8px"><div style="height:64px;background:#fff;border:1px solid var(--color-line);border-radius:var(--radius-lg);box-shadow:0 18px 40px -8px rgba(18,72,158,.45)"></div><div class="mono" style="color:var(--color-alert)">prohibido</div><div style="font-size:12px;color:var(--color-gray);line-height:1.35">Sombra azul difusa: lee como app de startup, no como clínica.</div></div>
+</div></div></figure><figure><figcaption><span>Bordes y foco</span><em>Hairline 1px, énfasis 2px. Anillo de foco azul 2px con 2px de offset, nunca removido.</em></figcaption><style>.spec-shapefocus *{box-sizing:border-box}.spec-shapefocus{margin:0;padding:24px;background:var(--color-white);color:var(--color-ink);font-family:var(--font-sans);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}.spec-shapefocus .mono{font-family:var(--font-mono);font-size:12.5px;color:var(--color-gray);letter-spacing:.02em}.spec-shapefocus .lbl{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-gray)}.spec-shapefocus .row{display:flex;gap:16px;align-items:stretch}.spec-shapefocus .col{display:flex;flex-direction:column;gap:6px}.spec-shapefocus table{border-collapse:collapse;width:100%;font-size:13px}.spec-shapefocus th{text-align:left;font-family:var(--font-mono);font-weight:400;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-gray);padding:0 12px 8px 0;border-bottom:1px solid var(--color-line)}.spec-shapefocus td{padding:7px 12px 7px 0;border-bottom:1px solid var(--color-line);vertical-align:baseline}.spec-shapefocus .ok{font-family:var(--font-mono);font-size:12px;color:var(--color-blue)}.spec-shapefocus .no{font-family:var(--font-mono);font-size:12px;color:var(--color-alert)}</style><div class="spec spec-shapefocus"><div class="row" style="gap:20px;align-items:flex-start">
+<div class="col" style="gap:10px;flex:1">
+<div class="lbl">borde de control</div>
+<div style="height:44px;border:1px solid var(--border-control);border-radius:var(--radius-md);display:flex;align-items:center;padding:0 12px;font-size:15px;color:var(--color-gray)">1px línea fuerte</div>
+<div class="lbl">foco visible</div>
+<div style="height:44px;border:1px solid var(--border-control);border-radius:var(--radius-md);outline:2px solid var(--color-blue);outline-offset:2px;display:flex;align-items:center;padding:0 12px;font-size:15px;color:var(--color-ink)">2px azul + 2px offset</div>
+<div class="lbl">error</div>
+<div style="height:44px;border:2px solid var(--border-error);border-radius:var(--radius-md);display:flex;align-items:center;padding:0 12px;font-size:15px;color:var(--color-ink)">2px alerta</div>
+</div>
+<div class="col" style="flex:1;gap:8px;padding-left:18px;border-left:1px solid var(--color-line)">
+<div class="lbl">reglas</div>
+<div style="font-size:13px;color:var(--color-gray);line-height:1.55">Divisores y bordes de tarjeta: 1px <span class="mono">línea</span>.<br>Controles de formulario: 1px <span class="mono">línea fuerte</span> (3:1 mínimo).<br>Énfasis 2px: anillo de foco y subrayado del ítem activo del header.<br>Ningún elemento pierde el foco visible, tampoco al hacer clic con mouse.<br>Área táctil mínima 44×44px en todo control.</div>
+</div></div></div></figure><h2>05 · Movimiento</h2><figure><figcaption><span>Duraciones y qué no se anima</span><em>150–200ms en hover y foco. El hilo se dibuja una vez al cargar.</em></figcaption><style>.spec-motiondurations *{box-sizing:border-box}.spec-motiondurations{margin:0;padding:24px;background:var(--color-white);color:var(--color-ink);font-family:var(--font-sans);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}.spec-motiondurations .mono{font-family:var(--font-mono);font-size:12.5px;color:var(--color-gray);letter-spacing:.02em}.spec-motiondurations .lbl{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-gray)}.spec-motiondurations .row{display:flex;gap:16px;align-items:stretch}.spec-motiondurations .col{display:flex;flex-direction:column;gap:6px}.spec-motiondurations table{border-collapse:collapse;width:100%;font-size:13px}.spec-motiondurations th{text-align:left;font-family:var(--font-mono);font-weight:400;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-gray);padding:0 12px 8px 0;border-bottom:1px solid var(--color-line)}.spec-motiondurations td{padding:7px 12px 7px 0;border-bottom:1px solid var(--color-line);vertical-align:baseline}.spec-motiondurations .ok{font-family:var(--font-mono);font-size:12px;color:var(--color-blue)}.spec-motiondurations .no{font-family:var(--font-mono);font-size:12px;color:var(--color-alert)}</style><div class="spec spec-motiondurations"><table><thead><tr><th>Token</th><th>Valor</th><th>Easing</th><th>Uso</th></tr></thead><tbody>
+<tr><td class="mono">--dur-fast</td><td class="mono">150ms</td><td class="mono">--ease-out</td><td>color de hover, foco, subrayado de enlace</td></tr>
+<tr><td class="mono">--dur-mid</td><td class="mono">200ms</td><td class="mono">--ease-standard</td><td>apertura de acordeón, header al hacer scroll</td></tr>
+<tr><td class="mono">--dur-slow</td><td class="mono">400ms</td><td class="mono">--ease-standard</td><td>menú móvil, pantalla de confirmación</td></tr>
+<tr><td class="mono">--dur-thread</td><td class="mono">1400ms</td><td class="mono">--ease-thread</td><td>hilo Conecta, una sola vez al cargar</td></tr>
+</tbody></table>
+<div style="margin-top:12px;font-size:13px;color:var(--color-gray);line-height:1.55"><span class="lbl">No se anima</span><br>Entradas al hacer scroll, contadores, parallax, autoplay de video, carruseles, tarjetas que se elevan al pasar el mouse, íconos que rebotan. Todo se anula con <span class="mono">prefers-reduced-motion</span>.</div></div></figure><h2>06 · Marca aplicada</h2><figure><figcaption><span>Marca aplicada</span><em>Cada variante es un recorte del archivo entregado; la marca no se redibuja.</em></figcaption><style>.spec-brandlockup *{box-sizing:border-box}.spec-brandlockup{margin:0;padding:24px;background:var(--color-white);color:var(--color-ink);font-family:var(--font-sans);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}.spec-brandlockup .mono{font-family:var(--font-mono);font-size:12.5px;color:var(--color-gray);letter-spacing:.02em}.spec-brandlockup .lbl{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-gray)}.spec-brandlockup .row{display:flex;gap:16px;align-items:stretch}.spec-brandlockup .col{display:flex;flex-direction:column;gap:6px}.spec-brandlockup .mark{background-image:url("80f650a8-f151-4d67-b2cf-7f05cb7ffb58");background-repeat:no-repeat}.spec-brandlockup .lockup{background-size:122% 274%;background-position:50% 45.67%}.spec-brandlockup .iso{background-size:1333% 1111%;background-position:54.05% 31.87%}.spec-brandlockup .full{background-size:100% 100%;background-position:0 0}</style><div class="spec spec-brandlockup">
+<div class="row" style="gap:24px;align-items:flex-start">
+<div class="col" style="gap:14px;flex:1">
+<div class="col" style="gap:6px"><div class="lbl">header · lockup 48px (40px comprimido)</div>
+<div style="border:1px solid var(--color-line);border-radius:var(--radius-md);padding:12px 16px;display:flex;align-items:center;gap:24px"><div class="mark lockup" style="height:48px;width:108px"></div><div class="mark lockup" style="height:40px;width:90px"></div></div></div>
+<div class="col" style="gap:6px"><div class="lbl">footer azul · placa blanca (interim)</div>
+<div style="background:var(--surface-footer);border-radius:var(--radius-md);padding:16px;display:flex;align-items:center;gap:16px"><div style="background:#fff;border-radius:var(--radius-md);padding:10px 14px;display:inline-flex"><div class="mark lockup" style="height:36px;width:81px"></div></div><div style="font-size:12px;color:#C7D6EC;line-height:1.4;max-width:26ch">El archivo es un JPG con fondo blanco: no existe monocromo. La placa es la solución hasta recibir el vector.</div></div></div>
+<div class="col" style="gap:6px"><div class="lbl">isotipo · 48 / 32 / 16px</div>
+<div style="display:flex;align-items:flex-end;gap:16px"><div class="mark iso" style="height:48px;width:40px"></div><div class="mark iso" style="height:32px;width:27px"></div><div class="mark iso" style="height:16px;width:13px"></div><div class="mono">se recorta la gota sobre la «i»</div></div></div>
+</div>
+<div class="col" style="flex:0 0 210px;gap:10px;padding-left:20px;border-left:1px solid var(--color-line)">
+<div class="lbl">círculo completo · ≥120px</div>
+<div class="mark full" style="height:120px;width:120px;border-radius:var(--radius-sm)"></div>
+<div class="lbl" style="margin-top:4px">reglas</div>
+<div style="font-size:12.5px;color:var(--color-gray);line-height:1.5">Resguardo: 0.55 × el alto del lockup por cada lado. Mínimos: lockup 32px, círculo 120px, isotipo 16px. El círculo nunca va en el header. Sin filtros, sin estirar, sin recolorear.</div>
+</div></div></div></figure><figure><figcaption><span>El negro de CONECTA</span><em>Recomendación: reemplazar el negro puro por tinta #14181D en el archivo fuente.</em></figcaption><style>.spec-brandconectablack *{box-sizing:border-box}.spec-brandconectablack{margin:0;padding:24px;background:var(--color-white);color:var(--color-ink);font-family:var(--font-sans);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}.spec-brandconectablack .mono{font-family:var(--font-mono);font-size:12.5px;color:var(--color-gray);letter-spacing:.02em}.spec-brandconectablack .lbl{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-gray)}.spec-brandconectablack .row{display:flex;gap:16px;align-items:stretch}.spec-brandconectablack .col{display:flex;flex-direction:column;gap:6px}.spec-brandconectablack .mark{background-image:url("80f650a8-f151-4d67-b2cf-7f05cb7ffb58");background-repeat:no-repeat}.spec-brandconectablack .lockup{background-size:113.6% 263.2%;background-position:50% 45.16%}.spec-brandconectablack .iso{background-size:1333% 1111%;background-position:54.05% 31.87%}.spec-brandconectablack .full{background-size:100% 100%;background-position:0 0}.spec-brandconectablack .word{font-family:var(--font-sans);font-weight:500;font-size:34px;letter-spacing:.34em;line-height:1}.spec-brandconectablack .blue{font-family:var(--font-serif);font-weight:600;font-size:26px;color:var(--color-blue);line-height:1}</style><div class="spec spec-brandconectablack">
+<div class="row" style="gap:24px;align-items:stretch">
+<div class="col" style="flex:1;gap:10px"><div class="lbl">antes · negro puro #000000</div>
+<div style="border:1px solid var(--color-line);border-radius:var(--radius-md);padding:20px 18px;display:flex;flex-direction:column;gap:8px;align-items:center"><div class="blue">Clínica</div><div class="word" style="color:#000">CONECTA</div></div>
+<div style="font-size:12.5px;color:var(--color-gray);line-height:1.45">21:1 sobre blanco. Junto al azul Conecta el salto de peso óptico corta el lockup en dos marcas distintas.</div></div>
+<div class="col" style="flex:1;gap:10px"><div class="lbl">después · tinta #14181D</div>
+<div style="border:1px solid var(--color-line);border-radius:var(--radius-md);padding:20px 18px;display:flex;flex-direction:column;gap:8px;align-items:center;background:var(--surface-alt)"><div class="blue">Clínica</div><div class="word" style="color:var(--color-ink)">CONECTA</div></div>
+<div style="font-size:12.5px;color:var(--color-gray);line-height:1.45">17.82:1, mismo color que todo el texto del sitio. El lockup se lee como una unidad y la marca deja de ser el único negro puro del sistema.</div></div>
+</div>
+<div class="mono" style="margin-top:14px">Muestra tipográfica, no el logo: el cambio se aplica en el archivo fuente. Alternativa si se quiere más contraste con el azul: azul profundo #0A2B5E.</div>
+</div></figure><figure><figcaption><span>Hilo Conecta: dónde sí, dónde no</span><em>La continuidad de la línea es el argumento del negocio, no un adorno.</em></figcaption><style>.spec-brandthreadusage *{box-sizing:border-box}.spec-brandthreadusage{margin:0;padding:24px;background:var(--color-white);color:var(--color-ink);font-family:var(--font-sans);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}.spec-brandthreadusage .mono{font-family:var(--font-mono);font-size:12.5px;color:var(--color-gray);letter-spacing:.02em}.spec-brandthreadusage .lbl{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-gray)}.spec-brandthreadusage .row{display:flex;gap:16px;align-items:stretch}.spec-brandthreadusage .col{display:flex;flex-direction:column;gap:6px}.spec-brandthreadusage table{border-collapse:collapse;width:100%;font-size:13px}.spec-brandthreadusage th{text-align:left;font-family:var(--font-mono);font-weight:400;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-gray);padding:0 12px 8px 0;border-bottom:1px solid var(--color-line)}.spec-brandthreadusage td{padding:7px 12px 7px 0;border-bottom:1px solid var(--color-line);vertical-align:baseline}.spec-brandthreadusage .ok{font-family:var(--font-mono);font-size:12px;color:var(--color-blue)}.spec-brandthreadusage .no{font-family:var(--font-mono);font-size:12px;color:var(--color-alert)}</style><div class="spec spec-brandthreadusage"><div class="col" style="gap:16px">
+<div class="col" style="gap:8px"><div class="lbl">así sí · secuencia real de la atención</div>
+<div style="position:relative;height:56px">
+<svg viewBox="0 0 640 8" preserveAspectRatio="none" style="position:absolute;left:0;top:14px;width:100%;height:8px;overflow:visible"><line x1="0" y1="4" x2="640" y2="4" stroke="var(--color-blue)" stroke-width="2" vector-effect="non-scaling-stroke"></line><circle cx="0" cy="4" r="5" fill="#fff" stroke="var(--color-blue)" stroke-width="2" vector-effect="non-scaling-stroke"></circle><circle cx="213" cy="4" r="5" fill="#fff" stroke="var(--color-blue)" stroke-width="2" vector-effect="non-scaling-stroke"></circle><circle cx="427" cy="4" r="5" fill="#fff" stroke="var(--color-blue)" stroke-width="2" vector-effect="non-scaling-stroke"></circle><circle cx="640" cy="4" r="5" fill="#fff" stroke="var(--color-blue)" stroke-width="2" vector-effect="non-scaling-stroke"></circle></svg>
+<div style="display:flex;justify-content:space-between;position:absolute;top:30px;width:100%;font-size:12px;color:var(--color-gray)"><span>Agendas</span><span>Consulta</span><span>Exámenes</span><span>Plan</span></div>
+</div></div>
+<div class="row" style="gap:18px">
+<div class="col" style="flex:1;gap:6px"><div class="lbl">reglas</div><div style="font-size:12.5px;color:var(--color-gray);line-height:1.5">Grosor 2px (1.5 mínimo, 3 máximo) en azul Conecta. Curvas con radio ≥24px. Una sola aparición por página: la secuencia de la atención. En &lt;768px se quiebra a vertical, nunca a media línea.</div></div>
+<div class="col" style="flex:1;gap:6px"><div class="lbl" style="color:var(--color-alert)">así no</div><div style="font-size:12.5px;color:var(--color-gray);line-height:1.5">Como fondo decorativo, cruzando texto, dentro de una tarjeta, sobre azul saturado, en el header o el footer, uniendo las cuatro prestaciones (eso lo resuelve la grilla), o redibujándose al hacer scroll.</div></div>
+</div></div></div></figure>
+<h2>07 · Componentes</h2>
+<figure><figcaption><span>Iconografía</span><em>Lucide en trazo de 2px como máscara CSS: hereda el color del texto.</em></figcaption><style>.spec-c-icon *{box-sizing:border-box}.spec-c-icon{margin:0;padding:24px;background:#fff;color:var(--color-ink);font-family:var(--font-sans);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}.spec-c-icon .lbl{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-gray);margin-bottom:8px}.spec-c-icon .stack{display:flex;flex-direction:column;gap:20px}.spec-c-icon .row{display:flex;gap:16px;align-items:center;flex-wrap:wrap}.spec-c-icon .zoom{width:1280px;transform:scale(.5078);transform-origin:top left}</style><div class="spec spec-c-icon" id="mount-icon"></div></figure><figure><figcaption><span>Acciones</span><em>Botón primario, secundario y de texto · tres tamaños · WhatsApp · enlaces.</em></figcaption><style>.spec-c-actions *{box-sizing:border-box}.spec-c-actions{margin:0;padding:24px;background:#fff;color:var(--color-ink);font-family:var(--font-sans);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}.spec-c-actions .lbl{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-gray);margin-bottom:8px}.spec-c-actions .stack{display:flex;flex-direction:column;gap:20px}.spec-c-actions .row{display:flex;gap:16px;align-items:center;flex-wrap:wrap}.spec-c-actions .zoom{width:1280px;transform:scale(.5078);transform-origin:top left}</style><div class="spec spec-c-actions" id="mount-actions"></div></figure><figure><figcaption><span>Navegación</span><em>Header en reposo y comprimido, header móvil con menú abierto, breadcrumbs y footer.</em></figcaption><style>.spec-c-navigation *{box-sizing:border-box}.spec-c-navigation{margin:0;padding:24px;background:#fff;color:var(--color-ink);font-family:var(--font-sans);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}.spec-c-navigation .lbl{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-gray);margin-bottom:8px}.spec-c-navigation .stack{display:flex;flex-direction:column;gap:20px}.spec-c-navigation .row{display:flex;gap:16px;align-items:center;flex-wrap:wrap}.spec-c-navigation .zoom{width:1280px;transform:scale(.5078);transform-origin:top left}</style><div class="spec spec-c-navigation" id="mount-navigation"></div></figure><figure><figcaption><span>Contenido</span><em>Prestación eje vs orbitantes, profesional, recurso, pasos, FAQ, precio, chips y cita.</em></figcaption><style>.spec-c-content *{box-sizing:border-box}.spec-c-content{margin:0;padding:24px;background:#fff;color:var(--color-ink);font-family:var(--font-sans);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}.spec-c-content .lbl{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-gray);margin-bottom:8px}.spec-c-content .stack{display:flex;flex-direction:column;gap:20px}.spec-c-content .row{display:flex;gap:16px;align-items:center;flex-wrap:wrap}.spec-c-content .zoom{width:1280px;transform:scale(.5078);transform-origin:top left}</style><div class="spec spec-c-content" id="mount-content"></div></figure><figure><figcaption><span>Formulario</span><em>Campos, estados de error, envío en carga y confirmación. Sin campo libre de síntomas.</em></figcaption><style>.spec-c-forms *{box-sizing:border-box}.spec-c-forms{margin:0;padding:24px;background:#fff;color:var(--color-ink);font-family:var(--font-sans);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}.spec-c-forms .lbl{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-gray);margin-bottom:8px}.spec-c-forms .stack{display:flex;flex-direction:column;gap:20px}.spec-c-forms .row{display:flex;gap:16px;align-items:center;flex-wrap:wrap}.spec-c-forms .zoom{width:1280px;transform:scale(.5078);transform-origin:top left}</style><div class="spec spec-c-forms" id="mount-forms"></div></figure><figure><figcaption><span>Avisos</span><em>Urgencias (único rojo junto a los errores), aviso clínico y nota neutra.</em></figcaption><style>.spec-c-notices *{box-sizing:border-box}.spec-c-notices{margin:0;padding:24px;background:#fff;color:var(--color-ink);font-family:var(--font-sans);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}.spec-c-notices .lbl{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-gray);margin-bottom:8px}.spec-c-notices .stack{display:flex;flex-direction:column;gap:20px}.spec-c-notices .row{display:flex;gap:16px;align-items:center;flex-wrap:wrap}.spec-c-notices .zoom{width:1280px;transform:scale(.5078);transform-origin:top left}</style><div class="spec spec-c-notices" id="mount-notices"></div></figure>
+</div>
+<script type="text/babel">
+
+const NS = window.ConectaDesignSystem_3fd8ff || {};
+
+const { Icon } = NS;
+const SET = ["clock","calendar","map-pin","phone","message-circle","video","file-text","download","arrow-right","chevron-down","plus","minus","check","triangle-alert","info"];
+function Card(){return (<div className="stack">
+  <div><div className="lbl">24px · azul Conecta</div><div className="row" style={{gap:18}}>{SET.map(n=><Icon key={n} name={n} size={24} color="var(--color-blue)" />)}</div></div>
+  <div className="row" style={{gap:28}}>
+    <div><div className="lbl">20px en texto</div><div style={{display:"flex",alignItems:"center",gap:8}}><Icon name="clock" size={20} color="var(--color-gray)" /><span style={{fontSize:16,color:"var(--color-gray)"}}>40 minutos</span></div></div>
+    <div><div className="lbl">sobre azul profundo</div><div style={{display:"flex",gap:12,background:"var(--surface-footer)",padding:"10px 14px",borderRadius:8}}>{["map-pin","phone","clock"].map(n=><Icon key={n} name={n} size={22} color="#fff" />)}</div></div>
+    <div><div className="lbl">whatsapp · set simple</div><Icon name="whatsapp" set="simple" size={24} color="#0F7A46" /></div>
+  </div>
+</div>);}
+
+
+window.__CARDS = window.__CARDS || {}; window.__CARDS["icon"] = Card;
+</script>
+<script type="text/babel">
+
+const NS = window.ConectaDesignSystem_3fd8ff || {};
+
+const { Button, WhatsAppButton, TextLink } = NS;
+function Card(){return (<div className="stack">
+  <div><div className="lbl">variantes · md</div><div className="row"><Button variant="primary" icon="calendar" iconPosition="left">Agendar hora</Button><Button variant="secondary">Ver prestaciones</Button><Button variant="text" icon="arrow-right">Leer más</Button></div></div>
+  <div><div className="lbl">tamaños · sm 40 / md 48 / lg 56</div><div className="row"><Button size="sm">Solicitar hora</Button><Button size="md">Solicitar hora</Button><Button size="lg">Solicitar hora</Button></div></div>
+  <div><div className="lbl">estados</div><div className="row"><Button loading>Solicitar hora</Button><Button disabled>No disponible</Button><Button variant="secondary" disabled>No disponible</Button></div></div>
+  <div className="row" style={{gap:32,alignItems:"flex-end"}}>
+    <div><div className="lbl">whatsapp · flotante / inline</div><div className="row"><WhatsAppButton /><WhatsAppButton variant="inline" /></div></div>
+  </div>
+  <div><div className="lbl">enlace en texto corrido</div><p style={{margin:0,fontSize:"var(--text-body)",lineHeight:1.6,maxWidth:"60ch"}}>La primera unidad es <TextLink href="#">Conecta Hematología</TextLink>, y puedes <TextLink href="#" arrow>agendar una hora</TextLink> sin derivación previa.</p></div>
+</div>);}
+
+
+window.__CARDS = window.__CARDS || {}; window.__CARDS["actions"] = Card;
+</script>
+<script type="text/babel">
+
+const NS = window.ConectaDesignSystem_3fd8ff || {};
+
+const { SiteHeader, Breadcrumbs, SiteFooter } = NS;
+const LOGO = window.__resources.logo;
+function Card(){return (<div className="stack" style={{gap:24}}>
+  <div><div className="lbl">header 80px · en reposo</div><div className="zoom" style={{height:41,overflow:"hidden"}}><SiteHeader logoSrc={LOGO} style={{border:"1px solid var(--color-line)",borderRadius:8}} /></div></div>
+  <div><div className="lbl">header 64px · comprimido al hacer scroll</div><div className="zoom" style={{height:33,overflow:"hidden"}}><SiteHeader logoSrc={LOGO} compressed style={{border:"1px solid var(--color-line)",borderRadius:8}} /></div></div>
+  <div className="row" style={{alignItems:"flex-start",gap:24}}>
+    <div><div className="lbl">móvil 390 · menú abierto</div><div style={{width:390,border:"1px solid var(--color-line)",borderRadius:8,overflow:"hidden"}}><SiteHeader logoSrc={LOGO} layout="mobile" menuOpen /></div></div>
+    <div style={{flex:1}}><div className="lbl">breadcrumbs</div><Breadcrumbs items={[{label:"Inicio",href:"#inicio"},{label:"Prestaciones",href:"#prestaciones"},{label:"Hematología"}]} /></div>
+  </div>
+  <div><div className="lbl">footer</div><div className="zoom" style={{height:265,overflow:"hidden"}}><SiteFooter logoSrc={LOGO} /></div></div>
+</div>);}
+
+
+window.__CARDS = window.__CARDS || {}; window.__CARDS["navigation"] = Card;
+</script>
+<script type="text/babel">
+
+const NS = window.ConectaDesignSystem_3fd8ff || {};
+
+const { ServiceCard, ProfessionalCard, ResourceCard, StepBlock, Accordion, PriceBlock, StatusChip, Pullquote, ConectaThread } = NS;
+function Card(){return (<div className="stack" style={{gap:28}}>
+  <div><div className="lbl">tarjeta de prestación · eje 6 col + orbitantes 2 col</div>
+    <div style={{display:"grid",gridTemplateColumns:"repeat(12,1fr)",gap:16}}>
+      <ServiceCard level="axis" style={{gridColumn:"span 6"}} icon="activity" title="Conecta Hematología" summary="Anemias, alteraciones de plaquetas y seguimiento oncohematológico, con un solo equipo a cargo de tu caso." chips={["presencial","telemedicina"]} />
+      <ServiceCard style={{gridColumn:"span 3"}} icon="stethoscope" title="Gastroenterología" summary="Estudio digestivo cuando la anemia lo pide." />
+      <ServiceCard style={{gridColumn:"span 3"}} icon="salad" title="Nutrición y dietética" summary="Plan alimentario durante el tratamiento." />
+    </div></div>
+  <div className="row" style={{gap:16,alignItems:"stretch"}}>
+    <ProfessionalCard style={{flex:1}} name="Dr. Carlos Flores Angulo" role="Hematología" subtitle="Doctorando en epidemiología" />
+    <ResourceCard style={{width:260}} videoId="conecta-pendiente" title="Qué mide un hemograma" duration="6 min" />
+  </div>
+  <div><div className="lbl">pasos de la atención · con el hilo Conecta</div>
+    <ConectaThread nodes={4} active={1} style={{marginBottom:12}} />
+    <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:16}}>
+      <StepBlock number={1} title="Agendas">Eliges día y modalidad. No necesitas derivación.</StepBlock>
+      <StepBlock number={2} title="Consulta">40 minutos con tus exámenes previos a la vista.</StepBlock>
+      <StepBlock number={3} title="Exámenes" active={false}>Solo los que faltan, con la orden en la mano.</StepBlock>
+      <StepBlock number={4} title="Plan" active={false}>Un plan escrito y quién lo sigue contigo.</StepBlock>
+    </div></div>
+  <div className="row" style={{gap:16,alignItems:"flex-start"}}>
+    <div style={{flex:1}}><div className="lbl">preguntas frecuentes</div><Accordion items={[{q:"¿Atienden por Fonasa o isapre?",a:"No. La atención es solo particular. Entregamos boleta para que la presentes a tu seguro."},{q:"¿Necesito derivación para agendar?",a:"No. Puedes agendar directamente."}]} /></div>
+    <div style={{width:230}}><div className="lbl">chips de estado</div><div className="row" style={{gap:8}}><StatusChip kind="presencial" /><StatusChip kind="telemedicina" /><StatusChip kind="sabado" /></div></div>
+  </div>
+  <div><div className="lbl">bloque de precio</div><PriceBlock /></div>
+  <div><div className="lbl">cita y dato destacado</div>
+    <Pullquote source="Dr. Carlos Flores Angulo, hematólogo" style={{margin:0}}>El paciente no debería tener que explicar su caso desde cero en cada puerta.</Pullquote>
+    <Pullquote kind="data" source="Duración de la consulta en Conecta" style={{marginTop:16,marginBottom:0}}>40 minutos de consulta</Pullquote></div>
+</div>);}
+
+
+window.__CARDS = window.__CARDS || {}; window.__CARDS["content"] = Card;
+</script>
+<script type="text/babel">
+
+const NS = window.ConectaDesignSystem_3fd8ff || {};
+
+const { Field, AppointmentForm, CONTROL_CSS } = NS;
+function Card(){return (<div className="stack" style={{gap:28}}>
+  <style>{CONTROL_CSS}</style>
+  <div><div className="lbl">estados del control</div>
+    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:20}}>
+      <Field id="d1" label="Nombre y apellido" required><input className="conecta-control" defaultValue="María Fuentes" /></Field>
+      <Field id="d2" label="Teléfono" help="Lo usamos solo para confirmar tu hora." required error="Escribe un teléfono de 9 dígitos."><input className="conecta-control" defaultValue="+56 9 123" /></Field>
+      <Field id="d3" label="Comuna" required><select className="conecta-control" defaultValue="Ñuñoa"><option>Ñuñoa</option></select></Field>
+      <Field id="d4" label="Mensaje" ><textarea className="conecta-control" disabled placeholder="No se usa en el sitio" /></Field>
+    </div></div>
+  <div><div className="lbl">solicitud de hora · en carga</div><AppointmentForm state="loading" style={{maxWidth:"100%"}} /></div>
+  <div><div className="lbl">confirmación</div><AppointmentForm state="sent" style={{maxWidth:"100%"}} /></div>
+</div>);}
+
+
+window.__CARDS = window.__CARDS || {}; window.__CARDS["forms"] = Card;
+</script>
+<script type="text/babel">
+
+const NS = window.ConectaDesignSystem_3fd8ff || {};
+
+const { UrgencyNotice, ClinicalDisclaimer, InfoNote } = NS;
+function Card(){return (<div className="stack" style={{gap:24}}>
+  <div><div className="lbl">urgencias · superficie</div><UrgencyNotice /></div>
+  <div><div className="lbl">urgencias · plano (footer)</div><UrgencyNotice tone="flat" /></div>
+  <div><div className="lbl">nota informativa neutra</div><InfoNote title="Trae tus exámenes previos" icon="file-text">Si tienes hemogramas o informes de los últimos 12 meses, tráelos impresos o en el teléfono.</InfoNote></div>
+  <div><div className="lbl">aviso al pie de contenido clínico</div><ClinicalDisclaimer style={{marginTop:0}} /></div>
+</div>);}
+
+
+window.__CARDS = window.__CARDS || {}; window.__CARDS["notices"] = Card;
+</script>
+
+<script type="text/babel">
+(function mount(t){
+  if ((!window.ConectaDesignSystem_3fd8ff || !window.__CARDS) && t < 60) return setTimeout(()=>mount(t+1),100);
+  Object.keys(window.__CARDS || {}).forEach(function(k){
+    var el = document.getElementById('mount-' + k);
+    if (el) ReactDOM.createRoot(el).render(React.createElement(window.__CARDS[k]));
+  });
+})(0);
+</script>
+</body></html>

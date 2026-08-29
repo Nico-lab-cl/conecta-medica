@@ -1,0 +1,221 @@
+---
+/* Información para pacientes.
+
+   Estado vacío honesto: mientras no haya material revisado, la página dice que
+   se está preparando y ofrece las preguntas frecuentes, que sí existen. No se
+   publican tarjetas de relleno ni títulos falsos "próximamente" que no llevan a
+   ninguna parte. */
+import Pagina from '../../layouts/Pagina.astro';
+import Boton from '../../components/actions/Boton.astro';
+import Icono from '../../components/core/Icono.astro';
+import DescargoClinico from '../../components/notices/DescargoClinico.astro';
+import BotonWhatsApp from '../../components/actions/BotonWhatsApp.astro';
+import { RUTAS, migas } from '../../lib/rutas';
+import { recursosPublicables, categoriasConRecursos, faqsPublicables } from '../../lib/contenido';
+
+const recursos = await recursosPublicables();
+const categorias = await categoriasConRecursos();
+const faqs = (await faqsPublicables()).filter((f) => f.data.categoria === 'clinica').slice(0, 4);
+const ruta = migas({ label: 'Información para pacientes' });
+---
+
+<Pagina
+  titulo="Información para pacientes — Clínica Conecta"
+  descripcion="Material para entender tus exámenes, prepararte para la consulta y saber qué esperar del tratamiento hematológico."
+  ruta={RUTAS.pacientes}
+  actual={RUTAS.pacientes}
+  eyebrow="Información para pacientes"
+  h1="Entender lo que te está pasando"
+  bajada="Material escrito y revisado por el equipo médico, en lenguaje simple. Es información general: no reemplaza una evaluación."
+  migas={ruta}
+>
+  <section class="seccion">
+    <div class="contenedor">
+      {
+        recursos.length > 0 ? (
+          <>
+            <nav class="filtros" aria-label="Categorías">
+              <a class="filtro" href={RUTAS.pacientes} aria-current="page">
+                Todo
+              </a>
+              {categorias.map((c) => (
+                <a class="filtro" href={RUTAS.categoria(c.data.slug)}>
+                  {c.data.nombre}
+                </a>
+              ))}
+            </nav>
+            <div class="rejilla">
+              {recursos.map((r) => (
+                <a class="tarjeta" href={RUTAS.recurso(r.data.slug)}>
+                  <span class="kicker">{r.data.tipo}</span>
+                  <span class="tarjeta-titulo">{r.data.titulo}</span>
+                  <span class="tarjeta-desc">{r.data.descripcion}</span>
+                </a>
+              ))}
+            </div>
+          </>
+        ) : (
+          <div class="vacio">
+            <Icono nombre="file-text" tam={32} color="var(--color-blue)" />
+            <h2>Estamos preparando este material</h2>
+            <p>
+              Estamos escribiendo las guías y grabando los videos, y cada contenido pasa por
+              revisión médica antes de publicarse. Mientras tanto, las preguntas frecuentes ya
+              responden lo que más nos consultan.
+            </p>
+            <Boton href={RUTAS.preguntas} variante="primary" icono="arrow-right">
+              Ir a las preguntas frecuentes
+            </Boton>
+          </div>
+        )
+      }
+    </div>
+  </section>
+
+  {
+    faqs.length > 0 && (
+      <section class="seccion seccion-alt">
+        <div class="contenedor">
+          <p class="eyebrow">Mientras tanto</p>
+          <h2>Lo que ya está respondido</h2>
+          <ul class="preguntas">
+            {faqs.map((f) => (
+              <li>
+                <a href={`${RUTAS.preguntas}#${f.data.slug}`}>
+                  <span>{f.data.pregunta}</span>
+                  <Icono nombre="arrow-right" tam={18} color="var(--color-blue)" />
+                </a>
+              </li>
+            ))}
+          </ul>
+          <DescargoClinico />
+        </div>
+      </section>
+    )
+  }
+
+  <section class="seccion">
+    <div class="contenedor cierre">
+      <h2>¿Tu duda no está acá?</h2>
+      <p>Escríbenos y te orientamos sobre si corresponde una consulta.</p>
+      <div class="acciones"><BotonWhatsApp origen="recursos" /></div>
+    </div>
+  </section>
+</Pagina>
+
+<style>
+  .filtros {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-bottom: var(--space-8);
+  }
+  .filtro {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--touch-min);
+    padding: 0 16px;
+    border-radius: var(--radius-pill);
+    border: var(--border-width) solid var(--color-line);
+    color: var(--color-ink);
+    text-decoration: none;
+    font-size: var(--text-body-sm);
+    font-weight: var(--weight-medium);
+  }
+  .filtro[aria-current='page'] {
+    background: var(--color-blue);
+    border-color: var(--color-blue);
+    color: var(--color-white);
+  }
+  .rejilla {
+    display: grid;
+    gap: var(--space-5);
+  }
+  @media (min-width: 700px) {
+    .rejilla {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (min-width: 1100px) {
+    .rejilla {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  .tarjeta {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-5);
+    border: var(--border-width) solid var(--color-line);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-1);
+    text-decoration: none;
+    color: var(--color-ink);
+  }
+  .tarjeta:hover {
+    border-color: var(--color-blue);
+  }
+  .kicker {
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-gray);
+  }
+  .tarjeta-titulo {
+    font-weight: var(--weight-semibold);
+    font-size: var(--text-h4);
+    line-height: 1.4;
+  }
+  .tarjeta-desc {
+    font-size: var(--text-body-sm);
+    line-height: 1.6;
+    color: var(--color-gray);
+  }
+
+  .vacio {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-5);
+    padding: var(--space-12);
+    background: var(--surface-alt);
+    border-radius: var(--radius-lg);
+    max-width: var(--measure-prose);
+  }
+  .vacio p {
+    font-size: var(--text-body);
+    line-height: 1.7;
+  }
+
+  .preguntas {
+    list-style: none;
+    margin: var(--space-8) 0 0;
+    padding: 0;
+    border-top: var(--border-width) solid var(--color-line);
+    max-width: 860px;
+  }
+  .preguntas a {
+    display: flex;
+    gap: var(--space-4);
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-5) 0;
+    border-bottom: var(--border-width) solid var(--color-line);
+    text-decoration: none;
+    color: var(--color-ink);
+    font-size: var(--text-h4);
+    font-weight: var(--weight-semibold);
+  }
+  .preguntas a:hover {
+    color: var(--color-blue);
+  }
+  .cierre p {
+    margin-top: var(--space-4);
+    font-size: var(--text-body-lg);
+    color: var(--color-gray);
+  }
+  .acciones {
+    margin-top: var(--space-6);
+  }
+</style>

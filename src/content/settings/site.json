@@ -1,0 +1,37 @@
+{
+  "site": {
+    "nombre": "Clínica Conecta",
+    "razonSocial": "Clínica Conecta SpA",
+    "tagline": "Tu salud hematológica, conectada con quienes la entienden",
+    "correoAgenda": "asistente@conectamedica.com",
+    "correoContacto": null,
+    "telefono": null,
+    "whatsapp": null,
+    "redes": [],
+    "precioConsulta": 50000,
+    "precioNota": "Atención particular. No trabajamos con Fonasa ni con isapres en convenio.",
+    "avisoUrgencias": {
+      "titulo": "Esta no es una unidad de urgencia",
+      "cuerpo": "Si tienes fiebre sobre 38 °C, sangrado que no se detiene o falta de aire, acude al servicio de urgencia más cercano o llama al 131. No esperes una hora con nosotros.",
+      "telefono": "131"
+    },
+    "agendamiento": {
+      "modo": "formulario",
+      "src": null,
+      "altura": 900,
+      "proveedor": null,
+      "politicaPrivacidadProveedor": null
+    },
+    "estadoApertura": {
+      "estado": "pre-apertura",
+      "fecha": null,
+      "mensaje": null
+    },
+    "compromisos": [
+      "Te explicamos el diagnóstico en palabras simples.",
+      "Sabes el precio antes de que te atendamos.",
+      "No indicamos exámenes que no aporten a tu caso.",
+      "Atendemos a la hora que te dimos."
+    ]
+  }
+}

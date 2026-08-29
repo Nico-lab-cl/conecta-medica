@@ -1,0 +1,203 @@
+---
+/* Página de agenda.
+
+   Existe desde el día uno y NO cambia cuando llegue Medinet: lo único que cambia
+   es `agendamiento.modo` en el CMS. En "formulario" muestra el formulario
+   propio; en "iframe" monta la agenda del proveedor. El resto del sitio —los
+   trece CTA que apuntan acá— no se toca.
+
+   El diseño está pensado para funcionar con un bloque opaco al medio: cabecera
+   propia con instrucciones, la agenda, y debajo el WhatsApp como salida para
+   quien se atasque. El flujo de RUT deja gente en el camino, sobre todo adultos
+   mayores y pacientes extranjeros. */
+import Pagina from '../../layouts/Pagina.astro';
+import FormularioHora from '../../components/forms/FormularioHora.astro';
+import EmbedAgenda from '../../components/agenda/EmbedAgenda.astro';
+import BotonWhatsApp from '../../components/actions/BotonWhatsApp.astro';
+import EnlaceTexto from '../../components/actions/EnlaceTexto.astro';
+import Icono from '../../components/core/Icono.astro';
+import AvisoUrgencias from '../../components/notices/AvisoUrgencias.astro';
+import '../../styles/formulario.css';
+import { RUTAS, migas } from '../../lib/rutas';
+import { ajustes, pais, horarioLegible, precioCLP } from '../../lib/contenido';
+
+const a = await ajustes();
+const cl = (await pais('cl')).data;
+const ruta = migas({ label: 'Agendar hora' });
+const claveTurnstile = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY as string | undefined;
+const conIframe = a.agendamiento.modo === 'iframe' && Boolean(a.agendamiento.src);
+---
+
+<Pagina
+  titulo="Agendar hora — Clínica Conecta"
+  descripcion="Solicita tu hora de hematología, presencial en Ñuñoa o por telemedicina. Consulta particular $50.000, sin derivación previa."
+  ruta={RUTAS.agendar}
+  actual={RUTAS.agendar}
+  eyebrow="Agendar"
+  h1="Agenda tu hora"
+  bajada={
+    conIframe
+      ? 'Elige día y hora en la agenda. Vas a necesitar tu RUT y un correo electrónico.'
+      : 'Déjanos tus datos y te contactamos dentro del próximo día hábil para confirmar día y hora.'
+  }
+  migas={ruta}
+>
+  <section class="seccion">
+    <div class="contenedor columnas">
+      <div class="principal">
+        {
+          conIframe ? (
+            <EmbedAgenda
+              src={a.agendamiento.src!}
+              altura={a.agendamiento.altura}
+              proveedor={a.agendamiento.proveedor}
+              politicaProveedor={a.agendamiento.politicaPrivacidadProveedor}
+            />
+          ) : (
+            <>
+              <FormularioHora claveTurnstile={claveTurnstile} retorno="/agendar/" />
+            </>
+          )
+        }
+
+        {/* Salida siempre visible para quien se atasque. */}
+        <div class="salida">
+          <h2>¿Se te complicó?</h2>
+          <p>
+            Escríbenos y coordinamos tu hora a mano. Sirve especialmente si no tienes RUT chileno o
+            si prefieres hablar con alguien.
+          </p>
+          <div class="salida-acciones">
+            <BotonWhatsApp origen="agendar" />
+            <EnlaceTexto href={`mailto:${a.correoAgenda}`}>{a.correoAgenda}</EnlaceTexto>
+          </div>
+        </div>
+      </div>
+
+      <aside class="lateral">
+        <div class="bloque">
+          <h2>Lo que necesitas saber</h2>
+          <ul class="datos">
+            <li>
+              <Icono nombre="info" tam={20} color="var(--color-blue)" />
+              <span>Consulta {precioCLP(a.precioConsulta)}, atención solo particular.</span>
+            </li>
+            <li>
+              <Icono nombre="check" tam={20} color="var(--color-blue)" />
+              <span>No necesitas derivación de otro médico.</span>
+            </li>
+            <li>
+              <Icono nombre="file-text" tam={20} color="var(--color-blue)" />
+              <span>Trae tus exámenes previos, aunque sean antiguos.</span>
+            </li>
+            <li>
+              <Icono nombre="video" tam={20} color="var(--color-blue)" />
+              <span>Puedes elegir presencial en Ñuñoa o telemedicina.</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="bloque">
+          <h2>Horarios</h2>
+          <ul class="horarios">
+            {
+              cl.horarios.map((h) => (
+                <li>
+                  <Icono nombre="clock" tam={18} color="var(--color-blue)" />
+                  {horarioLegible(h)}
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="seccion seccion-alt">
+    <div class="contenedor"><AvisoUrgencias /></div>
+  </section>
+</Pagina>
+
+<style>
+  .columnas {
+    display: grid;
+    gap: var(--space-12);
+  }
+  @media (min-width: 1000px) {
+    .columnas {
+      grid-template-columns: 1.4fr 1fr;
+      gap: var(--space-16);
+    }
+  }
+  .principal {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-12);
+  }
+  .salida {
+    padding: var(--space-6);
+    border: var(--border-width) solid var(--color-line);
+    border-radius: var(--radius-lg);
+    max-width: 620px;
+  }
+  .salida h2 {
+    font-size: var(--text-h3);
+  }
+  .salida p {
+    margin-top: var(--space-3);
+    font-size: var(--text-body-sm);
+    line-height: 1.6;
+    color: var(--color-gray);
+  }
+  .salida-acciones {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-4);
+    margin-top: var(--space-5);
+  }
+  .lateral {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+  .bloque {
+    padding: var(--space-6);
+    background: var(--surface-alt);
+    border-radius: var(--radius-lg);
+  }
+  .bloque h2 {
+    font-size: var(--text-h3);
+  }
+  .datos {
+    list-style: none;
+    margin: var(--space-5) 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    font-size: var(--text-body-sm);
+    line-height: 1.6;
+  }
+  .datos li {
+    display: flex;
+    gap: var(--space-3);
+    align-items: flex-start;
+  }
+  .horarios {
+    list-style: none;
+    margin: var(--space-5) 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    font-family: var(--font-mono);
+    font-size: var(--text-body-sm);
+  }
+  .horarios li {
+    display: flex;
+    gap: var(--space-3);
+    align-items: center;
+  }
+</style>

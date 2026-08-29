@@ -1,0 +1,43 @@
+/* Paleta Conecta — 8 valores base + 1 borde interactivo. No expandir.
+   Contrastes verificados sobre blanco (#FFFFFF) y azul nube (#EDF3FC). */
+:root{
+--color-blue:#12489E;        /* azul Conecta — 8.35:1 sobre blanco (AAA) */
+--color-blue-deep:#0A2B5E;   /* azul profundo — 13.81:1 sobre blanco (AAA) */
+--color-blue-cloud:#EDF3FC;  /* azul nube — fondo, nunca texto */
+--color-ink:#14181D;         /* tinta — 17.82:1 sobre blanco (AAA) */
+--color-gray:#5B646E;        /* gris — 6.01:1 sobre blanco (AA) */
+--color-line:#E2E7EE;        /* línea — divisores decorativos */
+--color-line-strong:#78828E; /* línea fuerte — bordes de controles, 3.90:1 (AA no-texto) */
+--color-white:#FFFFFF;
+--color-alert:#B4472F;       /* alerta — 5.41:1 sobre blanco (AA). Solo error y urgencias */
+
+/* Alias semánticos */
+--text-primary:var(--color-ink);
+--text-secondary:var(--color-gray);
+--text-heading:var(--color-blue);
+--text-on-blue:var(--color-white);
+--text-link:var(--color-blue);
+--text-link-hover:var(--color-blue-deep);
+--text-error:var(--color-alert);
+
+--surface-page:var(--color-white);
+--surface-alt:var(--color-blue-cloud);
+--surface-card:var(--color-white);
+--surface-footer:var(--color-blue-deep);
+--surface-accent:var(--color-blue);
+
+--border-hairline:var(--color-line);
+--border-control:var(--color-line-strong);
+--border-focus:var(--color-blue);
+--border-error:var(--color-alert);
+
+--action-primary-bg:var(--color-blue);
+--action-primary-bg-hover:var(--color-blue-deep);
+--action-primary-fg:var(--color-white);
+--action-secondary-fg:var(--color-blue);
+--action-disabled-bg:var(--color-line);
+--action-disabled-fg:var(--color-gray);
+
+--thread-stroke:var(--color-blue);
+--thread-stroke-muted:#B9CCE8; /* hilo inactivo / pasos no alcanzados */
+}

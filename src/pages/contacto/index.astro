@@ -1,0 +1,287 @@
+---
+import { Picture } from 'astro:assets';
+import calleImg from '../../assets/imagenes/calle-nunoa.png';
+import Pagina from '../../layouts/Pagina.astro';
+import FormularioHora from '../../components/forms/FormularioHora.astro';
+import Icono from '../../components/core/Icono.astro';
+import AvisoUrgencias from '../../components/notices/AvisoUrgencias.astro';
+import BotonWhatsApp from '../../components/actions/BotonWhatsApp.astro';
+import EnlaceTexto from '../../components/actions/EnlaceTexto.astro';
+import '../../styles/formulario.css';
+import { RUTAS, migas } from '../../lib/rutas';
+import { ajustes, pais, horarioLegible } from '../../lib/contenido';
+
+const a = await ajustes();
+const cl = (await pais('cl')).data;
+const d = cl.direccion;
+const ruta = migas({ label: 'Contacto' });
+
+// La clave pública de Turnstile llega por variable de entorno. Mientras no
+// exista la cuenta de Cloudflare, el widget simplemente no se monta.
+const claveTurnstile = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY as string | undefined;
+
+const consulta = encodeURIComponent(
+  `${d.edificio}, ${d.calle}, ${d.comuna}, ${d.ciudad}`,
+);
+const mapa = `https://www.google.com/maps/search/?api=1&query=${consulta}`;
+---
+
+<Pagina
+  titulo="Contacto y cómo llegar — Clínica Conecta, Ñuñoa"
+  descripcion="Solicita tu hora, escríbenos por WhatsApp o revisa cómo llegar al Edificio New Egaña desde Metro Plaza Egaña."
+  ruta={RUTAS.contacto}
+  actual={RUTAS.contacto}
+  eyebrow="Contacto"
+  h1="Pide tu hora"
+  bajada="Completa el formulario y te contactamos dentro del próximo día hábil. No pedimos síntomas ni antecedentes: eso se conversa en la consulta."
+  migas={ruta}
+>
+  <section class="seccion">
+    <div class="contenedor columnas">
+      <div>
+        <h2 class="oculto-visual">Formulario de solicitud de hora</h2>
+        <FormularioHora claveTurnstile={claveTurnstile} retorno="/contacto/" />
+      </div>
+
+      <aside class="lateral">
+        <div class="bloque">
+          <h2>Otras formas de contacto</h2>
+          <ul class="datos">
+            <li>
+              <Icono nombre="message-circle" tam={20} color="var(--color-blue)" />
+              <div>
+                <span class="etiqueta">Correo</span>
+                <EnlaceTexto href={`mailto:${a.correoAgenda}`}>{a.correoAgenda}</EnlaceTexto>
+              </div>
+            </li>
+            {
+              cl.telefono && (
+                <li>
+                  <Icono nombre="phone" tam={20} color="var(--color-blue)" />
+                  <div>
+                    <span class="etiqueta">Teléfono</span>
+                    <EnlaceTexto href={`tel:${cl.telefono.replace(/\s/g, '')}`}>
+                      {cl.telefono}
+                    </EnlaceTexto>
+                  </div>
+                </li>
+              )
+            }
+          </ul>
+          <div class="wa"><BotonWhatsApp origen="contacto" /></div>
+        </div>
+
+        <div class="bloque">
+          <h2>Dónde estamos</h2>
+          <address>
+            {d.edificio}<br />
+            {d.calle}, {d.oficina}<br />
+            {d.comuna}, {d.ciudad}
+          </address>
+          <p class="referencia">
+            <Icono nombre="map-pin" tam={18} color="var(--color-blue)" />
+            {d.referencia}
+          </p>
+
+          {/* Mapa estático enlazado, no un iframe de Google: el iframe carga
+              cookies de terceros y arruina el rendimiento de la página. */}
+          <figure class="barrio">
+            <Picture
+              src={calleImg}
+              alt="Avenida residencial de Ñuñoa con plátanos orientales y la cordillera al fondo."
+              widths={[400, 700]}
+              sizes="(min-width: 1000px) 380px, 100vw"
+              formats={['avif', 'webp']}
+              loading="lazy"
+            />
+            <figcaption>El barrio, a pasos de Metro Plaza Egaña.</figcaption>
+          </figure>
+
+          <a class="mapa" href={mapa} target="_blank" rel="noopener noreferrer">
+            <span class="mapa-marco" aria-hidden="true">
+              <Icono nombre="map-pin" tam={28} color="var(--color-blue)" />
+            </span>
+            <span class="mapa-texto">
+              Ver en Google Maps
+              <Icono nombre="external-link" tam={14} />
+            </span>
+          </a>
+
+          <h3 class="sub">Cómo llegar</h3>
+          <p class="parrafo">
+            La estación <b>Plaza Egaña</b> de la Línea 4 queda a pocos metros del edificio. Es la
+            forma más simple de llegar.
+          </p>
+        </div>
+
+        <div class="bloque">
+          <h2>Horarios</h2>
+          <ul class="horarios">
+            {
+              cl.horarios.map((h) => (
+                <li>
+                  <Icono nombre="clock" tam={18} color="var(--color-blue)" />
+                  {horarioLegible(h)}
+                </li>
+              ))
+            }
+            <li class="cerrado">Domingo y festivos · cerrado</li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="seccion seccion-alt">
+    <div class="contenedor"><AvisoUrgencias /></div>
+  </section>
+</Pagina>
+
+<style>
+  .columnas {
+    display: grid;
+    gap: var(--space-12);
+  }
+  @media (min-width: 1000px) {
+    .columnas {
+      grid-template-columns: 1.2fr 1fr;
+      gap: var(--space-16);
+    }
+  }
+  .oculto-visual {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  .lateral {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+  }
+  .bloque {
+    padding: var(--space-6);
+    background: var(--surface-alt);
+    border-radius: var(--radius-lg);
+  }
+  .bloque h2 {
+    font-size: var(--text-h3);
+  }
+  .datos {
+    list-style: none;
+    margin: var(--space-5) 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+  .datos li {
+    display: flex;
+    gap: var(--space-3);
+    align-items: flex-start;
+  }
+  .etiqueta {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-gray);
+    margin-bottom: 2px;
+  }
+  .wa {
+    margin-top: var(--space-6);
+  }
+  address {
+    font-style: normal;
+    margin-top: var(--space-5);
+    font-size: var(--text-body);
+    line-height: 1.7;
+  }
+  .referencia {
+    display: flex;
+    gap: var(--space-2);
+    align-items: center;
+    margin-top: var(--space-3);
+    font-size: var(--text-body-sm);
+    color: var(--color-gray);
+  }
+  .barrio {
+    margin: var(--space-5) 0 0;
+  }
+  .barrio :global(img) {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: var(--radius-md);
+  }
+  .barrio figcaption {
+    margin-top: var(--space-2);
+    font-size: var(--text-caption);
+    color: var(--color-gray);
+  }
+  .mapa {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    margin-top: var(--space-5);
+    padding: var(--space-4);
+    background: var(--color-white);
+    border: var(--border-width) solid var(--color-line);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    color: var(--color-blue);
+    font-weight: var(--weight-medium);
+    font-size: var(--text-body-sm);
+  }
+  .mapa:hover {
+    border-color: var(--color-blue);
+  }
+  .mapa:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: var(--focus-offset);
+  }
+  .mapa-marco {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-md);
+    background: var(--surface-alt);
+    flex-shrink: 0;
+  }
+  .mapa-texto {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .sub {
+    margin-top: var(--space-8);
+    font-size: var(--text-h4);
+  }
+  .parrafo {
+    margin-top: var(--space-3);
+    font-size: var(--text-body-sm);
+    line-height: 1.6;
+  }
+  .horarios {
+    list-style: none;
+    margin: var(--space-5) 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    font-family: var(--font-mono);
+    font-size: var(--text-body-sm);
+  }
+  .horarios li {
+    display: flex;
+    gap: var(--space-3);
+    align-items: center;
+  }
+  .cerrado {
+    color: var(--color-gray);
+  }
+</style>

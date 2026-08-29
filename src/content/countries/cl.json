@@ -1,0 +1,25 @@
+{
+  "nombre": "Chile",
+  "codigo": "cl",
+  "moneda": "CLP",
+  "locale": "es-CL",
+  "activo": true,
+  "telefono": null,
+  "whatsapp": null,
+  "direccion": {
+    "edificio": "Edificio New Egaña",
+    "calle": "Av. Américo Vespucio",
+    "oficina": "Oficina 1106",
+    "comuna": "Ñuñoa",
+    "ciudad": "Santiago",
+    "referencia": "A pasos del Metro Plaza Egaña"
+  },
+  "horarios": [
+    { "dia": "Martes",    "desde": "15:00", "hasta": "19:00" },
+    { "dia": "Miércoles", "desde": "16:00", "hasta": "19:00" },
+    { "dia": "Viernes",   "desde": "15:00", "hasta": "19:00" },
+    { "dia": "Sábado",    "desde": "10:00", "hasta": "13:00" }
+  ],
+  "notaLegal": "Clínica Conecta SpA",
+  "medioPago": []
+}

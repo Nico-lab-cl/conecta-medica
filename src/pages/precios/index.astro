@@ -1,0 +1,184 @@
+---
+import Pagina from '../../layouts/Pagina.astro';
+import BloquePrecio from '../../components/content/BloquePrecio.astro';
+import NotaInfo from '../../components/notices/NotaInfo.astro';
+import Icono from '../../components/core/Icono.astro';
+import BotonAgendar from '../../components/actions/BotonAgendar.astro';
+import BotonWhatsApp from '../../components/actions/BotonWhatsApp.astro';
+import { RUTAS, migas } from '../../lib/rutas';
+import { ajustes, pais, precioCLP } from '../../lib/contenido';
+
+const a = await ajustes();
+const cl = (await pais('cl')).data;
+const ruta = migas({ label: 'Precios' });
+
+const incluye = [
+  'El tiempo de la consulta con el médico',
+  'La revisión de los exámenes que traigas, incluidos los antiguos',
+  'La explicación del diagnóstico y del plan',
+  'La boleta correspondiente',
+];
+const noIncluye = [
+  'Exámenes de laboratorio',
+  'Imágenes (ecografías, tomografías)',
+  'Procedimientos',
+];
+---
+
+<Pagina
+  titulo="Precio de la consulta hematológica — $50.000"
+  descripcion="Valor de la consulta, qué incluye y por qué la atención es particular sin convenios. Sabes cuánto vas a pagar antes de llegar."
+  ruta={RUTAS.precios}
+  actual={RUTAS.precios}
+  eyebrow="Precios"
+  h1="Un solo precio, publicado"
+  bajada="Publicamos el valor porque saber cuánto vas a pagar antes de llegar es parte de una atención decente, no un detalle administrativo."
+  migas={ruta}
+>
+  <section class="seccion">
+    <div class="contenedor">
+      <BloquePrecio nota="Consulta hematología" />
+
+      <div class="dos">
+        <div>
+          <h2>Qué incluye</h2>
+          <ul class="lista">
+            {
+              incluye.map((i) => (
+                <li>
+                  <Icono nombre="check" tam={18} color="var(--color-blue)" />
+                  {i}
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+        <div>
+          <h2>Qué se cotiza aparte</h2>
+          <ul class="lista tenue">
+            {
+              noIncluye.map((i) => (
+                <li>
+                  <Icono nombre="minus" tam={18} color="var(--color-gray)" />
+                  {i}
+                </li>
+              ))
+            }
+          </ul>
+          <p class="nota">
+            Si tu caso necesita alguno, se te dice el costo antes de que decidas.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="seccion seccion-alt">
+    <div class="contenedor prosa">
+      <h2>Atención particular, sin convenios</h2>
+      <p class="parrafo">
+        No trabajamos con Fonasa ni con isapres en convenio. Lo decimos así de directo porque
+        preferimos que lo sepas antes de agendar y no cuando llegues al mostrador.
+      </p>
+      <p class="parrafo">
+        Si tienes un seguro complementario de salud, la boleta te sirve para pedir reembolso.
+        Cuánto te devuelvan depende de tu plan y de tu asegurador, y eso no es algo que nosotros
+        podamos comprometer.
+      </p>
+
+      {
+        cl.medioPago.length > 0 ? (
+          <>
+            <h3 class="sub">Medios de pago</h3>
+            <ul class="lista">
+              {cl.medioPago.map((m) => (
+                <li>
+                  <Icono nombre="check" tam={18} color="var(--color-blue)" />
+                  {m}
+                </li>
+              ))}
+            </ul>
+          </>
+        ) : (
+          <div class="pendiente">
+            <NotaInfo titulo="Medios de pago y política de anulación">
+              Estamos terminando de definir los medios de pago aceptados y la política de anulación.
+              Prefirimos no publicarlos hasta tenerlos confirmados: si tienes dudas antes de
+              agendar, escríbenos y te respondemos.
+            </NotaInfo>
+          </div>
+        )
+      }
+    </div>
+  </section>
+
+  <section class="seccion">
+    <div class="contenedor cierre">
+      <h2>La consulta cuesta {precioCLP(a.precioConsulta)}</h2>
+      <p>Puedes pedir hora sin derivación previa.</p>
+      <div class="acciones">
+        <BotonAgendar tam="lg" />
+        <BotonWhatsApp origen="precios" />
+      </div>
+    </div>
+  </section>
+</Pagina>
+
+<style>
+  .dos {
+    display: grid;
+    gap: var(--space-10);
+    margin-top: var(--space-12);
+  }
+  @media (min-width: 900px) {
+    .dos {
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-16);
+    }
+  }
+  .lista {
+    list-style: none;
+    margin: var(--space-5) 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+  .lista li {
+    display: flex;
+    gap: var(--space-3);
+    align-items: flex-start;
+    font-size: var(--text-body);
+    line-height: 1.6;
+  }
+  .lista.tenue li {
+    color: var(--color-gray);
+  }
+  .nota {
+    margin-top: var(--space-5);
+    font-size: var(--text-body-sm);
+    color: var(--color-gray);
+  }
+  .parrafo {
+    margin-top: var(--space-5);
+    font-size: var(--text-body);
+    line-height: 1.7;
+  }
+  .sub {
+    margin-top: var(--space-10);
+  }
+  .pendiente {
+    margin-top: var(--space-10);
+  }
+  .cierre p {
+    margin-top: var(--space-4);
+    font-size: var(--text-body-lg);
+    color: var(--color-gray);
+  }
+  .acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    margin-top: var(--space-6);
+  }
+</style>

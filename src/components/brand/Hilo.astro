@@ -1,0 +1,156 @@
+---
+/* El hilo Conecta. Portado de design-system/components/brand/ConectaThread.jsx.
+
+   No es un trazo SVG: es una pista apagada, un relleno que avanza y nodos que se
+   encienden. `activo` es el índice del último nodo alcanzado; -1 los enciende
+   todos. En "cómo funciona la atención" el estado significa algo real, es la
+   secuencia del recorrido del paciente.
+
+   CAMBIO RESPECTO DEL ORIGINAL: cero JavaScript. La animación es CSS pura y las
+   duraciones vienen de los tokens, que ya caen a 1ms bajo prefers-reduced-motion. */
+interface Props {
+  orientacion?: 'horizontal' | 'vertical';
+  nodos?: number;
+  activo?: number;
+  animar?: boolean;
+  grosor?: number;
+  radioNodo?: number;
+  clase?: string;
+}
+const {
+  orientacion = 'horizontal',
+  nodos = 4,
+  activo = -1,
+  animar = true,
+  grosor = 2,
+  radioNodo = 5,
+  clase,
+} = Astro.props;
+
+const n = Math.max(2, nodos);
+const r = radioNodo + grosor;
+const fraccion = activo < 0 ? 1 : Math.min(1, Math.max(0, activo / (n - 1)));
+const puntos = Array.from({ length: n }, (_, i) => ({
+  encendido: activo < 0 || i <= activo,
+  pos: `calc(${r}px + (100% - ${r * 2}px) * ${i / (n - 1)})`,
+}));
+---
+
+<div
+  class:list={['hilo', clase]}
+  data-orientacion={orientacion}
+  aria-hidden="true"
+  style={`--h-r:${r}px;--h-grosor:${grosor}px;--h-nodo:${radioNodo * 2}px;--h-fraccion:${fraccion}`}
+>
+  <span class="pista"></span>
+  <span class="relleno" data-animar={animar ? 'si' : undefined}></span>
+  {
+    puntos.map((p) => (
+      <span class="nodo" data-encendido={p.encendido ? 'si' : 'no'} style={`--h-pos:${p.pos}`} />
+    ))
+  }
+</div>
+
+<style>
+  .hilo {
+    position: relative;
+  }
+  .hilo[data-orientacion='horizontal'] {
+    width: 100%;
+    height: calc(var(--h-r) * 2);
+  }
+  .hilo[data-orientacion='vertical'] {
+    height: 100%;
+    width: calc(var(--h-r) * 2);
+  }
+
+  .pista,
+  .relleno {
+    position: absolute;
+    border-radius: var(--radius-pill);
+  }
+  .pista {
+    background: var(--thread-stroke-muted);
+  }
+  .relleno {
+    background: var(--thread-stroke);
+  }
+
+  .hilo[data-orientacion='horizontal'] .pista {
+    left: var(--h-r);
+    right: var(--h-r);
+    top: 50%;
+    height: var(--h-grosor);
+    transform: translateY(-50%);
+  }
+  .hilo[data-orientacion='horizontal'] .relleno {
+    left: var(--h-r);
+    top: 50%;
+    height: var(--h-grosor);
+    width: calc((100% - var(--h-r) * 2) * var(--h-fraccion));
+    transform: translateY(-50%);
+    transform-origin: left center;
+  }
+  .hilo[data-orientacion='horizontal'] .relleno[data-animar] {
+    animation: hilo-x var(--dur-thread) var(--ease-thread) both;
+  }
+
+  .hilo[data-orientacion='vertical'] .pista {
+    top: var(--h-r);
+    bottom: var(--h-r);
+    left: 50%;
+    width: var(--h-grosor);
+    transform: translateX(-50%);
+  }
+  .hilo[data-orientacion='vertical'] .relleno {
+    top: var(--h-r);
+    left: 50%;
+    width: var(--h-grosor);
+    height: calc((100% - var(--h-r) * 2) * var(--h-fraccion));
+    transform: translateX(-50%);
+    transform-origin: center top;
+  }
+  .hilo[data-orientacion='vertical'] .relleno[data-animar] {
+    animation: hilo-y var(--dur-thread) var(--ease-thread) both;
+  }
+
+  .nodo {
+    position: absolute;
+    width: var(--h-nodo);
+    height: var(--h-nodo);
+    border-radius: var(--radius-pill);
+    box-sizing: content-box;
+    background: var(--color-white);
+    border: var(--h-grosor) solid var(--thread-stroke-muted);
+  }
+  .nodo[data-encendido='si'] {
+    border-color: var(--thread-stroke);
+  }
+  .hilo[data-orientacion='horizontal'] .nodo {
+    left: var(--h-pos);
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .hilo[data-orientacion='vertical'] .nodo {
+    top: var(--h-pos);
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  @keyframes hilo-x {
+    from {
+      transform: translateY(-50%) scaleX(0);
+    }
+    to {
+      transform: translateY(-50%) scaleX(1);
+    }
+  }
+  @keyframes hilo-y {
+    from {
+      transform: translateX(-50%) scaleY(0);
+    }
+    to {
+      transform: translateX(-50%) scaleY(1);
+    }
+  }
+</style>

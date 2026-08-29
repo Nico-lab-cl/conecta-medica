@@ -1,0 +1,331 @@
+---
+/* Conócenos.
+
+   Orden deliberado: primero el médico y su formación verificable, después el
+   proyecto, y al final misión, visión y valores. Para una clínica de un solo
+   médico, abrir con "misión y visión" es relleno corporativo; lo que el
+   paciente quiere saber es quién lo va a atender. Ver docs/00-plan.md §5.3.
+
+   De los 14 valores del brief se publican 6: listar 14 diluye el mensaje. */
+import { Picture } from 'astro:assets';
+import escritorioImg from '../../assets/imagenes/escritorio.png';
+import Pagina from '../../layouts/Pagina.astro';
+import Icono from '../../components/core/Icono.astro';
+import Cita from '../../components/content/Cita.astro';
+import NotaInfo from '../../components/notices/NotaInfo.astro';
+import BotonAgendar from '../../components/actions/BotonAgendar.astro';
+import EnlaceTexto from '../../components/actions/EnlaceTexto.astro';
+import { RUTAS, migas } from '../../lib/rutas';
+import { profesionalesActivos, ajustes } from '../../lib/contenido';
+import { medicoJsonLd } from '../../lib/schema';
+
+const a = await ajustes();
+const profesionales = await profesionalesActivos();
+const fundador = profesionales.find((p) => p.data.slug === 'carlos-flores-angulo');
+const ruta = migas({ label: 'Conócenos' });
+const sitio = Astro.site?.toString() ?? 'https://conectamedica.com/';
+
+const VALORES = [
+  { t: 'Excelencia clínica', d: 'Decisiones basadas en evidencia, no en costumbre.', i: 'activity' },
+  { t: 'Atención humanizada', d: 'Tiempo suficiente y explicaciones que se entienden.', i: 'message-circle' },
+  { t: 'Transparencia en los precios', d: 'El valor está publicado. Sabes cuánto pagas antes de llegar.', i: 'file-text' },
+  { t: 'Confidencialidad', d: 'Pedimos los datos mínimos y no los usamos para nada más.', i: 'check' },
+  { t: 'Cercanía', d: 'Sin trato distante y sin jerga innecesaria.', i: 'map-pin' },
+  { t: 'Coordinación', d: 'Si tu caso necesita otra mirada, la coordinamos nosotros.', i: 'stethoscope' },
+];
+---
+
+<Pagina
+  titulo="Conócenos — Clínica Conecta, hematología en Ñuñoa"
+  descripcion="Quién atiende, por qué existe Conecta y qué puedes esperar de la atención. Atención hematológica coordinada en Ñuñoa y por telemedicina."
+  ruta={RUTAS.conocenos}
+  actual={RUTAS.conocenos}
+  eyebrow="Conócenos"
+  h1="Una consulta que coordina, no que se suma a la lista"
+  bajada="Conecta nace de una observación simple: el problema del paciente hematológico rara vez es la falta de especialistas. Es que ninguno se habla con el otro."
+  migas={ruta}
+  jsonLd={fundador
+    ? [medicoJsonLd(fundador.data, new URL(RUTAS.conocenos, sitio).toString(), sitio)]
+    : []}
+>
+  {
+    fundador && (
+      <section class="seccion">
+        <div class="contenedor perfil">
+          <div class="retrato">
+            {fundador.data.foto ? (
+              <img
+                src={fundador.data.foto}
+                alt={`Retrato de ${fundador.data.nombreCompleto}`}
+                width="320"
+                height="400"
+              />
+            ) : (
+              <span class="monograma" aria-hidden="true">CF</span>
+            )}
+          </div>
+
+          <div class="perfil-texto">
+            <p class="eyebrow">Quién atiende</p>
+            <h2>{fundador.data.nombreCompleto}</h2>
+            <p class="rol">{fundador.data.especialidad}</p>
+            <p class="bio">{fundador.data.bio}</p>
+
+            {fundador.data.formacion.length > 0 ? (
+              <>
+                <h3 class="sub">Formación</h3>
+                <ul class="formacion">
+                  {fundador.data.formacion.map((f) => (
+                    <li>
+                      <Icono nombre="check" tam={18} color="var(--color-blue)" />
+                      <span>
+                        <b>{f.titulo}</b>
+                        {f.institucion && <> · {f.institucion}</>}
+                        {f.anio && <> · {f.anio}</>}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            ) : (
+              <div class="pendiente">
+                <NotaInfo titulo="Formación y credenciales">
+                  Estamos completando esta sección con los títulos, instituciones y el número de
+                  registro en la Superintendencia de Salud. Preferimos dejarla vacía antes que
+                  publicar datos aproximados.
+                </NotaInfo>
+              </div>
+            )}
+
+            {fundador.data.registroSuperintendencia && (
+              <p class="registro">
+                Registro Nacional de Prestadores Individuales de Salud:{' '}
+                <b>{fundador.data.registroSuperintendencia}</b>.{' '}
+                <EnlaceTexto
+                  href="https://rnpi.superdesalud.gob.cl/"
+                  externo
+                >
+                  Verificar en la Superintendencia
+                </EnlaceTexto>
+              </p>
+            )}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  <section class="seccion seccion-alt">
+    <div class="contenedor prosa">
+      <p class="eyebrow">Por qué existe Conecta</p>
+      <h2>El problema no es la falta de especialistas</h2>
+      <p class="parrafo">
+        Un paciente con un hemograma alterado suele recorrer un camino largo y fragmentado. Lo ve un
+        médico general, lo derivan, espera, ve a un especialista, le piden exámenes que ya se hizo,
+        lo derivan otra vez. Cada consulta empieza de nuevo.
+      </p>
+      <p class="parrafo">
+        A eso se suma la geografía: la hematología está concentrada en pocos centros, casi todos en
+        Santiago. Para quien vive en regiones, cada control significa un viaje.
+      </p>
+
+      <figure class="escritorio">
+        <Picture
+          src={escritorioImg}
+          alt="Mesa de madera junto a una ventana, con un cuaderno cerrado, un lápiz y un vaso de agua."
+          widths={[600, 900]}
+          sizes="(min-width: 900px) 720px, 100vw"
+          formats={['avif', 'webp']}
+          loading="lazy"
+        />
+      </figure>
+
+      <Cita fuente="La tesis del proyecto">
+        Conecta existe para coordinar la atención, no para agregar otra consulta suelta.
+      </Cita>
+
+      <p class="parrafo">
+        Por eso la unidad se organiza con la hematología como eje y las otras prestaciones entrando
+        cuando el caso lo pide, coordinadas por el mismo médico. Y por eso la telemedicina no es un
+        agregado: es parte del diseño.
+      </p>
+    </div>
+  </section>
+
+  <section class="seccion">
+    <div class="contenedor">
+      <p class="eyebrow">Cómo trabajamos</p>
+      <h2>Seis cosas que definen la atención</h2>
+      <ul class="valores">
+        {
+          VALORES.map((v) => (
+            <li>
+              <Icono nombre={v.i} tam={24} color="var(--color-blue)" />
+              <div>
+                <p class="valor-t">{v.t}</p>
+                <p class="valor-d">{v.d}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="seccion seccion-alt">
+    <div class="contenedor cierre">
+      <p class="eyebrow">Nuestros compromisos</p>
+      <ul class="compromisos">
+        {a.compromisos.map((c) => <li><Icono nombre="check" tam={20} color="var(--color-blue)" />{c}</li>)}
+      </ul>
+      <div class="acciones"><BotonAgendar tam="lg" /></div>
+    </div>
+  </section>
+</Pagina>
+
+<style>
+  .perfil {
+    display: grid;
+    gap: var(--space-8);
+  }
+  @media (min-width: 900px) {
+    .perfil {
+      grid-template-columns: 320px 1fr;
+      gap: var(--space-16);
+      align-items: start;
+    }
+  }
+  .retrato {
+    background: var(--surface-alt);
+    border-radius: var(--radius-lg);
+    aspect-ratio: 4 / 5;
+    max-width: 320px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .retrato img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .monograma {
+    font-family: var(--font-serif);
+    font-size: 72px;
+    font-weight: var(--weight-semibold);
+    color: var(--color-blue);
+  }
+  .rol {
+    margin-top: var(--space-2);
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-blue);
+  }
+  .bio {
+    margin-top: var(--space-5);
+    font-size: var(--text-body-lg);
+    line-height: 1.6;
+    max-width: var(--measure-prose);
+  }
+  .sub {
+    margin-top: var(--space-10);
+  }
+  .formacion {
+    list-style: none;
+    margin: var(--space-5) 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    font-size: var(--text-body);
+    line-height: 1.6;
+  }
+  .formacion li {
+    display: flex;
+    gap: var(--space-3);
+    align-items: flex-start;
+  }
+  .pendiente,
+  .registro {
+    margin-top: var(--space-8);
+  }
+  .registro {
+    font-size: var(--text-body-sm);
+    line-height: 1.6;
+    color: var(--color-gray);
+  }
+  .escritorio {
+    margin: var(--space-10) 0 0;
+  }
+  .escritorio :global(img) {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    border-radius: var(--radius-lg);
+  }
+  .parrafo {
+    margin-top: var(--space-5);
+    font-size: var(--text-body);
+    line-height: 1.7;
+  }
+  .valores {
+    list-style: none;
+    margin: var(--space-10) 0 0;
+    padding: 0;
+    display: grid;
+    gap: var(--space-8);
+  }
+  @media (min-width: 700px) {
+    .valores {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (min-width: 1100px) {
+    .valores {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  .valores li {
+    display: flex;
+    gap: var(--space-4);
+    align-items: flex-start;
+  }
+  .valor-t {
+    font-weight: var(--weight-semibold);
+    font-size: var(--text-body);
+    color: var(--color-ink);
+  }
+  .valor-d {
+    margin-top: var(--space-1);
+    font-size: var(--text-body-sm);
+    line-height: 1.6;
+    color: var(--color-gray);
+  }
+  .compromisos {
+    list-style: none;
+    margin: var(--space-6) 0 0;
+    padding: 0;
+    display: grid;
+    gap: var(--space-4);
+    font-size: var(--text-body-lg);
+    line-height: 1.5;
+  }
+  @media (min-width: 700px) {
+    .compromisos {
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-6);
+    }
+  }
+  .compromisos li {
+    display: flex;
+    gap: var(--space-3);
+    align-items: flex-start;
+    color: var(--color-blue-deep);
+  }
+  .acciones {
+    margin-top: var(--space-10);
+  }
+</style>

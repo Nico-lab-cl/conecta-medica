@@ -1,0 +1,88 @@
+---
+import Pagina from '../../layouts/Pagina.astro';
+import Icono from '../../components/core/Icono.astro';
+import { RUTAS, migas } from '../../lib/rutas';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+
+export async function getStaticPaths() {
+  const textos = await getCollection('legal');
+  return textos.map((texto) => ({ params: { slug: texto.data.slug }, props: { texto } }));
+}
+
+interface Props {
+  texto: CollectionEntry<'legal'>;
+}
+const { texto } = Astro.props;
+const { Content } = await render(texto);
+const ruta = migas({ label: 'Legal' }, { label: texto.data.titulo });
+const fmt = new Intl.DateTimeFormat('es-CL', { day: 'numeric', month: 'long', year: 'numeric' });
+---
+
+<Pagina
+  titulo={texto.data.seo?.title ?? `${texto.data.titulo} — Clínica Conecta`}
+  descripcion={texto.data.seo?.description ?? `${texto.data.titulo} de Clínica Conecta SpA.`}
+  ruta={`/legal/${texto.data.slug}/`}
+  eyebrow="Legal"
+  h1={texto.data.titulo}
+  migas={ruta}
+  anchoTexto
+>
+  <section class="seccion">
+    <div class="contenedor prosa">
+      {
+        !texto.data.revisadoPorAbogado && (
+          <div class="borrador">
+            <Icono nombre="triangle-alert" tam={20} color="var(--text-error)" />
+            <p>
+              <b>Borrador.</b> Este texto está pendiente de revisión legal y no debe considerarse
+              vigente. Ver <code>docs/preguntas-carlos.md</code>, punto B-16.
+            </p>
+          </div>
+        )
+      }
+
+      <p class="vigencia">Vigente desde el {fmt.format(texto.data.vigenteDesde)}</p>
+
+      <div class="contenido-mdx"><Content /></div>
+
+      <nav class="otros" aria-label="Otros textos legales">
+        <a href={RUTAS.privacidad}>Política de privacidad</a>
+        <a href={RUTAS.terminos}>Términos de uso</a>
+        <a href={RUTAS.avisoMedico}>Aviso médico</a>
+      </nav>
+    </div>
+  </section>
+</Pagina>
+
+<style>
+  .borrador {
+    display: flex;
+    gap: var(--space-3);
+    padding: var(--space-5);
+    background: rgba(180, 71, 47, 0.06);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-8);
+    font-size: var(--text-body-sm);
+    line-height: 1.6;
+  }
+  .vigencia {
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    color: var(--color-gray);
+    margin-bottom: var(--space-8);
+  }
+  .otros {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-5);
+    margin-top: var(--space-16);
+    padding-top: var(--space-6);
+    border-top: var(--border-width) solid var(--color-line);
+    font-size: var(--text-body-sm);
+  }
+  .otros a {
+    color: var(--color-blue);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+</style>

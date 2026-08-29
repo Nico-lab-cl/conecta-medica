@@ -1,0 +1,139 @@
+---
+/* Directorio de profesionales y ficha individual.
+
+   La regla: con menos de dos perfiles activos, estas rutas NO se generan. Un
+   directorio con una sola persona resta credibilidad en vez de sumarla, y el
+   ítem del menú tampoco aparece (ver Encabezado.astro).
+
+   El código existe y está probado: en cuanto se active el segundo profesional
+   desde el CMS, /equipo/ y /equipo/[slug]/ aparecen solas, sin tocar código.
+   Por eso getStaticPaths devuelve [] en vez de que la ruta no exista. */
+import Pagina from '../../layouts/Pagina.astro';
+import TarjetaProfesional from '../../components/content/TarjetaProfesional.astro';
+import Icono from '../../components/core/Icono.astro';
+import BotonAgendar from '../../components/actions/BotonAgendar.astro';
+import { RUTAS, migas } from '../../lib/rutas';
+import { profesionalesActivos, hayDirectorioDeEquipo, type Profesional } from '../../lib/contenido';
+import { medicoJsonLd } from '../../lib/schema';
+import { render } from 'astro:content';
+
+export async function getStaticPaths() {
+  if (!(await hayDirectorioDeEquipo())) return [];
+  const equipo = await profesionalesActivos();
+  return [
+    { params: { slug: undefined }, props: { perfil: null, equipo } },
+    ...equipo.map((perfil) => ({ params: { slug: perfil.data.slug }, props: { perfil, equipo } })),
+  ];
+}
+
+interface Props {
+  perfil: Profesional | null;
+  equipo: Profesional[];
+}
+const { perfil, equipo } = Astro.props;
+const sitio = Astro.site?.toString() ?? 'https://conectamedica.com/';
+const Contenido = perfil ? (await render(perfil)).Content : null;
+---
+
+{
+  perfil ? (
+    <Pagina
+      titulo={`${perfil.data.nombreCompleto} — ${perfil.data.especialidad}`}
+      descripcion={perfil.data.bio}
+      ruta={RUTAS.perfil(perfil.data.slug)}
+      actual={RUTAS.equipo}
+      eyebrow={perfil.data.especialidad}
+      h1={perfil.data.nombreCompleto}
+      bajada={perfil.data.bio}
+      migas={migas({ label: 'Equipo', href: RUTAS.equipo }, { label: perfil.data.nombreCompleto })}
+      jsonLd={[
+        medicoJsonLd(
+          perfil.data,
+          new URL(RUTAS.perfil(perfil.data.slug), sitio).toString(),
+          sitio,
+        ),
+      ]}
+    >
+      <section class="seccion">
+        <div class="contenedor prosa contenido-mdx">{Contenido && <Contenido />}</div>
+      </section>
+
+      {perfil.data.areasAtencion.length > 0 && (
+        <section class="seccion seccion-alt">
+          <div class="contenedor">
+            <p class="eyebrow">Áreas de atención</p>
+            <ul class="lista">
+              {perfil.data.areasAtencion.map((a) => (
+                <li>
+                  <Icono nombre="check" tam={18} color="var(--color-blue)" />
+                  {a}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      )}
+
+      <section class="seccion">
+        <div class="contenedor">
+          <BotonAgendar tam="lg" />
+        </div>
+      </section>
+    </Pagina>
+  ) : (
+    <Pagina
+      titulo="Equipo — Clínica Conecta"
+      descripcion="Los profesionales que atienden en Conecta Hematología."
+      ruta={RUTAS.equipo}
+      actual={RUTAS.equipo}
+      eyebrow="Equipo"
+      h1="Quiénes atienden"
+      bajada="Cada perfil indica su formación y su registro en la Superintendencia de Salud, para que puedas verificarlo."
+      migas={migas({ label: 'Equipo' })}
+    >
+      <section class="seccion">
+        <div class="contenedor rejilla">
+          {equipo.map((p) => (
+            <TarjetaProfesional
+              nombre={p.data.nombreCompleto}
+              rol={p.data.especialidad}
+              subtitulo={p.data.subespecialidad}
+              foto={p.data.foto}
+              href={RUTAS.perfil(p.data.slug)}
+            />
+          ))}
+        </div>
+      </section>
+    </Pagina>
+  )
+}
+
+<style>
+  .rejilla {
+    display: grid;
+    gap: var(--space-5);
+  }
+  @media (min-width: 800px) {
+    .rejilla {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  .lista {
+    list-style: none;
+    margin: var(--space-6) 0 0;
+    padding: 0;
+    display: grid;
+    gap: var(--space-3);
+    font-size: var(--text-body);
+  }
+  @media (min-width: 700px) {
+    .lista {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  .lista li {
+    display: flex;
+    gap: var(--space-3);
+    align-items: flex-start;
+  }
+</style>

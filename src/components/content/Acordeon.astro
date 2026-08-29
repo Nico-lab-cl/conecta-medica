@@ -1,0 +1,54 @@
+---
+/* Acordeón de preguntas. Portado de design-system/components/content/Accordion.jsx.
+
+   CAMBIO RESPECTO DEL ORIGINAL: el design system lo resuelve con estado de React
+   y aria-expanded. Acá se usa <details>/<summary> nativo: mismo comportamiento,
+   misma semántica para lectores de pantalla, funciona con el buscador del
+   navegador (Ctrl+F encuentra texto dentro de un details cerrado) y no monta ni
+   un byte de JavaScript. El acordeón de las FAQ es la sección más consultada del
+   sitio; hidratar React ahí sería el peor lugar para gastar el presupuesto. */
+import Icono from '../core/Icono.astro';
+interface Props { items: { q: string; a: string; href?: string | undefined }[]; abrirPrimera?: boolean }
+const { items, abrirPrimera = false } = Astro.props;
+---
+<div class="acordeon">
+  {items.map((it, i) => (
+    <details open={abrirPrimera && i === 0}>
+      <summary>
+        <span>{it.q}</span>
+        <Icono nombre="plus" tam={22} color="var(--color-blue)" clase="mas" />
+        <Icono nombre="minus" tam={22} color="var(--color-blue)" clase="menos" />
+      </summary>
+      <div class="respuesta">
+        <p>{it.a}</p>
+        {it.href && <a class="leer" href={it.href}>Leer la respuesta completa<Icono nombre="arrow-right" tam={16} /></a>}
+      </div>
+    </details>
+  ))}
+</div>
+<style>
+  .acordeon { border-top: var(--border-width) solid var(--color-line); }
+  details { border-bottom: var(--border-width) solid var(--color-line); }
+  summary {
+    display: flex; width: 100%; gap: 16px; align-items: flex-start;
+    justify-content: space-between; min-height: var(--touch-min); padding: 20px 0;
+    cursor: pointer; list-style: none; text-align: left;
+    font-family: var(--font-sans); font-size: var(--text-h4);
+    font-weight: var(--weight-semibold); color: var(--color-ink);
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary:hover { color: var(--color-blue); }
+  summary:focus-visible { outline: var(--focus-ring); outline-offset: var(--focus-offset); border-radius: var(--radius-sm); }
+  summary :global(.mas), summary :global(.menos) { margin-top: 2px; }
+  summary :global(.menos) { display: none; }
+  details[open] summary :global(.mas) { display: none; }
+  details[open] summary :global(.menos) { display: inline-block; }
+  .respuesta { padding: 0 0 24px; max-width: var(--measure-prose); }
+  .respuesta p { font-size: var(--text-body); line-height: 1.6; color: var(--color-ink); }
+  .leer {
+    margin-top: 12px; display: inline-flex; align-items: center; gap: 6px;
+    color: var(--color-blue); font-weight: var(--weight-medium); font-size: var(--text-body-sm);
+    text-decoration: underline; text-underline-offset: 3px;
+  }
+</style>

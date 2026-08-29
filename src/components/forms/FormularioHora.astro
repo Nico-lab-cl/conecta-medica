@@ -1,0 +1,259 @@
+---
+/* Formulario de solicitud de hora.
+
+   Portado de design-system/components/forms/AppointmentForm.jsx, con dos
+   cambios respecto del plan original y del design system:
+
+   1. NO es una isla de React. La versión en React costaba 64,5 KB comprimidos
+      en /contacto/ y /agendar/, por encima del presupuesto de 60 KB del brief.
+      Todo lo que hacía —validar, enviar, mostrar estados— cabe en un script de
+      ~90 líneas sin dependencias.
+
+   2. Funciona sin JavaScript. El <form> tiene `method="post"` y `action`
+      reales: si el script no carga, el navegador envía igual y el Worker
+      responde con una redirección. Para un público que incluye adultos mayores
+      y conexiones móviles de regiones, que el camino de conversión dependa de
+      que cargue un framework es un riesgo innecesario.
+
+   Restricción del proyecto, heredada del design system y de la Ley 21.719:
+   ningún campo de texto libre. Ni síntomas, ni diagnósticos, ni antecedentes.
+   El motivo se elige de una lista cerrada. */
+import Icono from '../core/Icono.astro';
+
+interface Props {
+  claveTurnstile?: string | undefined;
+  /** Ruta a la que volver tras un envío sin JavaScript. */
+  retorno: string;
+}
+const { claveTurnstile, retorno } = Astro.props;
+
+const MOTIVOS = [
+  'Hemograma alterado',
+  'Anemia',
+  'Plaquetas bajas o altas',
+  'Control de tratamiento hematológico',
+  'Interpretación de imágenes',
+  'Otra derivación de mi médico',
+];
+
+const COMUNAS = [
+  'Ñuñoa',
+  'Providencia',
+  'Las Condes',
+  'La Reina',
+  'Macul',
+  'Peñalolén',
+  'Santiago Centro',
+  'Otra comuna',
+  'Otra región',
+];
+
+// Tras un envío sin JavaScript el Worker vuelve acá con ?enviado=1 o ?error=1
+const enviado = Astro.url.searchParams.get('enviado') === '1';
+const fallo = Astro.url.searchParams.get('error') === '1';
+---
+
+<div class="formulario-zona">
+  <div class="ok" id="form-ok" role="status" hidden={!enviado}>
+    <Icono nombre="check" tam={32} color="var(--color-blue)" />
+    <h3>Solicitud enviada</h3>
+    <p>
+      Te contactamos dentro del próximo día hábil para confirmar día y hora. Si necesitas algo
+      antes, escríbenos por WhatsApp.
+    </p>
+  </div>
+
+  <form
+    class="formulario"
+    id="form-hora"
+    method="post"
+    action="/api/contacto/"
+    novalidate
+    hidden={enviado}
+  >
+    <input type="hidden" name="retorno" value={retorno} />
+
+    {/* Trampa para robots: fuera de pantalla y fuera del orden de tabulación.
+        Una persona nunca lo completa; un robot casi siempre sí. */}
+    <div class="trampa" aria-hidden="true">
+      <label for="sitio-web">No completar</label>
+      <input id="sitio-web" name="sitio_web" type="text" tabindex="-1" autocomplete="off" />
+    </div>
+
+    <div class="rejilla">
+      <div class="campo ancho">
+        <label for="nombre">Nombre y apellido</label>
+        <input class="control" id="nombre" name="nombre" autocomplete="name" required />
+        <p class="error" id="nombre-error" role="alert" hidden></p>
+      </div>
+
+      <div class="campo">
+        <label for="telefono">Teléfono</label>
+        <p class="ayuda" id="telefono-ayuda">Lo usamos solo para confirmar tu hora.</p>
+        <input
+          class="control"
+          id="telefono"
+          name="telefono"
+          type="tel"
+          inputmode="tel"
+          autocomplete="tel"
+          placeholder="+56 9 XXXX XXXX"
+          aria-describedby="telefono-ayuda"
+          required
+        />
+        <p class="error" id="telefono-error" role="alert" hidden></p>
+      </div>
+
+      <div class="campo">
+        <label for="correo">Correo</label>
+        <input class="control" id="correo" name="correo" type="email" autocomplete="email" required />
+        <p class="error" id="correo-error" role="alert" hidden></p>
+      </div>
+
+      <div class="campo">
+        <label for="comuna">Comuna</label>
+        <select class="control" id="comuna" name="comuna" required>
+          <option value="" selected disabled>Selecciona</option>
+          {COMUNAS.map((c) => <option>{c}</option>)}
+        </select>
+        <p class="error" id="comuna-error" role="alert" hidden></p>
+      </div>
+
+      <div class="campo">
+        <label for="modalidad">Modalidad</label>
+        <select class="control" id="modalidad" name="modalidad" required>
+          <option value="" selected disabled>Selecciona</option>
+          <option>Presencial en Ñuñoa</option>
+          <option>Telemedicina</option>
+        </select>
+        <p class="error" id="modalidad-error" role="alert" hidden></p>
+      </div>
+
+      <div class="campo ancho">
+        <label for="motivo">Motivo de la consulta</label>
+        <p class="ayuda" id="motivo-ayuda">
+          Elige la opción más cercana. No escribas síntomas ni antecedentes acá.
+        </p>
+        <select class="control" id="motivo" name="motivo" aria-describedby="motivo-ayuda" required>
+          <option value="" selected disabled>Selecciona</option>
+          {MOTIVOS.map((m) => <option>{m}</option>)}
+        </select>
+        <p class="error" id="motivo-error" role="alert" hidden></p>
+      </div>
+    </div>
+
+    <label class="consentimiento">
+      <input type="checkbox" name="consentimiento" value="si" required />
+      <span>
+        Autorizo a Clínica Conecta a contactarme por teléfono, correo o WhatsApp para coordinar
+        esta hora. No enviaremos publicidad.
+        <a href="/legal/politica-de-privacidad/">Política de privacidad</a>.
+      </span>
+    </label>
+    <p class="error" id="consentimiento-error" role="alert" hidden></p>
+
+    {claveTurnstile && <div class="cf-turnstile" data-sitekey={claveTurnstile}></div>}
+
+    <p class="error-envio" id="form-error" role="alert" hidden={!fallo}>
+      {fallo &&
+        'No pudimos enviar tu solicitud. Revisa que los datos estén completos e inténtalo de nuevo, o escríbenos por WhatsApp.'}
+    </p>
+
+    <div class="pie">
+      <button class="enviar" type="submit" id="form-enviar">Solicitar hora</button>
+      <span class="respuesta">Respondemos dentro del próximo día hábil.</span>
+    </div>
+  </form>
+</div>
+
+{claveTurnstile && <script is:inline async defer src="https://challenges.cloudflare.com/turnstile/v0/api.js"></script>}
+
+<script>
+  /* Mejora progresiva. Sin este script el formulario sigue enviando por POST
+     normal y el Worker responde con una redirección a ?enviado=1. */
+  const form = document.getElementById('form-hora') as HTMLFormElement | null;
+  const bloqueOk = document.getElementById('form-ok');
+  const boton = document.getElementById('form-enviar') as HTMLButtonElement | null;
+  const errorGeneral = document.getElementById('form-error');
+
+  if (form && bloqueOk && boton && errorGeneral) {
+    const mostrarError = (campo: string, mensaje: string | null) => {
+      const p = document.getElementById(`${campo}-error`);
+      const control = form.querySelector<HTMLElement>(`[name="${campo}"]`);
+      if (p) {
+        p.textContent = mensaje ?? '';
+        p.hidden = !mensaje;
+      }
+      if (control) {
+        if (mensaje) {
+          control.setAttribute('data-error', 'true');
+          control.setAttribute('aria-invalid', 'true');
+          const descrito = (control.getAttribute('aria-describedby') ?? '')
+            .split(' ')
+            .filter((x) => x && x !== `${campo}-error`);
+          control.setAttribute('aria-describedby', [...descrito, `${campo}-error`].join(' '));
+        } else {
+          control.removeAttribute('data-error');
+          control.removeAttribute('aria-invalid');
+        }
+      }
+    };
+
+    const validar = (d: FormData): Record<string, string> => {
+      const e: Record<string, string> = {};
+      const txt = (k: string) => String(d.get(k) ?? '').trim();
+
+      if (txt('nombre').length < 3) e['nombre'] = 'Escribe tu nombre y apellido.';
+      if (txt('telefono').replace(/\D/g, '').length < 8)
+        e['telefono'] = 'Necesitamos un teléfono para confirmarte la hora.';
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(txt('correo')))
+        e['correo'] = 'Revisa el correo: parece que le falta algo.';
+      if (!txt('comuna')) e['comuna'] = 'Elige tu comuna.';
+      if (!txt('modalidad')) e['modalidad'] = 'Elige presencial o telemedicina.';
+      if (!txt('motivo')) e['motivo'] = 'Elige el motivo más cercano.';
+      if (!d.get('consentimiento'))
+        e['consentimiento'] = 'Necesitamos tu autorización para poder contactarte.';
+      return e;
+    };
+
+    const CAMPOS = ['nombre', 'telefono', 'correo', 'comuna', 'modalidad', 'motivo', 'consentimiento'];
+
+    form.addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      const datos = new FormData(form);
+      const errores = validar(datos);
+
+      for (const c of CAMPOS) mostrarError(c, errores[c] ?? null);
+
+      const primero = CAMPOS.find((c) => errores[c]);
+      if (primero) {
+        form.querySelector<HTMLElement>(`[name="${primero}"]`)?.focus();
+        return;
+      }
+
+      errorGeneral.hidden = true;
+      boton.disabled = true;
+      boton.textContent = 'Enviando…';
+
+      try {
+        const r = await fetch(form.action, {
+          method: 'POST',
+          body: datos,
+          headers: { accept: 'application/json' },
+        });
+        if (!r.ok) throw new Error(String(r.status));
+        form.hidden = true;
+        bloqueOk.hidden = false;
+        bloqueOk.scrollIntoView({ block: 'center' });
+        (bloqueOk.querySelector('h3') as HTMLElement | null)?.focus();
+      } catch {
+        errorGeneral.textContent =
+          'No pudimos enviar tu solicitud. Inténtalo de nuevo, o escríbenos por WhatsApp.';
+        errorGeneral.hidden = false;
+      } finally {
+        boton.disabled = false;
+        boton.textContent = 'Solicitar hora';
+      }
+    });
+  }
+</script>

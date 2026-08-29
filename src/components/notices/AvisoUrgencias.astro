@@ -1,0 +1,31 @@
+---
+/* Aviso de urgencias. Portado de UrgencyNotice.jsx.
+   Presente sin gritar: el rojo aparece en el ícono y el título, sobre una
+   superficie al 6%. Nunca un banner rojo a sangre. */
+import Icono from '../core/Icono.astro';
+import { ajustes } from '../../lib/contenido';
+interface Props { tono?: 'surface' | 'flat' }
+const { tono = 'surface' } = Astro.props;
+const { avisoUrgencias } = await ajustes();
+---
+<aside class="urgencia" data-tono={tono} role="note">
+  <Icono nombre="triangle-alert" tam={24} color="var(--text-error)" style="margin-top:2px" />
+  <div>
+    <p class="titulo">{avisoUrgencias.titulo}</p>
+    <p class="cuerpo">{avisoUrgencias.cuerpo}</p>
+  </div>
+</aside>
+<style>
+  .urgencia { display: flex; gap: 14px; }
+  .urgencia[data-tono='surface'] {
+    padding: 24px; background: rgba(180, 71, 47, .06); border-radius: var(--radius-lg);
+  }
+  .urgencia[data-tono='flat'] {
+    padding: 16px 0; border-top: var(--border-width) solid var(--color-line);
+  }
+  .titulo {
+    margin: 0 0 6px; font-family: var(--font-sans); font-weight: var(--weight-semibold);
+    font-size: var(--text-h4); color: var(--text-error);
+  }
+  .cuerpo { margin: 0; font-size: var(--text-body); line-height: 1.6; max-width: 62ch; }
+</style>

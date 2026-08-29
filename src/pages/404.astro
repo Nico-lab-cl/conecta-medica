@@ -1,0 +1,117 @@
+---
+import Base from '../layouts/Base.astro';
+import Boton from '../components/actions/Boton.astro';
+import BotonAgendar from '../components/actions/BotonAgendar.astro';
+import Icono from '../components/core/Icono.astro';
+import { RUTAS } from '../lib/rutas';
+
+/* 404 útil: en vez de un callejón sin salida, ofrece las tres cosas que la
+   gente viene a buscar. */
+const DESTINOS = [
+  { t: 'Agendar una hora', d: 'Formulario y contacto directo', h: RUTAS.agendar, i: 'calendar' },
+  { t: 'Preguntas frecuentes', d: 'Anemia, plaquetas, ganglios, anticoagulantes', h: RUTAS.preguntas, i: 'message-circle' },
+  { t: 'Prestaciones', d: 'Qué atiende Conecta Hematología', h: RUTAS.prestaciones, i: 'stethoscope' },
+  { t: 'Precios', d: 'Cuánto cuesta la consulta', h: RUTAS.precios, i: 'file-text' },
+];
+---
+
+<Base
+  titulo="Página no encontrada — Clínica Conecta"
+  descripcion="La página que buscas no existe o cambió de dirección."
+  ruta="/404/"
+  noindex
+>
+  <section class="seccion">
+    <div class="contenedor">
+      <p class="eyebrow">Error 404</p>
+      <h1>Esta página no existe</h1>
+      <p class="bajada">
+        Puede que el enlace esté roto o que la página haya cambiado de dirección. Esto es lo que
+        probablemente venías a buscar:
+      </p>
+
+      <ul class="destinos">
+        {
+          DESTINOS.map((d) => (
+            <li>
+              <a href={d.h}>
+                <Icono nombre={d.i} tam={24} color="var(--color-blue)" />
+                <span>
+                  <b>{d.t}</b>
+                  <em>{d.d}</em>
+                </span>
+                <Icono nombre="arrow-right" tam={18} color="var(--color-blue)" />
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+
+      <div class="acciones">
+        <BotonAgendar tam="lg" />
+        <Boton href={RUTAS.inicio} variante="secondary" tam="lg">Volver al inicio</Boton>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  h1 {
+    margin-top: var(--space-4);
+    max-width: 16ch;
+  }
+  .bajada {
+    margin-top: var(--space-5);
+    font-size: var(--text-body-lg);
+    line-height: 1.6;
+    color: var(--color-gray);
+    max-width: var(--measure-prose);
+  }
+  .destinos {
+    list-style: none;
+    margin: var(--space-10) 0 0;
+    padding: 0;
+    display: grid;
+    gap: var(--space-4);
+    max-width: 720px;
+  }
+  @media (min-width: 700px) {
+    .destinos {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  .destinos a {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-5);
+    border: var(--border-width) solid var(--color-line);
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    color: var(--color-ink);
+  }
+  .destinos a:hover {
+    border-color: var(--color-blue);
+  }
+  .destinos span {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+  }
+  .destinos b {
+    font-size: var(--text-body);
+    font-weight: var(--weight-semibold);
+  }
+  .destinos em {
+    font-style: normal;
+    font-size: var(--text-body-sm);
+    color: var(--color-gray);
+  }
+  .acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    margin-top: var(--space-12);
+  }
+</style>

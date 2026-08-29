@@ -1,0 +1,40 @@
+---
+/* Ícono monocromo. Portado de design-system/components/core/Icon.jsx.
+   CAMBIO RESPECTO DEL ORIGINAL: el design system carga los SVG desde unpkg.com
+   por CDN. Acá se sirven autoalojados desde /iconos/. Un CDN de terceros en cada
+   ícono rompe el presupuesto de rendimiento y agrega una dependencia externa que
+   no controlamos. La técnica es la misma: máscara CSS, así el ícono hereda el
+   color en vez de verse como una imagen pegada. */
+interface Props {
+  nombre: string;
+  tam?: number;
+  color?: string;
+  clase?: string;
+  style?: string;
+}
+const { nombre, tam = 20, color = 'currentColor', clase, style } = Astro.props;
+---
+
+<span
+  aria-hidden="true"
+  class:list={['icono', clase]}
+  style={`--i-tam:${tam}px;--i-color:${color};--i-url:url(/iconos/${nombre}.svg);${style ?? ''}`}
+></span>
+
+<style>
+  .icono {
+    display: inline-block;
+    width: var(--i-tam);
+    height: var(--i-tam);
+    flex-shrink: 0;
+    background: var(--i-color);
+    -webkit-mask-image: var(--i-url);
+    mask-image: var(--i-url);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-position: center;
+    mask-position: center;
+  }
+</style>

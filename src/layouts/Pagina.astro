@@ -1,0 +1,85 @@
+---
+/* Layout de página interior: migas, encabezado y ranura de contenido.
+   Evita repetir la misma cabecera en trece páginas. */
+import Base from './Base.astro';
+import Migas from '../components/navigation/Migas.astro';
+import type { Miga } from '../lib/rutas';
+
+interface Props {
+  titulo: string;
+  descripcion: string;
+  ruta: string;
+  actual?: string;
+  h1: string;
+  bajada?: string | undefined;
+  eyebrow?: string | undefined;
+  migas: Miga[];
+  jsonLd?: unknown[];
+  anchoTexto?: boolean;
+  noindex?: boolean;
+}
+
+const {
+  titulo,
+  descripcion,
+  ruta,
+  actual,
+  h1,
+  bajada,
+  eyebrow,
+  migas,
+  jsonLd = [],
+  anchoTexto = false,
+  noindex = false,
+} = Astro.props;
+---
+
+<Base
+  titulo={titulo}
+  descripcion={descripcion}
+  ruta={ruta}
+  actual={actual}
+  migas={migas}
+  jsonLd={jsonLd}
+  noindex={noindex}
+>
+  <div class="encabezado-pagina">
+    <div class="contenedor">
+      <Migas items={migas} />
+      {eyebrow && <p class="eyebrow arriba">{eyebrow}</p>}
+      <h1 class:list={['titulo', anchoTexto && 'angosto']}>{h1}</h1>
+      {bajada && <p class="bajada">{bajada}</p>}
+    </div>
+  </div>
+
+  <slot />
+</Base>
+
+<style>
+  .encabezado-pagina {
+    padding-block: var(--space-8) var(--space-10);
+    border-bottom: var(--border-width) solid var(--color-line);
+  }
+  @media (min-width: 768px) {
+    .encabezado-pagina {
+      padding-block: var(--space-10) var(--space-16);
+    }
+  }
+  .arriba {
+    margin-top: var(--space-8);
+  }
+  .titulo {
+    margin-top: var(--space-4);
+    max-width: 22ch;
+  }
+  .titulo.angosto {
+    max-width: 18ch;
+  }
+  .bajada {
+    margin-top: var(--space-5);
+    font-size: var(--text-body-lg);
+    line-height: 1.6;
+    color: var(--color-gray);
+    max-width: var(--measure-prose);
+  }
+</style>

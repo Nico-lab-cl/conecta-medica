@@ -1,0 +1,60 @@
+---
+/* Logo. Portado de design-system/components/brand/ConectaLogo.jsx.
+   Cada variante es una ventana sobre el mismo archivo original: no se redibuja
+   la marca. Los recortes son los del design system.
+   PENDIENTE-CARLOS: logo en vectorial. Con el SVG estos recortes se reemplazan
+   por tres archivos limpios y desaparece el truco del background-position. */
+interface Props {
+  variante?: 'full' | 'lockup' | 'isotype';
+  alto?: number;
+  placa?: boolean;
+  alt?: string;
+}
+const { variante = 'lockup', alto = 44, placa = false, alt = 'Clínica Conecta' } = Astro.props;
+
+const RECORTES = {
+  full: { x: 0, y: 0, w: 1, h: 1 },
+  /* Caja real de la tinta del archivo original, medida píxel a píxel:
+     x 0.096–0.908, y 0.310–0.628. El recorte del design system
+     ({ x: 0.09, y: 0.29, w: 0.82, h: 0.365 }) incluye un 15% de aire vertical
+     de más, que a 44 px de alto en la cabecera deja "Clinica" casi ilegible.
+     Este ajusta a la tinta con un margen mínimo. Misma marca, sin redibujar. */
+  lockup: { x: 0.09, y: 0.303, w: 0.824, h: 0.332 },
+  isotype: { x: 0.5, y: 0.29, w: 0.075, h: 0.09 },
+} as const;
+
+const c = RECORTES[variante];
+const src = '/assets/logo-conecta-original.jpg';
+const estilo = [
+  `height:${alto}px`,
+  `width:${alto * (c.w / c.h)}px`,
+  `background-image:url(${src})`,
+  `background-size:${100 / c.w}% ${100 / c.h}%`,
+  `background-position:${(c.x / (1 - c.w || 1)) * 100}% ${(c.y / (1 - c.h || 1)) * 100}%`,
+].join(';');
+---
+
+{
+  placa ? (
+    <span class="placa">
+      <span class="marca" role="img" aria-label={alt} style={estilo} />
+    </span>
+  ) : (
+    <span class="marca" role="img" aria-label={alt} style={estilo} />
+  )
+}
+
+<style>
+  .marca {
+    display: block;
+    background-repeat: no-repeat;
+    flex-shrink: 0;
+  }
+  .placa {
+    background: var(--color-white);
+    border-radius: var(--radius-md);
+    padding: 10px 14px;
+    display: inline-flex;
+    align-items: center;
+  }
+</style>

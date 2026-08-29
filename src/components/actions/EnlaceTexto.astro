@@ -1,0 +1,43 @@
+---
+/* Enlace en texto corrido: siempre subrayado, nunca solo color.
+   Portado de design-system/components/actions/TextLink.jsx. */
+import Icono from '../core/Icono.astro';
+
+interface Props {
+  href: string;
+  externo?: boolean;
+  flecha?: boolean;
+}
+const { href, externo = false, flecha = false } = Astro.props;
+---
+
+<a
+  class="enlace"
+  href={href}
+  target={externo ? '_blank' : undefined}
+  rel={externo ? 'noopener noreferrer' : undefined}
+>
+  <slot />
+  {flecha && <Icono nombre="arrow-right" tam={16} style="margin-left:4px;vertical-align:-2px" />}
+  {externo && <Icono nombre="external-link" tam={14} style="margin-left:4px;vertical-align:-1px" />}
+</a>
+
+<style>
+  .enlace {
+    color: var(--text-link);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+    font-weight: var(--weight-medium);
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+  .enlace:hover {
+    color: var(--text-link-hover);
+    text-decoration-thickness: 2px;
+  }
+  .enlace:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: var(--focus-offset);
+    border-radius: 2px;
+  }
+</style>

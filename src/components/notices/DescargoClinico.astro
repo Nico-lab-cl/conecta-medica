@@ -1,0 +1,15 @@
+---
+/* Descargo al pie de todo contenido clínico. Portado de ClinicalDisclaimer.jsx. */
+import Icono from '../core/Icono.astro';
+---
+<div class="descargo">
+  <Icono nombre="info" tam={18} color="var(--color-gray)" style="margin-top:2px" />
+  <p>Información general, no reemplaza una evaluación médica. Cada caso se define en consulta, con tus exámenes a la vista.</p>
+</div>
+<style>
+  .descargo {
+    display: flex; gap: 10px; align-items: flex-start; margin-top: 40px; padding-top: 20px;
+    border-top: var(--border-width) solid var(--color-line); max-width: var(--container-prose);
+  }
+  .descargo p { margin: 0; font-size: var(--text-body-sm); line-height: 1.55; color: var(--color-gray); }
+</style>

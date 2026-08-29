@@ -1,0 +1,26 @@
+---
+/* Cita o dato destacado. Portado de Pullquote.jsx. */
+interface Props { fuente?: string | undefined; tipo?: 'quote' | 'data' }
+const { fuente, tipo = 'quote' } = Astro.props;
+---
+<figure class="cita" data-tipo={tipo}>
+  <blockquote><slot /></blockquote>
+  {fuente && <figcaption>{fuente}</figcaption>}
+</figure>
+<style>
+  .cita { margin: 40px 0; padding: 28px 32px; }
+  .cita[data-tipo='quote'] {
+    border-top: var(--border-width-emph) solid var(--color-blue);
+    border-bottom: var(--border-width) solid var(--color-line);
+  }
+  .cita[data-tipo='data'] { background: var(--surface-alt); border-radius: var(--radius-lg); }
+  .cita blockquote {
+    margin: 0; font-family: var(--font-serif); font-weight: var(--weight-semibold);
+    font-size: var(--text-h3); line-height: 1.4; color: var(--color-blue);
+  }
+  .cita[data-tipo='data'] blockquote {
+    font-family: var(--font-mono); font-weight: var(--weight-regular);
+    font-size: var(--text-h2); line-height: 1.25; color: var(--color-blue-deep);
+  }
+  .cita figcaption { margin-top: 12px; font-size: var(--text-body-sm); color: var(--color-gray); }
+</style>

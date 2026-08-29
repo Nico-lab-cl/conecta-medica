@@ -1,0 +1,544 @@
+---
+import { Picture } from 'astro:assets';
+import heroImg from '../assets/imagenes/hero-corredor.png';
+import Base from '../layouts/Base.astro';
+import Hilo from '../components/brand/Hilo.astro';
+import BotonAgendar from '../components/actions/BotonAgendar.astro';
+import Boton from '../components/actions/Boton.astro';
+import Chip from '../components/content/Chip.astro';
+import BloquePaso from '../components/content/BloquePaso.astro';
+import TarjetaPrestacion from '../components/content/TarjetaPrestacion.astro';
+import Acordeon from '../components/content/Acordeon.astro';
+import Icono from '../components/core/Icono.astro';
+import { RUTAS } from '../lib/rutas';
+import {
+  ajustes,
+  pais,
+  serviciosActivos,
+  faqsDestacadas,
+  horarioLegible,
+  precioCLP,
+} from '../lib/contenido';
+import { faqJsonLd } from '../lib/schema';
+
+const a = await ajustes();
+const cl = (await pais('cl')).data;
+const servicios = await serviciosActivos();
+const destacadas = await faqsDestacadas(4);
+
+const PASOS = [
+  {
+    titulo: 'Solicitas tu hora',
+    texto:
+      'Por el formulario o por WhatsApp. Te confirmamos día y hora por el canal que prefieras.',
+  },
+  {
+    titulo: 'Te evaluamos con tiempo',
+    texto:
+      'Revisamos tu historia completa y los exámenes que traigas, incluidos los antiguos. No partimos de cero.',
+  },
+  {
+    titulo: 'Estudiamos y te explicamos',
+    texto:
+      'Definimos qué falta estudiar y en qué orden, y te explicamos el plan en palabras que se entienden.',
+  },
+  {
+    titulo: 'Coordinamos si hace falta',
+    texto:
+      'Si tu caso necesita otra mirada, la coordinamos nosotros. No tienes que armar el recorrido por tu cuenta.',
+  },
+];
+
+const faqItems = destacadas.map((f) => ({
+  q: f.data.pregunta,
+  a: f.data.respuestaCorta.trim(),
+  href: `${RUTAS.preguntas}#${f.data.slug}`,
+}));
+---
+
+<Base
+  titulo="Hematólogo en Ñuñoa y telemedicina — Clínica Conecta"
+  descripcion="Atención hematológica coordinada en Ñuñoa y por telemedicina en todo Chile. Consulta particular $50.000. Atención de sábado."
+  ruta={RUTAS.inicio}
+  actual={RUTAS.inicio}
+  jsonLd={destacadas.length ? [faqJsonLd(destacadas.map((f) => f.data))] : []}
+>
+  <!-- ===================== HERO ===================== -->
+  <section class="hero">
+    <div class="contenedor hero-rejilla">
+      <div class="hero-texto">
+        <p class="eyebrow">Clínica Conecta · Unidad de hematología</p>
+        <h1>Atención hematológica coordinada, presencial y a distancia.</h1>
+        <p class="bajada">{a.tagline}.</p>
+
+        <div class="hero-acciones">
+          <BotonAgendar tam="lg" />
+          <Boton href="#como-funciona" variante="secondary" tam="lg" icono="arrow-right">
+            Cómo funciona la atención
+          </Boton>
+        </div>
+
+        <ul class="hero-chips">
+          <li><Chip tipo="telemedicina" etiqueta="Telemedicina en todo Chile" /></li>
+          <li><Chip tipo="presencial" etiqueta={`Consulta ${precioCLP(a.precioConsulta)}`} /></li>
+          <li><Chip tipo="sabado" etiqueta="Atención de sábado" /></li>
+        </ul>
+      </div>
+
+      <div class="hero-figura">
+        <Picture
+          src={heroImg}
+          alt="Corredor luminoso de un edificio de oficinas en Santiago, con ventanales de piso a techo y la cordillera al fondo."
+          widths={[400, 600, 900, 1200]}
+          sizes="(min-width: 900px) 40vw, calc(100vw - 40px)"
+          formats={['avif', 'webp']}
+          loading="lazy"
+          class="hero-imagen"
+        />
+      </div>
+    </div>
+    <div class="contenedor"><Hilo nodos={5} /></div>
+  </section>
+
+  <!-- ===================== EL PROBLEMA ===================== -->
+  <section class="seccion seccion-alt">
+    <div class="contenedor">
+      <p class="eyebrow">El problema</p>
+      <div class="problema">
+        <p>
+          El paciente hematológico recorre consultas que no se hablan entre sí. Cuenta su historia
+          desde el principio en cada una.
+        </p>
+        <p>
+          Repite exámenes que ya se hizo, porque el resultado quedó en otro sistema o nadie lo
+          revisó.
+        </p>
+        <p>
+          Y si vive fuera de Santiago, suma horas de viaje a un problema que muchas veces se podía
+          resolver mirando bien los exámenes que ya tenía.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== CÓMO FUNCIONA ===================== -->
+  <section class="seccion" id="como-funciona">
+    <div class="contenedor">
+      <p class="eyebrow">Cómo funciona la atención</p>
+      <h2>Un recorrido que no se corta entre un especialista y otro</h2>
+
+      <div class="pasos-hilo" aria-hidden="true"><Hilo nodos={4} /></div>
+
+      <ol class="pasos">
+        {
+          PASOS.map((p, i) => (
+            <li>
+              <BloquePaso numero={i + 1} titulo={p.titulo}>
+                {p.texto}
+              </BloquePaso>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- ===================== LA UNIDAD ===================== -->
+  <section class="seccion seccion-alt">
+    <div class="contenedor">
+      <p class="eyebrow">Conecta Hematología</p>
+      <h2>La hematología es el eje. Lo demás entra cuando tu caso lo necesita.</h2>
+      <p class="intro prosa">
+        Gastroenterología, nutrición e imágenes no son especialidades sueltas ofrecidas en el mismo
+        lugar: entran cuando el estudio hematológico las necesita, y las coordina el mismo médico
+        que lleva tu caso.
+      </p>
+
+      <div class="prestaciones">
+        {
+          servicios.map((s) => (
+            <TarjetaPrestacion
+              nivel={s.data.nivel}
+              titulo={s.data.nombre}
+              resumen={s.data.resumen}
+              href={RUTAS.prestacion(s.data.slug)}
+              icono={s.data.icono}
+              chips={s.data.modalidades}
+            />
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== TELEMEDICINA ===================== -->
+  <section class="seccion">
+    <div class="contenedor dos-columnas">
+      <div>
+        <p class="eyebrow">Telemedicina</p>
+        <h2>Qué se resuelve a distancia, y qué no</h2>
+        <p class="intro">
+          Decimos las dos cosas, porque una consulta a distancia que debía ser presencial no le
+          sirve a nadie.
+        </p>
+        <Boton href={RUTAS.telemedicina} variante="secondary" icono="arrow-right">
+          Ver cómo funciona
+        </Boton>
+      </div>
+      <div class="listas">
+        <div>
+          <h3 class="lista-titulo">Sí, a distancia</h3>
+          <ul class="lista si">
+            <li><Icono nombre="check" tam={18} color="var(--color-blue)" />Interpretar un hemograma o un perfil de hierro</li>
+            <li><Icono nombre="check" tam={18} color="var(--color-blue)" />Revisar y ajustar un tratamiento en curso</li>
+            <li><Icono nombre="check" tam={18} color="var(--color-blue)" />Controles de seguimiento</li>
+            <li><Icono nombre="check" tam={18} color="var(--color-blue)" />Segunda opinión sobre un estudio ya hecho</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="lista-titulo">Necesita ser presencial</h3>
+          <ul class="lista no">
+            <li><Icono nombre="minus" tam={18} color="var(--color-gray)" />Examinar un ganglio, el bazo o el abdomen</li>
+            <li><Icono nombre="minus" tam={18} color="var(--color-gray)" />Primera evaluación donde el examen físico decide</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== COMPROMISOS ===================== -->
+  <section class="seccion seccion-alt">
+    <div class="contenedor">
+      <p class="eyebrow">Nuestros compromisos</p>
+      <h2>Cuatro cosas que puedes exigirnos</h2>
+      <ul class="compromisos">
+        {
+          a.compromisos.map((c, i) => (
+            <li>
+              <span class="compromiso-num">{String(i + 1).padStart(2, '0')}</span>
+              <span>{c}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===================== PREGUNTAS ===================== -->
+  {
+    faqItems.length > 0 && (
+      <section class="seccion">
+        <div class="contenedor">
+          <p class="eyebrow">Preguntas frecuentes</p>
+          <h2>Lo que más nos preguntan</h2>
+          <div class="faq-bloque">
+            <Acordeon items={faqItems} />
+            <Boton href={RUTAS.preguntas} variante="text" icono="arrow-right">
+              Ver todas las preguntas
+            </Boton>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  <!-- ===================== UBICACIÓN Y CTA ===================== -->
+  <section class="seccion seccion-alt">
+    <div class="contenedor dos-columnas">
+      <div>
+        <p class="eyebrow">Dónde y cuándo</p>
+        <h2>Ñuñoa, a pasos del Metro Plaza Egaña</h2>
+        <address class="direccion">
+          {cl.direccion.edificio}<br />
+          {cl.direccion.calle}, {cl.direccion.oficina}<br />
+          {cl.direccion.comuna}, {cl.direccion.ciudad}
+        </address>
+        <ul class="horarios">
+          {cl.horarios.map((h) => <li><Icono nombre="clock" tam={18} color="var(--color-blue)" />{horarioLegible(h)}</li>)}
+        </ul>
+      </div>
+      <div class="cta-final">
+        <h2>¿Necesitas una hora?</h2>
+        <p>
+          Puedes pedirla sin derivación previa. Te confirmamos dentro del próximo día hábil.
+        </p>
+        <div class="cta-acciones">
+          <BotonAgendar tam="lg" />
+          <Boton href={RUTAS.contacto} variante="secondary" tam="lg">Ver formas de contacto</Boton>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  /* ---------- hero ---------- */
+  .hero {
+    padding-top: var(--space-12);
+    padding-bottom: var(--space-10);
+  }
+  .hero-rejilla {
+    display: grid;
+    gap: var(--space-10);
+    align-items: center;
+  }
+  @media (min-width: 900px) {
+    .hero-rejilla {
+      grid-template-columns: 1.35fr 1fr;
+      gap: var(--space-16);
+    }
+    .hero {
+      padding-top: var(--space-16);
+    }
+  }
+  .hero h1 {
+    font-size: var(--text-display);
+    line-height: var(--text-display-lh);
+    letter-spacing: var(--text-display-ls);
+    margin-top: var(--space-4);
+    max-width: 18ch;
+  }
+  .bajada {
+    margin-top: var(--space-5);
+    font-size: var(--text-body-lg);
+    line-height: 1.6;
+    color: var(--color-ink);
+    max-width: 46ch;
+  }
+  .hero-acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    margin-top: var(--space-8);
+  }
+  .hero-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    list-style: none;
+    margin: var(--space-6) 0 0;
+    padding: 0;
+  }
+  /* En móvil la imagen va DESPUÉS del texto y los botones, no antes: así no es
+     el elemento LCP y no compite con el titular por el primer render. En
+     escritorio ocupa su columna del hero. */
+  .hero-figura {
+    order: 2;
+    margin-top: var(--space-8);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: var(--surface-alt);
+  }
+  .hero-rejilla {
+    display: flex;
+    flex-direction: column;
+  }
+  @media (min-width: 900px) {
+    .hero-rejilla {
+      display: grid;
+    }
+    .hero-figura {
+      order: 0;
+      margin-top: 0;
+    }
+  }
+  .hero-figura :global(.hero-imagen) {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* ---------- problema ---------- */
+  .problema {
+    display: grid;
+    gap: var(--space-6);
+    margin-top: var(--space-6);
+  }
+  @media (min-width: 900px) {
+    .problema {
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-10);
+    }
+  }
+  .problema p {
+    font-size: var(--text-body-lg);
+    line-height: 1.6;
+    color: var(--color-blue-deep);
+  }
+
+  /* ---------- pasos ---------- */
+  h2 {
+    margin-top: var(--space-3);
+    max-width: 24ch;
+  }
+  .intro {
+    margin-top: var(--space-5);
+    font-size: var(--text-body-lg);
+    line-height: 1.6;
+    color: var(--color-gray);
+  }
+  .pasos-hilo {
+    margin-top: var(--space-12);
+    display: none;
+  }
+  @media (min-width: 900px) {
+    .pasos-hilo {
+      display: block;
+    }
+  }
+  .pasos {
+    display: grid;
+    gap: var(--space-10);
+    list-style: none;
+    margin: var(--space-8) 0 0;
+    padding: 0;
+  }
+  @media (min-width: 900px) {
+    .pasos {
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-8);
+      margin-top: var(--space-6);
+    }
+  }
+
+  /* ---------- prestaciones ---------- */
+  .prestaciones {
+    display: grid;
+    gap: var(--space-5);
+    margin-top: var(--space-10);
+  }
+  @media (min-width: 700px) {
+    .prestaciones {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (min-width: 1100px) {
+    .prestaciones {
+      grid-template-columns: 1.5fr 1fr 1fr;
+    }
+    .prestaciones > :first-child {
+      grid-row: span 2;
+    }
+  }
+
+  /* ---------- dos columnas ---------- */
+  .dos-columnas {
+    display: grid;
+    gap: var(--space-10);
+  }
+  @media (min-width: 900px) {
+    .dos-columnas {
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-16);
+    }
+  }
+  .listas {
+    display: grid;
+    gap: var(--space-8);
+  }
+  .lista-titulo {
+    font-family: var(--font-mono);
+    font-size: var(--text-eyebrow);
+    letter-spacing: var(--text-eyebrow-ls);
+    text-transform: uppercase;
+    color: var(--color-gray);
+  }
+  .lista {
+    list-style: none;
+    margin: var(--space-4) 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+  .lista li {
+    display: flex;
+    gap: var(--space-3);
+    align-items: flex-start;
+    font-size: var(--text-body);
+    line-height: 1.6;
+  }
+  .lista.no li {
+    color: var(--color-gray);
+  }
+
+  /* ---------- compromisos ---------- */
+  .compromisos {
+    list-style: none;
+    margin: var(--space-10) 0 0;
+    padding: 0;
+    display: grid;
+    gap: var(--space-6);
+  }
+  @media (min-width: 700px) {
+    .compromisos {
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-8);
+    }
+  }
+  .compromisos li {
+    display: flex;
+    gap: var(--space-4);
+    align-items: baseline;
+    font-size: var(--text-body-lg);
+    line-height: 1.5;
+    color: var(--color-blue-deep);
+  }
+  .compromiso-num {
+    font-family: var(--font-mono);
+    font-size: var(--text-body-sm);
+    color: var(--color-blue);
+    flex-shrink: 0;
+  }
+
+  /* ---------- faq + cierre ---------- */
+  .faq-bloque {
+    margin-top: var(--space-8);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    align-items: flex-start;
+    max-width: 860px;
+  }
+  .direccion {
+    font-style: normal;
+    margin-top: var(--space-5);
+    font-size: var(--text-body);
+    line-height: 1.7;
+  }
+  .horarios {
+    list-style: none;
+    margin: var(--space-6) 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    font-family: var(--font-mono);
+    font-size: var(--text-body-sm);
+  }
+  .horarios li {
+    display: flex;
+    gap: var(--space-3);
+    align-items: center;
+  }
+  .cta-final {
+    background: var(--surface-card);
+    border-radius: var(--radius-lg);
+    padding: var(--space-8);
+    box-shadow: var(--shadow-1);
+  }
+  .cta-final p {
+    margin-top: var(--space-4);
+    font-size: var(--text-body);
+    line-height: 1.6;
+    color: var(--color-gray);
+  }
+  .cta-acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    margin-top: var(--space-6);
+  }
+</style>

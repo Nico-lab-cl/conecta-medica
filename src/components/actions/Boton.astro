@@ -1,0 +1,146 @@
+---
+/* Botón. Portado de design-system/components/actions/Button.jsx.
+   Mismos tamaños (40/48/56), mismas variantes y mismos estados que el original. */
+import Icono from '../core/Icono.astro';
+
+interface Props {
+  variante?: 'primary' | 'secondary' | 'text';
+  tam?: 'sm' | 'md' | 'lg';
+  icono?: string | undefined;
+  posicionIcono?: 'left' | 'right';
+  href?: string | undefined;
+  type?: 'button' | 'submit';
+  deshabilitado?: boolean;
+  anchoCompleto?: boolean;
+  clase?: string | undefined;
+  rel?: string | undefined;
+  target?: string | undefined;
+}
+
+const {
+  variante = 'primary',
+  tam = 'md',
+  icono,
+  posicionIcono = 'right',
+  href,
+  type = 'button',
+  deshabilitado = false,
+  anchoCompleto = false,
+  clase,
+  rel,
+  target,
+} = Astro.props;
+
+const TAMANOS = {
+  sm: { alto: 40, pad: '0 16px', fuente: 'var(--text-body-sm)', icono: 18, gap: 8 },
+  md: { alto: 48, pad: '0 20px', fuente: 'var(--text-body)', icono: 20, gap: 8 },
+  lg: { alto: 56, pad: '0 28px', fuente: 'var(--text-body-lg)', icono: 22, gap: 10 },
+} as const;
+
+const t = TAMANOS[tam];
+const esTexto = variante === 'text';
+const Etiqueta = href ? 'a' : 'button';
+const estilo = [
+  `--b-alto:${t.alto}px`,
+  `--b-pad:${esTexto ? '0 2px' : t.pad}`,
+  `--b-fuente:${t.fuente}`,
+  `--b-gap:${t.gap}px`,
+  `--b-radio:${esTexto ? 'var(--radius-sm)' : 'var(--radius-md)'}`,
+].join(';');
+---
+
+<Etiqueta
+  class:list={['btn', clase]}
+  data-variante={variante}
+  data-ancho={anchoCompleto ? 'completo' : undefined}
+  style={estilo}
+  href={href}
+  rel={rel}
+  target={target}
+  type={href ? undefined : type}
+  disabled={href ? undefined : deshabilitado}
+  aria-disabled={href && deshabilitado ? 'true' : undefined}
+>
+  {icono && posicionIcono === 'left' && <Icono nombre={icono} tam={t.icono} />}
+  <span><slot /></span>
+  {icono && posicionIcono === 'right' && <Icono nombre={icono} tam={t.icono} />}
+</Etiqueta>
+
+<style>
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--b-gap);
+    min-height: var(--b-alto);
+    min-width: var(--touch-min);
+    padding: var(--b-pad);
+    border-radius: var(--b-radio);
+    font-family: var(--font-sans);
+    font-size: var(--b-fuente);
+    font-weight: var(--weight-semibold);
+    line-height: 1;
+    cursor: pointer;
+    text-decoration: none;
+    border: var(--border-width) solid transparent;
+    transition:
+      background-color var(--dur-fast) var(--ease-out),
+      color var(--dur-fast) var(--ease-out),
+      border-color var(--dur-fast) var(--ease-out);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn[data-ancho='completo'] {
+    display: flex;
+    width: 100%;
+  }
+  .btn:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: var(--focus-offset);
+  }
+
+  .btn[data-variante='primary'] {
+    background: var(--action-primary-bg);
+    color: var(--action-primary-fg);
+  }
+  .btn[data-variante='primary']:hover:not(:disabled):not([aria-disabled='true']) {
+    background: var(--action-primary-bg-hover);
+  }
+  .btn[data-variante='primary']:active:not(:disabled) {
+    background: #08214a;
+  }
+
+  .btn[data-variante='secondary'] {
+    background: transparent;
+    color: var(--action-secondary-fg);
+    border-color: var(--color-blue);
+  }
+  .btn[data-variante='secondary']:hover:not(:disabled):not([aria-disabled='true']) {
+    background: var(--surface-alt);
+  }
+  .btn[data-variante='secondary']:active:not(:disabled) {
+    background: #dce8f9;
+  }
+
+  .btn[data-variante='text'] {
+    background: transparent;
+    color: var(--color-blue);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-thickness: 1px;
+  }
+  .btn[data-variante='text']:hover:not(:disabled) {
+    color: var(--color-blue-deep);
+  }
+
+  .btn:disabled,
+  .btn[aria-disabled='true'] {
+    cursor: not-allowed;
+    background: var(--action-disabled-bg);
+    color: var(--action-disabled-fg);
+    border-color: var(--color-line);
+  }
+  .btn[data-variante='secondary']:disabled,
+  .btn[data-variante='text']:disabled {
+    background: transparent;
+  }
+</style>
