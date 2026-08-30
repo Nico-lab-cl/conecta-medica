@@ -324,70 +324,87 @@ Están en `Hero.astro` y `SeccionMedia.astro`, y valen para los tres videos:
 
 Santiago → Ñuñoa → la avenida → llegar. El usuario baja y el viaje avanza con él.
 
-## Por qué son cuatro planos y no uno
+## Por qué NO es un video
 
-Ningún modelo de video hace ese recorrido en una sola generación sin que se
-deshaga a la mitad. Son **cuatro planos generados por separado**, cada uno desde
-una imagen fija que se controla antes, y montados con fundidos de 0,7 s.
+La primera versión fue un video recorrido con el scroll. Se veía pixelada, y la
+razón no era Higgsfield: **un zoom es el peor caso posible para comprimir video.**
 
-| Plano | Nace de | Qué muestra |
+La compresión guarda lo que *no* cambia entre fotogramas. En un zoom continuo se
+mueve cada píxel en cada fotograma, así que no hay nada que reutilizar. Encima,
+poder saltar a cualquier punto con el scroll obliga a un fotograma clave cada 8, y
+cada uno es una imagen completa: todo el bitrate se gasta ahí. Para que ese viaje
+se viera nítido a 1080p harían falta entre **20 y 35 MB**.
+
+Un zoom, en el fondo, es una transformación geométrica: `scale()`. La versión en
+video la horneaba en píxeles y después comprimía mal esos píxeles. La versión
+actual se la deja al navegador sobre imágenes de 4096 px, así que la GPU
+remuestrea desde el original completo en cada paso: **nítido en todos los puntos
+del recorrido, siempre.**
+
+| | Video (descartado) | **Zoom en CSS** |
 |---|---|---|
-| 1 | `viaje-1-santiago` | Santiago desde el aire, la cuadrícula hasta la cordillera |
-| 2 | `viaje-2-nunoa` | Descenso sobre los techos y las copas de Ñuñoa |
-| 3 | `calle-nunoa` | La avenida con plátanos, a la altura de la vista |
-| 4 | `edificio-nunoa` | Llegar: la fachada con la cordillera detrás |
+| Nitidez | Pixelado | Perfecta en todo el zoom |
+| Peso | 2,51 MB | **1,08 MB en el peor caso** |
+| Fluidez | Depende de decodificar y buscar | GPU, sin decodificación |
+| Móvil | Archivo aparte, sin scroll | El mismo código |
 
-Los planos 3 y 4 nacen de fotografías que **ya estaban en el sitio**. Por eso el
-viaje no se siente como un video pegado encima: termina exactamente en las
-imágenes que el visitante va a volver a ver en contacto y en conócenos.
+Lo que se perdió: el movimiento orgánico —las hojas, la calima—. En los planos
+aéreos no se nota, porque una ciudad desde el aire ya está casi inmóvil.
 
-Modelo: **Kling 3.0 Turbo** a 1080p, 5 s por plano. Da mejor resolución que
-Seedance Mini —que topa en 720p— y sale más barato.
+## Las cuatro etapas
+
+| Etapa | Imagen | Rótulo | Movimiento de cámara |
+|---|---|---|---|
+| 1 | `viaje-1-santiago` | Santiago de Chile | Avanza hacia la cordillera |
+| 2 | `viaje-2-nunoa` | Comuna de Ñuñoa | Desciende sobre los techos |
+| 3 | `calle-nunoa` | A pasos de Metro Plaza Egaña | Entra caminando por la avenida |
+| 4 | `edificio-nunoa` | Aquí atendemos | Se acerca al edificio |
+
+Cada etapa tiene su propio encuadre de origen y de destino: un zoom idéntico
+cuatro veces se siente mecánico. Las etapas 3 y 4 nacen de fotografías que **ya
+estaban en el sitio**, así que el viaje termina en las mismas imágenes que el
+visitante vuelve a ver en contacto y en conócenos.
+
+Las cuatro se escalaron a 4096 px con **Topaz** (`topaz_image`, variante High
+Fidelity V2) desde los originales de 2048 px. Fuente en `src/assets/viaje/`.
+
+## El detalle que decide la nitidez
+
+`sizes="160vw"`, no `100vw`.
+
+`sizes` le dice al navegador cuántos píxeles va a necesitar. Con `100vw` pide una
+imagen del ancho de la pantalla — pero el zoom la amplía hasta 1,5×, así que en el
+punto de máximo acercamiento estaría estirando 1440 px para llenar 2160, y se
+vería exactamente igual de blanda que el video que reemplazó.
+
+Verificado en una ventana de 1440 px: sirve una imagen de **2304 px**, 1,60× el
+ancho de pantalla, contra un zoom máximo de 1,5×. Sobran píxeles reales incluso en
+el punto más cerrado del recorrido.
 
 ## Hasta dónde llega, y por qué no entra
 
-El cliente pidió que el viaje llegara hasta los pasillos interiores de la
-clínica. **Termina en la calle.**
+El cliente pidió que el viaje llegara hasta los pasillos interiores. **Termina en
+la calle.**
 
-La clínica todavía no está construida. Un paciente que ve un hero que baja hasta
-un edificio y entra a unos pasillos va a creer que ese es el lugar al que va a
-ir; cuando llegue y sea otro, lo que se rompe no es el diseño sino la confianza,
-en un sitio de salud, el día uno. Es distinto de una imagen de ambiente: acá hay
-una dirección específica.
+La clínica todavía no está construida y no hay fotografía del Edificio New Egaña
+real. Un paciente que ve un hero que baja hasta un edificio y entra a unos
+pasillos va a creer que ese es el lugar al que va a ir. Es distinto de una imagen
+de ambiente: acá hay una dirección específica. Por eso la última etapa muestra una
+fachada **de contexto**, sin señalética, y en ninguna parte se dice que sea esa.
 
-Tampoco hay una fotografía del Edificio New Egaña real. Por eso el plano 4
-muestra una fachada **de contexto**, sin señalética, y en ninguna parte se dice
-que sea la del edificio. Los rótulos que acompañan el descenso —"Santiago de
-Chile", "Comuna de Ñuñoa", "A pasos de Metro Plaza Egaña"— sí son verdad
+Los rótulos del descenso —Santiago, Ñuñoa, a pasos de Plaza Egaña— sí son verdad
 verificable.
 
-**Cuando llegue una foto del edificio real**, se regenera solo el plano 4 desde
-ella y el viaje pasa a ser literalmente cierto. Cuando el espacio esté habilitado
-y haya video del interior, se agrega como quinto plano. Ninguna de las dos cosas
-obliga a rehacer lo demás.
+**Cuando llegue una foto del edificio real**, se reemplaza solo la cuarta imagen y
+el viaje pasa a ser literalmente cierto. Cuando el espacio esté habilitado, se
+agrega una quinta etapa. Ninguna de las dos obliga a rehacer nada.
 
-## Los dos archivos, y por qué son dos
+## Dos defectos corregidos probando en el navegador
 
-| Archivo | Peso | Para qué |
-|---|---|---|
-| `viaje-scroll.mp4` | 2,51 MB | Escritorio, notebook y tablet. Un fotograma clave **cada 8**, para que saltar a cualquier punto sea instantáneo. Esos fotogramas clave son la razón de que pese más de lo normal, y son justamente lo que hace posible recorrerlo con el scroll. |
-| `viaje-movil.mp4` | 0,72 MB | Móvil. Compresión normal, porque ahí **no** se controla con el scroll. |
-| `viaje.jpg` | 0,13 MB | Póster: el primer plano, la vista de Santiago. |
+**El recorrido se quedaba corto.** La posición llegaba solo a `total - 1 + CRUCE`,
+con lo que la última etapa completaba apenas un 22% de su movimiento: el viaje
+terminaba a medio acercarse al edificio.
 
-En móvil el viaje se reproduce solo, en bucle, y el hero ocupa una sola pantalla.
-iOS no permite buscar dentro de un video con fluidez, y forzarlo se ve peor que
-no hacerlo. Con `prefers-reduced-motion` o ahorro de datos no se descarga ningún
-video: queda el póster.
-
-## Una lección del código
-
-La primera versión interpolaba el avance con `actual += (objetivo - actual) *
-0.12` **por fotograma**. Parece correcto y no lo es: avanza al doble de velocidad
-en una pantalla de 120 Hz que en una de 60, y se arrastra sin llegar nunca cuando
-el navegador estrangula los cuadros. Se descubrió midiendo: en el entorno de
-prueba corrían 4 fotogramas en 3 segundos y el video se quedaba a un séptimo del
-recorrido.
-
-Ahora la interpolación es **exponencial por tiempo transcurrido**, con una
-constante de 90 ms. El video llega al mismo punto en el mismo lapso en cualquier
-dispositivo.
+**El rótulo se adelantaba a la imagen.** Se elegía por redondeo de la posición, así
+que cambiaba a mitad de camino: se leía "Comuna de Ñuñoa" mientras seguías viendo
+Santiago entero. Ahora sigue a la etapa que más se ve.

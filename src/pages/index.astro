@@ -15,7 +15,7 @@
 */
 import { Picture } from 'astro:assets';
 import Base from '../layouts/Base.astro';
-import HeroViaje from '../components/brand/HeroViaje.astro';
+import HeroZoom from '../components/brand/HeroZoom.astro';
 import Hilo from '../components/brand/Hilo.astro';
 import SeccionMedia from '../components/content/SeccionMedia.astro';
 import BotonAgendar from '../components/actions/BotonAgendar.astro';
@@ -79,7 +79,7 @@ const faqItems = destacadas.map((f) => ({
   heroSuelto
   jsonLd={destacadas.length ? [faqJsonLd(destacadas.map((f) => f.data))] : []}
 >
-  <HeroViaje
+  <HeroZoom
     titulo="Atención hematológica coordinada."
     bajada={`${a.tagline}. Presencial en Ñuñoa y por telemedicina en todo Chile.`}
   >
@@ -87,7 +87,7 @@ const faqItems = destacadas.map((f) => ({
     <Boton href="#como-funciona" variante="secondary" tam="lg" icono="arrow-right">
       Cómo funciona la atención
     </Boton>
-  </HeroViaje>
+  </HeroZoom>
 
   {/* Principio de proximidad: esta barra pertenece al hero, no es una sección
       aparte. Antes era una franja blanca flotando entre el hero y "el problema",
