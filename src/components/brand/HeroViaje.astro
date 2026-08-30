@@ -1,0 +1,377 @@
+---
+/* Hero del viaje: Santiago → Ñuñoa → la avenida → llegar.
+
+   El usuario baja y el viaje avanza con él. No es un video que se reproduce
+   solo: el scroll es el que mueve el tiempo del video, así que la persona
+   siente que está descendiendo, no que está mirando.
+
+   Cómo funciona: un contenedor alto con un bloque `sticky` adentro. Mientras el
+   contenedor recorre la pantalla, se traduce el avance del scroll a
+   `video.currentTime`. Tres cosas lo hacen viable:
+
+   1. El video está codificado con un fotograma clave cada 8. Sin eso, cada
+      movimiento del scroll obliga a decodificar desde el fotograma clave
+      anterior y la imagen se traba. Ver `scripts/viaje.mjs`.
+   2. El valor se suaviza con interpolación en `requestAnimationFrame`, no se
+      escribe directo desde el evento de scroll. Escribirlo directo produce un
+      movimiento a saltos que se siente barato.
+   3. En MÓVIL no se controla con el scroll. iOS no permite buscar en un video
+      con fluidez y el resultado es peor que no hacerlo: ahí el viaje se
+      reproduce solo, en bucle, desde un archivo más liviano.
+
+   Con `prefers-reduced-motion` no se descarga ningún video: queda el póster.
+
+   El texto acompaña el descenso. El rótulo va nombrando dónde estamos —Santiago,
+   Ñuñoa, Plaza Egaña— y el titular con los botones se asienta al final, cuando
+   ya llegamos. Eso responde la primera pregunta que se hace quien entra: dónde
+   queda esto. */
+
+interface Props {
+  titulo: string;
+  bajada: string;
+}
+const { titulo, bajada } = Astro.props;
+
+/* Cada parada del viaje, con el punto del recorrido donde aparece.
+   El texto es real: la clínica está en Ñuñoa, a pasos de Plaza Egaña. */
+const PARADAS = [
+  { hasta: 0.3, texto: 'Santiago de Chile' },
+  { hasta: 0.58, texto: 'Comuna de Ñuñoa' },
+  { hasta: 1.01, texto: 'A pasos de Metro Plaza Egaña' },
+];
+---
+
+<section class="viaje" id="viaje">
+  <div class="pegado">
+    <div class="lienzo">
+      <img class="poster" src="/video/viaje.jpg" alt="" aria-hidden="true" />
+      <video
+        class="pelicula"
+        id="pelicula-viaje"
+        muted
+        playsinline
+        preload="none"
+        aria-hidden="true"
+        data-scroll="/video/viaje-scroll.mp4"
+        data-movil="/video/viaje-movil.mp4"></video>
+      <span class="velo" aria-hidden="true"></span>
+    </div>
+
+    <div class="texto contenedor">
+      <p class="paradas" aria-live="off">
+        {
+          PARADAS.map((p, i) => (
+            <span class="parada" data-parada={i} data-hasta={p.hasta}>
+              {p.texto}
+            </span>
+          ))
+        }
+      </p>
+
+      <h1 class="titular-hero">{titulo}</h1>
+      <p class="bajada">{bajada}</p>
+      <div class="acciones"><slot /></div>
+    </div>
+
+    <a class="seguir" href="#como-funciona" aria-label="Bajar al contenido">
+      <span class="seguir-linea" aria-hidden="true"></span>
+    </a>
+  </div>
+</section>
+
+<noscript>
+  <style>
+    /* Sin JavaScript el viaje no puede avanzar con el scroll. El hero se reduce
+       a una sola pantalla con el póster, que es el primer plano del viaje: la
+       vista de Santiago. Se entiende igual. */
+    .viaje {
+      height: 100svh !important;
+    }
+  </style>
+</noscript>
+
+<script>
+  const seccion = document.getElementById('viaje');
+  const video = document.getElementById('pelicula-viaje') as HTMLVideoElement | null;
+
+  if (seccion && video) {
+    const paradas = [...seccion.querySelectorAll<HTMLElement>('.parada')];
+    const quietud = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const angosto = window.matchMedia('(max-width: 899px)');
+    const conexion = (navigator as { connection?: { saveData?: boolean } }).connection;
+
+    /** Deja visible el rótulo que corresponde al punto del viaje. */
+    const rotular = (avance: number) => {
+      let activa = 0;
+      for (let i = 0; i < paradas.length; i++) {
+        if (avance < Number(paradas[i]?.dataset['hasta'] ?? 1)) {
+          activa = i;
+          break;
+        }
+        activa = i;
+      }
+      paradas.forEach((p, i) => p.classList.toggle('visible', i === activa));
+    };
+
+    const arrancar = () => {
+      if (quietud.matches || conexion?.saveData) {
+        // Queda el póster. No se descarga un solo byte de video.
+        rotular(0);
+        return;
+      }
+
+      if (angosto.matches) {
+        /* Móvil: el viaje se reproduce solo. Buscar dentro de un video con el
+           scroll no funciona bien en iOS, y forzarlo se ve peor que no hacerlo. */
+        video.src = video.dataset['movil'] ?? '';
+        video.loop = true;
+        video.preload = 'auto';
+        video.addEventListener('playing', () => video.classList.add('corriendo'), { once: true });
+        video.play().catch(() => {
+          /* Si la reproducción automática está bloqueada, queda el póster. */
+        });
+        rotular(0);
+        return;
+      }
+
+      /* Escritorio, notebook y tablet: el scroll mueve el tiempo del video. */
+      video.src = video.dataset['scroll'] ?? '';
+      video.preload = 'auto';
+
+      let objetivo = 0;
+      let actual = 0;
+      let corriendo = false;
+      let ultimo = 0;
+
+      /* Constante de tiempo del seguimiento, en milisegundos. Cuanto más baja,
+         más pegado va el video al scroll. 90ms se siente atado sin ser brusco. */
+      const TAU = 90;
+
+      const avance = () => {
+        const caja = seccion.getBoundingClientRect();
+        const recorrido = caja.height - window.innerHeight;
+        if (recorrido <= 0) return 0;
+        return Math.min(1, Math.max(0, -caja.top / recorrido));
+      };
+
+      const cuadro = (ahora: number) => {
+        /* Interpolación exponencial por TIEMPO, no por fotograma.
+
+           Un `actual += (objetivo - actual) * 0.12` por cuadro parece
+           equivalente, pero avanza el doble de rápido en una pantalla de 120 Hz
+           que en una de 60, y se arrastra hasta no llegar nunca cuando el
+           navegador estrangula los cuadros —una pestaña en segundo plano, un
+           móvil ahorrando batería—. Con el delta de tiempo, el video llega al
+           mismo punto en el mismo lapso en cualquier dispositivo. */
+        const dt = ultimo ? Math.min(ahora - ultimo, 100) : 16;
+        ultimo = ahora;
+
+        actual += (objetivo - actual) * (1 - Math.exp(-dt / TAU));
+        if (Math.abs(objetivo - actual) < 0.0004) actual = objetivo;
+        if (video.duration) video.currentTime = actual * video.duration;
+
+        if (Math.abs(objetivo - actual) > 0.0001) {
+          requestAnimationFrame(cuadro);
+        } else {
+          corriendo = false;
+          ultimo = 0;
+        }
+      };
+
+      const alScrollear = () => {
+        objetivo = avance();
+        rotular(objetivo);
+        seccion.style.setProperty('--avance', String(objetivo));
+        if (!corriendo) {
+          corriendo = true;
+          ultimo = 0;
+          requestAnimationFrame(cuadro);
+        }
+      };
+
+      video.addEventListener(
+        'loadeddata',
+        () => {
+          video.classList.add('corriendo');
+          alScrollear();
+        },
+        { once: true },
+      );
+
+      addEventListener('scroll', alScrollear, { passive: true });
+      addEventListener('resize', alScrollear, { passive: true });
+      video.load();
+    };
+
+    /* El video pesa: no se pide hasta que el hero está realmente en pantalla. */
+    if ('IntersectionObserver' in window) {
+      const obs = new IntersectionObserver(
+        (e) => {
+          if (e.some((x) => x.isIntersecting)) {
+            obs.disconnect();
+            arrancar();
+          }
+        },
+        { rootMargin: '200px' },
+      );
+      obs.observe(seccion);
+    } else {
+      arrancar();
+    }
+  }
+</script>
+
+<style>
+  /* El contenedor mide varias pantallas: esa altura es la distancia de scroll
+     que dura el viaje. En móvil se reduce a una sola pantalla, porque ahí el
+     video se reproduce solo y no hay nada que recorrer. */
+  .viaje {
+    position: relative;
+    height: 100svh;
+    background: var(--color-blue-deep);
+  }
+  @media (min-width: 900px) {
+    .viaje {
+      height: 320svh;
+    }
+  }
+
+  .pegado {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    overflow: hidden;
+    display: flex;
+    align-items: flex-end;
+  }
+
+  .lienzo {
+    position: absolute;
+    inset: 0;
+  }
+  .poster,
+  .pelicula {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  /* El video solo tapa el póster cuando ya tiene datos. Si algo falla, se ve la
+     vista de Santiago fija en vez de un rectángulo negro. */
+  .pelicula {
+    opacity: 0;
+    transition: opacity var(--dur-slow) var(--ease-out);
+  }
+  .pelicula:global(.corriendo) {
+    opacity: 1;
+  }
+
+  .velo {
+    position: absolute;
+    inset: 0;
+    background: var(--velo);
+  }
+
+  .texto {
+    position: relative;
+    padding-block: var(--space-16);
+    color: #fff;
+  }
+  @media (min-width: 900px) {
+    .texto {
+      padding-block: var(--space-20) var(--space-24);
+    }
+  }
+
+  /* Los rótulos ocupan el mismo lugar y se turnan: uno solo visible a la vez.
+     Se apilan en la misma celda de grilla para que el bloque no salte de alto
+     cuando cambia el texto. */
+  .paradas {
+    display: grid;
+    grid-template-areas: 'parada';
+    font-family: var(--font-mono);
+    font-size: var(--text-eyebrow);
+    line-height: var(--text-eyebrow-lh);
+    letter-spacing: var(--text-eyebrow-ls);
+    text-transform: uppercase;
+    color: #a9c4e8;
+  }
+  .parada {
+    grid-area: parada;
+    opacity: 0;
+    transform: translateY(6px);
+    transition:
+      opacity var(--dur-mid) var(--ease-out),
+      transform var(--dur-mid) var(--ease-out);
+  }
+  .parada:global(.visible) {
+    opacity: 1;
+    transform: none;
+  }
+
+  .titular-hero {
+    margin-top: var(--space-5);
+    max-width: 15ch;
+    color: #fff;
+  }
+  .bajada {
+    margin-top: var(--space-6);
+    font-size: var(--text-body-lg);
+    line-height: 1.55;
+    color: #dce7f7;
+    max-width: 44ch;
+  }
+  .acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    margin-top: var(--space-8);
+  }
+  .acciones :global(.btn[data-variante='secondary']) {
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(6px);
+  }
+  .acciones :global(.btn[data-variante='secondary']:hover) {
+    background: rgba(255, 255, 255, 0.18);
+    border-color: #fff;
+  }
+  .acciones :global(.btn[data-variante='primary']) {
+    background: #fff;
+    color: var(--color-blue-deep);
+  }
+  .acciones :global(.btn[data-variante='primary']:hover) {
+    background: #d6e3f7;
+  }
+
+  /* Indicador de que hay que seguir bajando. Se desvanece a medida que el viaje
+     avanza: cuando ya llegaste, deja de pedirte que sigas. */
+  .seguir {
+    position: absolute;
+    right: var(--margin-x);
+    bottom: var(--space-8);
+    display: none;
+    width: 44px;
+    height: 64px;
+    align-items: flex-end;
+    justify-content: center;
+    opacity: calc(1 - var(--avance, 0) * 2.4);
+  }
+  @media (min-width: 900px) {
+    .seguir {
+      display: flex;
+      right: var(--margin-x-lg);
+    }
+  }
+  .seguir-linea {
+    width: 1px;
+    height: 56px;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0), #fff);
+  }
+  .seguir:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: var(--focus-offset);
+  }
+</style>

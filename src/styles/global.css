@@ -358,3 +358,54 @@ video {
     opacity: 1;
   }
 }
+
+/* ===========================================================================
+   EL VELO, DEFINIDO UNA SOLA VEZ
+
+   Principio de repetición. Había cuatro velos escritos por separado —en el hero
+   del viaje, en el hero simple, en la cabecera de página interior y en las
+   secciones con fondo— con valores ligeramente distintos entre sí. Nadie ve la
+   diferencia mirando una pantalla; se nota al recorrer el sitio, como una
+   sensación de que algo no termina de cuadrar.
+
+   Ahora es un solo tratamiento, en tres capas con trabajos distintos:
+     · `--velo-pie`      oscurece abajo, donde cae el texto;
+     · `--velo-costado`  carga el lado izquierdo, donde vive el bloque;
+     · `--velo-techo`    una franja corta arriba, para que la cabecera
+                         transparente tenga contraste garantizado.
+   El centro y la derecha quedan casi limpios: ahí se ve la fotografía.
+   =========================================================================== */
+
+:root {
+  --velo-tinta: 6, 24, 54;
+
+  --velo-pie: linear-gradient(
+    to top,
+    rgba(var(--velo-tinta), 0.88) 0%,
+    rgba(var(--velo-tinta), 0.58) 24%,
+    rgba(var(--velo-tinta), 0.1) 56%,
+    rgba(var(--velo-tinta), 0) 78%
+  );
+  --velo-costado: linear-gradient(
+    to right,
+    rgba(var(--velo-tinta), 0.62) 0%,
+    rgba(var(--velo-tinta), 0.14) 46%,
+    rgba(var(--velo-tinta), 0) 70%
+  );
+  --velo-techo: linear-gradient(
+    to bottom,
+    rgba(var(--velo-tinta), 0.52) 0%,
+    rgba(var(--velo-tinta), 0) 18%
+  );
+
+  /* El velo completo, para fondos con texto blanco encima. */
+  --velo: var(--velo-pie), var(--velo-costado), var(--velo-techo);
+
+  /* Variante para secciones claras: el texto va en tinta sobre la fotografía. */
+  --velo-claro: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0.97) 0%,
+    rgba(255, 255, 255, 0.9) 46%,
+    rgba(255, 255, 255, 0.55) 100%
+  );
+}

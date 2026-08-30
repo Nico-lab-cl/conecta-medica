@@ -15,7 +15,7 @@
 */
 import { Picture } from 'astro:assets';
 import Base from '../layouts/Base.astro';
-import Hero from '../components/brand/Hero.astro';
+import HeroViaje from '../components/brand/HeroViaje.astro';
 import Hilo from '../components/brand/Hilo.astro';
 import SeccionMedia from '../components/content/SeccionMedia.astro';
 import BotonAgendar from '../components/actions/BotonAgendar.astro';
@@ -79,11 +79,7 @@ const faqItems = destacadas.map((f) => ({
   heroSuelto
   jsonLd={destacadas.length ? [faqJsonLd(destacadas.map((f) => f.data))] : []}
 >
-  <Hero
-    imagen={FOTO_PAGINA.inicio.src}
-    alt={FOTO_PAGINA.inicio.alt}
-    video="v-hero"
-    eyebrow="Unidad de hematología · Ñuñoa, Santiago"
+  <HeroViaje
     titulo="Atención hematológica coordinada."
     bajada={`${a.tagline}. Presencial en Ñuñoa y por telemedicina en todo Chile.`}
   >
@@ -91,10 +87,13 @@ const faqItems = destacadas.map((f) => ({
     <Boton href="#como-funciona" variante="secondary" tam="lg" icono="arrow-right">
       Cómo funciona la atención
     </Boton>
-  </Hero>
+  </HeroViaje>
 
-  <!-- ============ Barra de datos duros, pegada bajo el hero ============ -->
-  <section class="datos">
+  {/* Principio de proximidad: esta barra pertenece al hero, no es una sección
+      aparte. Antes era una franja blanca flotando entre el hero y "el problema",
+      sin pertenecer a ninguno de los dos. Ahora cierra el hero: mismo fondo,
+      misma tinta, sin borde que la separe de arriba. */}
+  <section class="datos seccion-oscura">
     <div class="contenedor datos-fila">
       <span><Chip tipo="telemedicina" etiqueta="Telemedicina en todo Chile" /></span>
       <span><Chip tipo="presencial" etiqueta={`Consulta ${precioCLP(a.precioConsulta)}`} /></span>
@@ -320,8 +319,8 @@ const faqItems = destacadas.map((f) => ({
 <style>
   /* ---------- barra de datos ---------- */
   .datos {
-    background: var(--color-white);
-    border-bottom: var(--border-width) solid var(--color-line);
+    background: var(--color-blue-deep);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.14);
   }
   .datos-fila {
     display: flex;
@@ -335,7 +334,16 @@ const faqItems = destacadas.map((f) => ({
     font-size: var(--text-caption);
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: var(--color-gray);
+    color: #a9c4e8;
+  }
+  /* Los chips sobre azul profundo: borde claro en vez de fondo azul nube. */
+  .datos :global(.chip) {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.28);
+    color: #fff;
+  }
+  .datos :global(.chip .icono) {
+    background: #a9c4e8 !important;
   }
 
   /* ---------- el problema ---------- */

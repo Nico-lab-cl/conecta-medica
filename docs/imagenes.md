@@ -317,3 +317,77 @@ Están en `Hero.astro` y `SeccionMedia.astro`, y valen para los tres videos:
   primera versión dejaba un bloque azul cuando el video se pausaba.
 - **Nunca llevan audio** ni controles, y son `aria-hidden`: son fondo, no
   contenido.
+
+---
+
+# El viaje del hero
+
+Santiago → Ñuñoa → la avenida → llegar. El usuario baja y el viaje avanza con él.
+
+## Por qué son cuatro planos y no uno
+
+Ningún modelo de video hace ese recorrido en una sola generación sin que se
+deshaga a la mitad. Son **cuatro planos generados por separado**, cada uno desde
+una imagen fija que se controla antes, y montados con fundidos de 0,7 s.
+
+| Plano | Nace de | Qué muestra |
+|---|---|---|
+| 1 | `viaje-1-santiago` | Santiago desde el aire, la cuadrícula hasta la cordillera |
+| 2 | `viaje-2-nunoa` | Descenso sobre los techos y las copas de Ñuñoa |
+| 3 | `calle-nunoa` | La avenida con plátanos, a la altura de la vista |
+| 4 | `edificio-nunoa` | Llegar: la fachada con la cordillera detrás |
+
+Los planos 3 y 4 nacen de fotografías que **ya estaban en el sitio**. Por eso el
+viaje no se siente como un video pegado encima: termina exactamente en las
+imágenes que el visitante va a volver a ver en contacto y en conócenos.
+
+Modelo: **Kling 3.0 Turbo** a 1080p, 5 s por plano. Da mejor resolución que
+Seedance Mini —que topa en 720p— y sale más barato.
+
+## Hasta dónde llega, y por qué no entra
+
+El cliente pidió que el viaje llegara hasta los pasillos interiores de la
+clínica. **Termina en la calle.**
+
+La clínica todavía no está construida. Un paciente que ve un hero que baja hasta
+un edificio y entra a unos pasillos va a creer que ese es el lugar al que va a
+ir; cuando llegue y sea otro, lo que se rompe no es el diseño sino la confianza,
+en un sitio de salud, el día uno. Es distinto de una imagen de ambiente: acá hay
+una dirección específica.
+
+Tampoco hay una fotografía del Edificio New Egaña real. Por eso el plano 4
+muestra una fachada **de contexto**, sin señalética, y en ninguna parte se dice
+que sea la del edificio. Los rótulos que acompañan el descenso —"Santiago de
+Chile", "Comuna de Ñuñoa", "A pasos de Metro Plaza Egaña"— sí son verdad
+verificable.
+
+**Cuando llegue una foto del edificio real**, se regenera solo el plano 4 desde
+ella y el viaje pasa a ser literalmente cierto. Cuando el espacio esté habilitado
+y haya video del interior, se agrega como quinto plano. Ninguna de las dos cosas
+obliga a rehacer lo demás.
+
+## Los dos archivos, y por qué son dos
+
+| Archivo | Peso | Para qué |
+|---|---|---|
+| `viaje-scroll.mp4` | 2,51 MB | Escritorio, notebook y tablet. Un fotograma clave **cada 8**, para que saltar a cualquier punto sea instantáneo. Esos fotogramas clave son la razón de que pese más de lo normal, y son justamente lo que hace posible recorrerlo con el scroll. |
+| `viaje-movil.mp4` | 0,72 MB | Móvil. Compresión normal, porque ahí **no** se controla con el scroll. |
+| `viaje.jpg` | 0,13 MB | Póster: el primer plano, la vista de Santiago. |
+
+En móvil el viaje se reproduce solo, en bucle, y el hero ocupa una sola pantalla.
+iOS no permite buscar dentro de un video con fluidez, y forzarlo se ve peor que
+no hacerlo. Con `prefers-reduced-motion` o ahorro de datos no se descarga ningún
+video: queda el póster.
+
+## Una lección del código
+
+La primera versión interpolaba el avance con `actual += (objetivo - actual) *
+0.12` **por fotograma**. Parece correcto y no lo es: avanza al doble de velocidad
+en una pantalla de 120 Hz que en una de 60, y se arrastra sin llegar nunca cuando
+el navegador estrangula los cuadros. Se descubrió midiendo: en el entorno de
+prueba corrían 4 fotogramas en 3 segundos y el video se quedaba a un séptimo del
+recorrido.
+
+Ahora la interpolación es **exponencial por tiempo transcurrido**, con una
+constante de 90 ms. El video llega al mismo punto en el mismo lapso en cualquier
+dispositivo.
