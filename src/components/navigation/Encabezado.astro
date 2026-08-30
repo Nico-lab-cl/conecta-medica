@@ -19,9 +19,7 @@ import { RUTAS } from '../../lib/rutas';
 import {
   ajustes,
   precioCLP,
-  menuUsaDesplegable,
   hayDirectorioDeEquipo,
-  recursosPublicables,
 } from '../../lib/contenido';
 
 interface Props {
@@ -35,34 +33,38 @@ interface Props {
 const { actual = '', sobreHero = false } = Astro.props;
 
 const a = await ajustes();
-const desplegable = await menuUsaDesplegable();
 const conEquipo = await hayDirectorioDeEquipo();
-const conRecursos = (await recursosPublicables()).length > 0;
 
-/* El menú de escritorio se queda en cinco ítems, que es lo que cabe en una
-   línea a 1200px. Con siete se parte en dos y la cabecera crece de 80 a 104px.
+/* Menú definido por el cliente. Seis ítems fijos, en su orden.
 
-   Los que faltan no desaparecen: "Prestaciones" está dentro de la unidad, que
-   lista las cuatro; "Conócenos", "Preguntas" e "Información para pacientes"
-   están en el pie y enlazadas desde el contenido.
+   Dos notas sobre lo que cambió respecto del menú anterior:
 
-   Dos ítems son condicionales y aparecen solos cuando exista el contenido:
-   equipo con dos o más profesionales, y recursos cuando haya material revisado. */
+   - "Inicio" es redundante con el logo, que ya lleva a la portada. Va porque el
+     cliente lo pidió explícitamente, y en salud es un ítem que el público mayor
+     sí busca.
+   - "Agendar hora" repite el botón de acción de la derecha. Se mantienen los
+     dos: el botón convierte, el ítem de menú da la ruta a quien lee el menú
+     antes de mirar los botones.
+
+   "Equipo médico" existe desde un solo profesional. Ver hayDirectorioDeEquipo()
+   en lib/contenido.ts y la advertencia sobre los datos que faltan. */
 const items = [
-  { label: desplegable ? 'Unidades' : 'Conecta Hematología', href: RUTAS.unidad },
-  { label: 'Telemedicina', href: RUTAS.telemedicina },
-  ...(conRecursos ? [{ label: 'Para pacientes', href: RUTAS.pacientes }] : []),
-  ...(conEquipo ? [{ label: 'Equipo', href: RUTAS.equipo }] : []),
-  { label: 'Preguntas', href: RUTAS.preguntas },
-  { label: 'Precios', href: RUTAS.precios },
+  { label: 'Inicio', href: RUTAS.inicio },
+  { label: 'Quiénes somos', href: RUTAS.conocenos },
+  { label: 'Agendar hora', href: RUTAS.agendar },
+  { label: 'Preguntas frecuentes', href: RUTAS.preguntas },
   { label: 'Contacto', href: RUTAS.contacto },
+  ...(conEquipo ? [{ label: 'Equipo médico', href: RUTAS.equipo }] : []),
 ];
 
-/* El menú móvil sí los lleva todos: ahí no hay problema de ancho. */
+/* El menú móvil lleva los mismos seis, más los destinos que no entran arriba
+   pero que sí conviene alcanzar desde el panel: la unidad clínica, sus precios
+   y la telemedicina. En móvil no hay problema de ancho. */
 const itemsMovil = [
   ...items,
-  ...(conRecursos ? [] : [{ label: 'Información para pacientes', href: RUTAS.pacientes }]),
-  { label: 'Conócenos', href: RUTAS.conocenos },
+  { label: 'Conecta Hematología', href: RUTAS.unidad },
+  { label: 'Telemedicina', href: RUTAS.telemedicina },
+  { label: 'Precios', href: RUTAS.precios },
 ];
 ---
 

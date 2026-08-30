@@ -35,7 +35,6 @@ import Boton from '../../components/actions/Boton.astro';
 import Icono from '../../components/core/Icono.astro';
 import TarjetaPrestacion from '../../components/content/TarjetaPrestacion.astro';
 import Acordeon from '../../components/content/Acordeon.astro';
-import AvisoUrgencias from '../../components/notices/AvisoUrgencias.astro';
 import { RUTAS } from '../../lib/rutas';
 import {
   ajustes,
@@ -134,15 +133,17 @@ const foto = FOTO_PAGINA['inicio'];
 
     <div class="contenedor hero-rejilla">
       <div class="hero-texto">
-        <p class="hero-eyebrow">Ñuñoa · Santiago · y telemedicina en todo Chile</p>
-        <h1>Atención hematológica coordinada</h1>
-        <p class="hero-bajada">{a.tagline}.</p>
+        <p class="hero-eyebrow entra" style="--retraso:0ms">
+          Ñuñoa · Santiago · y telemedicina en todo Chile
+        </p>
+        <h1 class="entra" style="--retraso:70ms">Atención hematológica coordinada</h1>
+        <p class="hero-bajada entra" style="--retraso:140ms">{a.tagline}.</p>
       </div>
 
       <!-- El bloque de reserva va DENTRO del hero, no encima. Es la diferencia
            entre Alemana y los otros doce, y es lo que hace que se vea comercial
            sin verse recargado. -->
-      <form class="reserva" method="get" action={RUTAS.agendar}>
+      <form class="reserva entra" style="--retraso:210ms" method="get" action={RUTAS.agendar}>
         <p class="reserva-titulo">Solicitar una hora</p>
 
         <label class="campo">
@@ -176,8 +177,8 @@ const foto = FOTO_PAGINA['inicio'];
   <section class="hechos">
     <div class="contenedor hechos-rejilla">
       {
-        HECHOS.map((h) => (
-          <div class="hecho">
+        HECHOS.map((h, i) => (
+          <div class="hecho entra" style={`--retraso:${280 + i * 60}ms`}>
             <Icono nombre={h.icono} tam={22} color="var(--color-blue)" />
             <div>
               <p class="hecho-titulo">{h.titulo}</p>
@@ -190,7 +191,7 @@ const foto = FOTO_PAGINA['inicio'];
   </section>
 
   <!-- ==================== ¿QUÉ NECESITAS HACER? ==================== -->
-  <section class="seccion tareas">
+  <section class="seccion tareas revelar">
     <div class="contenedor">
       <div class="encabezado-seccion">
         <h2>¿Qué necesitas hacer?</h2>
@@ -198,8 +199,8 @@ const foto = FOTO_PAGINA['inicio'];
       </div>
       <div class="tareas-rejilla">
         {
-          TAREAS.map((t) => (
-            <a class="tarea" href={t.href}>
+          TAREAS.map((t, i) => (
+            <a class="tarea" href={t.href} style={`--escalon:${i}`}>
               <span class="tarea-icono">
                 <Icono nombre={t.icono} tam={24} color="var(--color-blue)" />
               </span>
@@ -213,7 +214,7 @@ const foto = FOTO_PAGINA['inicio'];
   </section>
 
   <!-- ==================== PRESTACIONES ==================== -->
-  <section class="seccion prestaciones">
+  <section class="seccion prestaciones revelar">
     <div class="contenedor">
       <div class="encabezado-seccion con-enlace">
         <div>
@@ -288,7 +289,7 @@ const foto = FOTO_PAGINA['inicio'];
   </section>
 
   <!-- ==================== DÓNDE ESTAMOS ==================== -->
-  <section class="seccion ubicacion">
+  <section class="seccion ubicacion revelar">
     <div class="contenedor ubicacion-rejilla">
       <div>
         <p class="eyebrow">Dónde estamos</p>
@@ -319,7 +320,7 @@ const foto = FOTO_PAGINA['inicio'];
   </section>
 
   <!-- ==================== PREGUNTAS ==================== -->
-  <section class="seccion preguntas">
+  <section class="seccion preguntas revelar">
     <div class="contenedor preguntas-rejilla">
       <div class="preguntas-intro">
         <p class="eyebrow">Preguntas frecuentes</p>
@@ -342,7 +343,7 @@ const foto = FOTO_PAGINA['inicio'];
   </section>
 
   <!-- ==================== CIERRE ==================== -->
-  <section class="cierre">
+  <section class="cierre revelar">
     <div class="contenedor cierre-caja">
       <div>
         <h2>Solicita tu hora</h2>
@@ -356,8 +357,13 @@ const foto = FOTO_PAGINA['inicio'];
     </div>
   </section>
 
-  <div class="contenedor aviso-final">
-    <AvisoUrgencias />
+  <!-- Barra de acción fija en móvil. Aparece al pasar el hero, que es donde el
+       bloque de reserva sale de pantalla y el visitante se queda sin manera de
+       agendar hasta el pie. Es el patrón que más convierte en móvil y no lo usa
+       ninguno de los trece sitios revisados. -->
+  <div class="barra-movil" id="barra-movil" aria-hidden="true">
+    <span class="barra-movil-precio">Consulta {precioCLP(a.precioConsulta)}</span>
+    <Boton href={RUTAS.agendar} variante="primary" icono="calendar" tam="sm">Solicitar hora</Boton>
   </div>
 </Base>
 
@@ -366,6 +372,24 @@ const foto = FOTO_PAGINA['inicio'];
      cuando la sección se acerca, solo tapa su póster mientras corre de verdad, y
      el teléfono recibe la versión vertical para no estirar píxeles ni recortar
      el 73% del encuadre. */
+  /* Barra de acción fija en móvil. Aparece cuando el bloque de reserva del hero
+     sale de pantalla, que es el momento en que el visitante se queda sin manera
+     de agendar hasta llegar al pie. */
+  const reserva = document.querySelector<HTMLElement>('.reserva');
+  const barra = document.getElementById('barra-movil');
+
+  if (reserva && barra) {
+    new IntersectionObserver(
+      ([e]) => {
+        if (!e) return;
+        const mostrar = !e.isIntersecting && e.boundingClientRect.top < 0;
+        barra.toggleAttribute('data-visible', mostrar);
+        barra.setAttribute('aria-hidden', mostrar ? 'false' : 'true');
+      },
+      { threshold: 0 },
+    ).observe(reserva);
+  }
+
   const seccion = document.querySelector<HTMLElement>('.atencion');
   const video = document.getElementById('video-atencion') as HTMLVideoElement | null;
 
@@ -404,6 +428,123 @@ const foto = FOTO_PAGINA['inicio'];
 </script>
 
 <style>
+
+  /* ==========================================================================
+     MOVIMIENTO
+
+     Un gesto orquestado —la entrada del hero— y micro-interacciones. No hay
+     efectos sueltos repartidos por la página: eso es lo que hace que un sitio
+     se sienta hecho a pedazos.
+
+     Todo bajo prefers-reduced-motion: no-preference. Con movimiento reducido no
+     se anima nada y la página se ve completa desde el primer fotograma, no a
+     medio aparecer.
+     ========================================================================== */
+
+  /* `backwards`, no `forwards`. La diferencia importa: con `forwards` el estado
+     final lo fija la animación, así que si el motor de animación no corre —una
+     pestaña en segundo plano, un navegador con el reloj detenido— el elemento se
+     queda en opacity 0 y el hero aparece en blanco. Con `backwards` el relleno
+     se aplica solo ANTES de empezar, y al terminar el elemento vuelve a su
+     estilo base, que es visible. El peor caso pasa de "hero invisible" a "hero
+     sin animar". */
+  .entra {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .entra {
+      animation: entrada 620ms var(--ease-out) backwards;
+      animation-delay: var(--retraso, 0ms);
+    }
+  }
+
+  @keyframes entrada {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* La fotografía del hero se aleja despacio mientras se scrollea, y el velo se
+     cierra. Da la sensación de que el contenido sube por encima de la imagen en
+     vez de que la imagen se vaya de golpe. Es scroll-driven en CSS: cero JS. */
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      .hero-fondo {
+        animation: alejar linear both;
+        animation-timeline: view();
+        animation-range: cover 0% cover 100%;
+      }
+      .hero-velo {
+        animation: cerrar-velo linear both;
+        animation-timeline: view();
+        animation-range: cover 20% cover 100%;
+      }
+      /* Las tarjetas de tarea entran escalonadas cuando la sección aparece. */
+      .tarea {
+        animation: entrada linear both;
+        animation-timeline: view();
+        animation-range: entry 0% cover 26%;
+        animation-delay: calc(var(--escalon, 0) * -40ms);
+      }
+    }
+  }
+
+  @keyframes alejar {
+    from {
+      transform: scale(1.06);
+    }
+    to {
+      transform: scale(1);
+    }
+  }
+  @keyframes cerrar-velo {
+    to {
+      opacity: 1.35;
+    }
+  }
+
+  /* ==========================================================================
+     BARRA DE ACCIÓN FIJA EN MÓVIL
+     ========================================================================== */
+  .barra-movil {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 60;
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding: var(--space-3) var(--margin-x);
+    padding-bottom: calc(var(--space-3) + env(safe-area-inset-bottom, 0px));
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(10px);
+    border-top: var(--border-width) solid var(--color-line);
+    transform: translateY(105%);
+    transition: transform var(--dur-mid) var(--ease-out);
+  }
+  @media (max-width: 899px) {
+    .barra-movil {
+      display: flex;
+    }
+  }
+  .barra-movil[data-visible] {
+    transform: none;
+  }
+  .barra-movil-precio {
+    font-weight: var(--weight-semibold);
+    color: var(--color-blue-deep);
+    font-size: var(--text-body-sm);
+    font-variant-numeric: tabular-nums;
+  }
+
   /* ==================== HERO ==================== */
   .hero {
     position: relative;
@@ -950,8 +1091,10 @@ const foto = FOTO_PAGINA['inicio'];
   .cierre :global(.btn[data-variante='primary']:hover) {
     background: #d6e3f7;
   }
-
-  .aviso-final {
-    padding-bottom: var(--space-16);
+  @media (max-width: 899px) {
+    .cierre {
+      padding-bottom: calc(var(--space-16) + 72px);
+    }
   }
+
 </style>

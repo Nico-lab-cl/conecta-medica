@@ -44,12 +44,19 @@ export async function profesionalesActivos() {
 }
 
 /**
- * El directorio de profesionales solo existe con dos o más perfiles.
- * Un directorio con una sola persona resta credibilidad en vez de sumarla:
- * la vista y sus rutas existen y están probadas, pero no se publican.
+ * El directorio de profesionales existe desde el primer perfil activo.
+ *
+ * Antes el umbral eran dos: un directorio de una sola persona suele restar
+ * credibilidad en vez de sumarla. El cliente pidió "Equipo médico" en el menú
+ * principal, así que la decisión es suya y el umbral baja a uno.
+ *
+ * Queda una advertencia registrada: la ficha del Dr. Flores todavía no tiene
+ * foto, formación, experiencia ni número de Superintendencia, porque esos datos
+ * no se inventan. Ver `docs/preguntas-carlos.md`, puntos B-3, B-4 y B-7. Con
+ * ellos cargados la página se completa sola.
  */
 export async function hayDirectorioDeEquipo() {
-  return (await profesionalesActivos()).length >= 2;
+  return (await profesionalesActivos()).length >= 1;
 }
 
 /**

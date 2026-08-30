@@ -409,3 +409,23 @@ video {
     rgba(255, 255, 255, 0.55) 100%
   );
 }
+
+
+/* ===========================================================================
+   TRANSICIONES ENTRE PÁGINAS
+
+   Transiciones de vista nativas del navegador: el paso de una página a otra
+   deja de ser un parpadeo en blanco y pasa a ser un fundido. Son cuatro líneas
+   de CSS y cero JavaScript —el router de Astro cuesta ~8 KB y acá no hace
+   falta—. Donde el navegador no las soporta, la navegación es la de siempre.
+   =========================================================================== */
+
+@view-transition {
+  navigation: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @view-transition {
+    navigation: none;
+  }
+}
