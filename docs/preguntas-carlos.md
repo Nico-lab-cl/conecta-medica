@@ -94,3 +94,29 @@ Ver `docs/seo-keywords.md`. Los datos muestran que el tráfico está en las preg
 **Propuesta:** `/preguntas-frecuentes/` queda como hub con respuestas cortas, y cada pregunta clínica recibe además su propia página en `/informacion-para-pacientes/[slug]/`, que es la que compite por la keyword. No agrega rutas nuevas: usa la ruta de recursos que el brief ya define.
 
 **Necesito aprobación de Nico.** Cambia la cantidad de copy clínico a escribir (7 páginas completas en vez de 7 respuestas) y, sobre todo, la cantidad de texto que el Dr. Flores tiene que revisar y firmar.
+
+---
+
+## F. Material real que reemplaza al generado (2026-08-30)
+
+El hero tiene un segundo acto —la consulta y el laboratorio— que hoy usa las
+escenas anónimas generadas. **Está construido para que ese material se reemplace
+por el real sin rehacer nada:** basta cambiar la imagen y el nombre del video en
+el arreglo `ETAPAS` de `src/components/brand/HeroZoom.astro`.
+
+Lo que hay que grabar cuando la clínica esté habilitada, en orden de valor:
+
+1. **El equipo real, de frente y sonriendo.** Es lo que el cliente pidió y lo que
+   más convierte en un sitio de salud: la gente quiere ver quién la va a atender.
+   No se puede generar porque afirmaría que existe un equipo contratado que hoy
+   no existe.
+2. **La recepción y el pasillo con la clínica funcionando.** Misma razón: mostrar
+   una clínica operando cuando todavía no abre es una afirmación falsa sobre el
+   estado del negocio, no ambientación.
+3. **El retrato del Dr. Flores.** Sigue pendiente desde el primer día (punto B-4).
+4. **Una fotografía del Edificio New Egaña.** Con ella, la cuarta etapa del viaje
+   del hero deja de ser una fachada de contexto y pasa a ser el edificio real, y
+   la promesa "aquí atendemos" se vuelve literalmente cierta.
+
+Con 1 y 2 grabados, el hero pasa de "así es esta clase de atención" a "estos
+somos nosotros", que es una diferencia enorme en un sitio de salud.

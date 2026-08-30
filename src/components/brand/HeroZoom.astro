@@ -1,33 +1,49 @@
 ---
-/* Hero del viaje, versión nítida: Santiago → Ñuñoa → la avenida → llegar.
+/* Hero en dos actos, recorrido con el scroll.
 
-   Reemplaza a la versión en video, que se veía pixelada. La razón de fondo:
+   ACTO 1 · DÓNDE — Santiago → Ñuñoa → la avenida → llegar.
+   Zoom sobre imágenes de 4096 px. Responde la primera pregunta de cualquiera
+   que entra a un sitio de clínica: dónde queda esto.
 
-   Un zoom es el peor caso posible para comprimir video. La compresión guarda lo
-   que NO cambia entre fotogramas, y en un zoom continuo se mueve cada píxel en
-   cada fotograma. Encima, recorrer el video con el scroll obliga a un fotograma
-   clave cada 8, y cada uno es una imagen completa. Todo el bitrate se va ahí.
-   Para que ese viaje se viera nítido a 1080p harían falta entre 20 y 35 MB.
+   ACTO 2 · CÓMO — la consulta y el laboratorio, en video.
+   Aparecen los valores de la clínica y los botones. Responde la segunda:
+   qué puedo esperar de ustedes.
 
-   Un zoom, en el fondo, es una transformación geométrica: `scale()`. Antes yo la
-   horneaba en píxeles y después comprimía mal esos píxeles. Acá la hace el
-   navegador sobre imágenes de 4096 px, así que la GPU remuestrea desde el
-   original completo en cada paso del recorrido: nítido en todos los puntos,
-   siempre, y con menos peso que el video que reemplaza.
+   ---
 
-   Lo que se pierde es el movimiento orgánico —las hojas, la calima—. En los
-   planos aéreos no se nota; una ciudad desde el aire ya está casi inmóvil.
+   Por qué el acto 1 es zoom en CSS y el acto 2 es video, y no al revés:
 
-   Cada plano tiene su propio encuadre de origen y de destino. La cámara no hace
-   siempre lo mismo: sobre Santiago avanza hacia la cordillera, sobre Ñuñoa
-   desciende, en la avenida entra caminando, y en el último se acerca al edificio.
-   Un zoom idéntico cuatro veces se siente mecánico. */
+   Un zoom es el peor caso para comprimir video —se mueve cada píxel en cada
+   fotograma, así que no hay nada que reutilizar— y por eso el acto 1 se veía
+   pixelado cuando era video. Hecho con `scale()` sobre imágenes grandes, la GPU
+   remuestrea del original y queda nítido en todo el recorrido.
+
+   El acto 2 es lo contrario: cámara fija y movimiento mínimo. Ahí la compresión
+   funciona perfecto —los fondos pesan entre 137 y 211 KB— y el movimiento real
+   aporta algo que una foto quieta no da.
+
+   ---
+
+   Lo que NO muestra, a propósito:
+
+   El cliente pidió recepcionistas sonriendo "como viendo al personal que te
+   atenderá" y un pasillo "con todos operando, para que se vea que la clínica está
+   al 100%". No se hizo. La clínica no ha abierto, no hay equipo contratado y el
+   espacio no está habilitado: las tres serían afirmaciones falsas sobre el estado
+   actual del negocio, no ambientación. Las escenas del acto 2 son anónimas, no se
+   presentan como el equipo de Conecta, y ningún texto dice que esté operando.
+
+   Cuando el espacio esté habilitado y haya equipo, se graba de verdad y se
+   reemplazan las dos etapas del acto 2. La estructura ya está lista para eso:
+   basta cambiar la imagen y el nombre del video en ETAPAS. */
 import { Picture } from 'astro:assets';
 
 import santiago from '../../assets/viaje/viaje-1-santiago.png';
 import nunoa from '../../assets/viaje/viaje-2-nunoa.png';
 import avenida from '../../assets/viaje/calle-nunoa.png';
 import edificio from '../../assets/viaje/edificio-nunoa.png';
+import consulta from '../../assets/imagenes/c-hero.png';
+import laboratorio from '../../assets/imagenes/c-microscopio.png';
 
 interface Props {
   titulo: string;
@@ -35,41 +51,76 @@ interface Props {
 }
 const { titulo, bajada } = Astro.props;
 
-/* Cada etapa: su imagen, su rótulo, y el movimiento de cámara.
-   `de` y `a` son [escala, desplazamientoX %, desplazamientoY %]. */
+/* `de` y `a` son [escala, desplazamientoX %, desplazamientoY %].
+   Cada etapa tiene su propio movimiento: un zoom idéntico seis veces se siente
+   mecánico. */
 const ETAPAS = [
   {
+    acto: 1,
     img: santiago,
     alt: 'Vista aérea de Santiago de Chile al atardecer, con la cordillera de los Andes al fondo.',
     rotulo: 'Santiago de Chile',
     de: [1.0, 0, 0],
-    a: [1.35, 0, 6],
+    a: [1.32, 0, 5],
   },
   {
+    acto: 1,
     img: nunoa,
     alt: 'Vista aérea de la comuna de Ñuñoa, con las copas de los plátanos sobre las avenidas.',
     rotulo: 'Comuna de Ñuñoa',
-    de: [1.1, 0, -6],
-    a: [1.5, 0, 8],
+    de: [1.1, 0, -5],
+    a: [1.45, 0, 7],
   },
   {
+    acto: 1,
     img: avenida,
     alt: 'Avenida residencial de Ñuñoa con plátanos orientales y la cordillera al fondo.',
     rotulo: 'A pasos de Metro Plaza Egaña',
-    de: [1.15, 6, 0],
-    a: [1.45, -4, 2],
+    de: [1.15, 5, 0],
+    a: [1.42, -4, 2],
   },
   {
+    acto: 1,
     img: edificio,
     alt: 'Edificio de oficinas de fachada clara en Ñuñoa a la hora dorada.',
     rotulo: 'Aquí atendemos',
     de: [1.05, 0, 0],
-    a: [1.3, -3, 0],
+    a: [1.28, -3, 0],
+  },
+  {
+    acto: 2,
+    img: consulta,
+    video: 'v-hero',
+    alt: 'Consulta médica vista desde atrás: sobre el escritorio, un informe de laboratorio y una mano señalando una línea.',
+    de: [1.06, 0, 0],
+    a: [1.2, -2, 0],
+  },
+  {
+    acto: 2,
+    img: laboratorio,
+    video: 'v-compromisos',
+    alt: 'Unas manos ajustan el foco de un microscopio de laboratorio sobre un mesón blanco.',
+    de: [1.06, 0, 0],
+    a: [1.2, 2, 0],
   },
 ];
+
+/* Los mismos seis valores que se publican en Conócenos. Principio de
+   repetición: si el hero dijera otra cosa, serían dos promesas distintas. */
+const VALORES = [
+  'Excelencia clínica',
+  'Atención humanizada',
+  'Transparencia en los precios',
+  'Confidencialidad',
+  'Cercanía',
+  'Coordinación',
+];
+
+const PRIMER_ACTO_2 = ETAPAS.findIndex((e) => e.acto === 2);
+const ROTULOS = ETAPAS.filter((e) => e.acto === 1);
 ---
 
-<section class="viaje" id="viaje" style={`--etapas:${ETAPAS.length}`}>
+<section class="viaje" id="viaje" data-acto2={PRIMER_ACTO_2}>
   <div class="pegado">
     <div class="lienzo">
       {
@@ -77,25 +128,30 @@ const ETAPAS = [
           <div
             class="etapa"
             data-etapa={i}
+            data-acto={e.acto}
             style={`--de-s:${e.de[0]};--de-x:${e.de[1]}%;--de-y:${e.de[2]}%;--a-s:${e.a[0]};--a-x:${e.a[1]}%;--a-y:${e.a[2]}%`}
           >
             <Picture
               src={e.img}
               alt={i === 0 ? e.alt : ''}
               widths={[1400, 2000, 2600, 3400, 4096]}
-              {/* 160vw, no 100vw.
-
-                  `sizes` le dice al navegador cuántos píxeles va a necesitar. Si
-                  se le declara 100vw pide una imagen del ancho de la pantalla,
-                  pero el zoom la amplía hasta 1,5×: en el punto de máximo
-                  acercamiento estaría estirando 1440 px para llenar 2160, y se
-                  vería exactamente igual de blanda que el video que reemplazó.
-                  160vw cubre el zoom máximo con margen. */}
               sizes="160vw"
               formats={['avif', 'webp']}
               loading={i === 0 ? 'eager' : 'lazy'}
               {...(i === 0 ? { fetchpriority: 'high' as const } : {})}
             />
+            {e.video && (
+              <video
+                class="pelicula"
+                poster={`/video/${e.video}.jpg`}
+                preload="none"
+                muted
+                loop
+                playsinline
+                aria-hidden="true"
+                data-fuente={e.video}
+              />
+            )}
           </div>
         ))
       }
@@ -103,19 +159,33 @@ const ETAPAS = [
     </div>
 
     <div class="texto contenedor">
-      <p class="paradas">
-        {
-          ETAPAS.map((e, i) => (
-            <span class="parada" data-parada={i}>
-              {e.rotulo}
-            </span>
-          ))
-        }
-      </p>
+      <div class="acto acto-1">
+        <p class="paradas">
+          {
+            ROTULOS.map((e, i) => (
+              <span class="parada" data-parada={i}>
+                {e.rotulo}
+              </span>
+            ))
+          }
+        </p>
+        <h1 class="titular-hero">{titulo}</h1>
+        <p class="bajada">{bajada}</p>
+      </div>
 
-      <h1 class="titular-hero">{titulo}</h1>
-      <p class="bajada">{bajada}</p>
-      <div class="acciones"><slot /></div>
+      <div class="acto acto-2">
+        <p class="eyebrow">Cómo atendemos</p>
+        <ul class="valores">
+          {
+            VALORES.map((v, i) => (
+              <li class="valor" style={`--orden:${i}`}>
+                {v}
+              </li>
+            ))
+          }
+        </ul>
+        <div class="acciones"><slot /></div>
+      </div>
     </div>
 
     <a class="seguir" href="#como-funciona" aria-label="Bajar al contenido">
@@ -125,46 +195,55 @@ const ETAPAS = [
 </section>
 
 <script>
-  /* El scroll mueve el viaje. Todo el trabajo por cuadro es escribir dos
-     propiedades CSS por etapa; la GPU hace el resto. No hay decodificación de
-     video, así que no hay nada que se pueda trabar. */
   const seccion = document.getElementById('viaje');
   if (seccion) {
     const etapas = [...seccion.querySelectorAll<HTMLElement>('.etapa')];
     const paradas = [...seccion.querySelectorAll<HTMLElement>('.parada')];
+    const acto1 = seccion.querySelector<HTMLElement>('.acto-1');
+    const acto2 = seccion.querySelector<HTMLElement>('.acto-2');
     const total = etapas.length;
+    const primerActo2 = Number(seccion.dataset['acto2'] ?? 4);
     const quietud = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const conexion = (navigator as { connection?: { saveData?: boolean } }).connection;
+    const sinVideo = quietud.matches || Boolean(conexion?.saveData);
 
     /* Cuánto del recorrido de cada etapa se dedica al cruce con la siguiente. */
     const CRUCE = 0.22;
 
     const pintar = (avance: number) => {
-      /* Posición dentro del viaje completo, en unidades de etapa: 0 es el
-         comienzo del primer plano y `total` el final del último.
-
-         Antes esto llegaba solo a (total - 1 + CRUCE), y el resultado era que la
-         última etapa alcanzaba a completar apenas un 22% de su movimiento de
-         cámara: el viaje terminaba a medio acercarse al edificio. */
       const pos = avance * total;
 
       etapas.forEach((etapa, i) => {
-        /* Avance interno de esta etapa, de 0 a 1. */
-        const propio = Math.min(1, Math.max(0, pos - i));
-        etapa.style.setProperty('--t', String(propio));
+        etapa.style.setProperty('--t', String(Math.min(1, Math.max(0, pos - i))));
 
-        /* Opacidad: entra durante el cruce con la anterior, sale durante el
-           cruce con la siguiente. La primera nunca se desvanece por arriba. */
         let opacidad = 1;
         if (i > 0 && pos < i) opacidad = Math.max(0, 1 - (i - pos) / CRUCE);
         if (i < total - 1 && pos > i + 1 - CRUCE) opacidad = Math.max(0, (i + 1 - pos) / CRUCE);
         etapa.style.opacity = String(opacidad);
         etapa.style.zIndex = String(opacidad > 0.02 ? 10 + i : 0);
+
+        /* El video de una etapa solo corre cuando esa etapa se está viendo, y no
+           se descarga hasta entonces. Fuera de eso queda su póster. */
+        const peli = etapa.querySelector<HTMLVideoElement>('.pelicula');
+        if (peli && !sinVideo) {
+          if (opacidad > 0.35) {
+            if (!peli.getAttribute('src')) {
+              peli.src = `/video/${peli.dataset['fuente']}.mp4`;
+              peli.preload = 'auto';
+              peli.addEventListener('playing', () => peli.classList.add('corriendo'));
+              for (const ev of ['pause', 'ended', 'error', 'stalled']) {
+                peli.addEventListener(ev, () => peli.classList.remove('corriendo'));
+              }
+            }
+            if (peli.paused) peli.play().catch(() => {});
+          } else if (!peli.paused) {
+            peli.pause();
+          }
+        }
       });
 
-      /* El rótulo sigue a la etapa que MÁS se ve, no a la más cercana por
-         redondeo. Con redondeo el texto cambiaba a mitad de camino, cuando la
-         imagen anterior todavía estaba entera en pantalla: se leía "Ñuñoa"
-         mientras seguías viendo Santiago. */
+      /* Rótulo: sigue a la etapa que MÁS se ve, no a la más cercana por
+         redondeo, que cambiaba el texto mientras seguías viendo la anterior. */
       let activa = 0;
       let mayor = -1;
       etapas.forEach((etapa, i) => {
@@ -175,11 +254,19 @@ const ETAPAS = [
         }
       });
       paradas.forEach((p, i) => p.classList.toggle('visible', i === activa));
+
+      /* El texto cambia de acto en la misma ventana en que cambia la imagen, así
+         el titular no se desvanece sobre un fondo que todavía es del acto 1. */
+      const enActo2 = Math.min(1, Math.max(0, (pos - (primerActo2 - CRUCE)) / CRUCE));
+      acto1?.style.setProperty('--visible', String(1 - enActo2));
+      acto2?.style.setProperty('--visible', String(enActo2));
+      acto1?.toggleAttribute('data-activo', enActo2 < 0.5);
+      acto2?.toggleAttribute('data-activo', enActo2 >= 0.5);
+      seccion.style.setProperty('--acto2-avance', String(enActo2));
       seccion.style.setProperty('--avance', String(avance));
     };
 
     if (quietud.matches) {
-      /* Sin movimiento: se queda el primer plano, la vista de Santiago. */
       pintar(0);
     } else {
       let pedido = false;
@@ -201,17 +288,14 @@ const ETAPAS = [
 </script>
 
 <style>
-  /* La altura del contenedor es la distancia de scroll que dura el viaje.
-     En móvil se acorta: el mismo recorrido en menos scroll, porque en una
-     pantalla de teléfono cuatro pantallas de viaje se hacen eternas. */
   .viaje {
     position: relative;
-    height: 240svh;
+    height: 300svh;
     background: var(--color-blue-deep);
   }
   @media (min-width: 900px) {
     .viaje {
-      height: 340svh;
+      height: 460svh;
     }
   }
 
@@ -233,8 +317,6 @@ const ETAPAS = [
     position: absolute;
     inset: 0;
     opacity: 0;
-    /* La interpolación entre el encuadre de origen y el de destino se hace en
-       CSS con --t, así el JavaScript solo escribe un número por etapa. */
     --s: calc(var(--de-s) + (var(--a-s) - var(--de-s)) * var(--t, 0));
     --x: calc(var(--de-x) + (var(--a-x) - var(--de-x)) * var(--t, 0));
     --y: calc(var(--de-y) + (var(--a-y) - var(--de-y)) * var(--t, 0));
@@ -245,11 +327,23 @@ const ETAPAS = [
   .etapa:first-child {
     opacity: 1;
   }
-  .etapa :global(img) {
+  .etapa :global(img),
+  .pelicula {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
+  }
+  /* El video solo tapa la fotografía mientras corre de verdad. Si se pausa por
+     lo que sea, reaparece la imagen: nunca un rectángulo liso. */
+  .pelicula {
+    opacity: 0;
+    transition: opacity var(--dur-slow) var(--ease-out);
+  }
+  .pelicula:global(.corriendo) {
+    opacity: 1;
   }
 
   .velo {
@@ -262,6 +356,8 @@ const ETAPAS = [
   .texto {
     position: relative;
     z-index: 21;
+    display: grid;
+    grid-template-areas: 'acto';
     padding-block: var(--space-16);
     color: #fff;
   }
@@ -269,6 +365,23 @@ const ETAPAS = [
     .texto {
       padding-block: var(--space-20) var(--space-24);
     }
+  }
+
+  /* Los dos actos ocupan la misma celda y se turnan. Se apilan en vez de
+     sucederse para que el bloque no salte de alto al cambiar. */
+  .acto {
+    grid-area: acto;
+    opacity: var(--visible, 0);
+    transform: translateY(calc((1 - var(--visible, 0)) * 14px));
+    transition:
+      opacity var(--dur-mid) var(--ease-out),
+      transform var(--dur-mid) var(--ease-out);
+  }
+  .acto-1 {
+    --visible: 1;
+  }
+  .acto:not([data-activo]) {
+    pointer-events: none;
   }
 
   .paradas {
@@ -306,6 +419,43 @@ const ETAPAS = [
     color: #dce7f7;
     max-width: 44ch;
   }
+
+  /* ---- Valores del acto 2 ---- */
+  .acto-2 .eyebrow {
+    color: #a9c4e8;
+  }
+  .valores {
+    list-style: none;
+    margin: var(--space-6) 0 0;
+    padding: 0;
+    display: grid;
+    gap: var(--space-3);
+    max-width: 30ch;
+  }
+  @media (min-width: 700px) {
+    .valores {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-3) var(--space-8);
+      max-width: 54ch;
+    }
+  }
+  /* Entran escalonados con el avance del acto, no todos de golpe. */
+  .valor {
+    --aparece: clamp(0, calc(var(--acto2-avance, 0) * 7 - var(--orden) * 0.7), 1);
+    font-family: var(--font-serif);
+    font-weight: var(--weight-semibold);
+    font-size: var(--text-h3);
+    line-height: 1.25;
+    color: #fff;
+    padding-top: var(--space-2);
+    border-top: 1px solid rgba(255, 255, 255, 0.22);
+    opacity: var(--aparece);
+    transform: translateY(calc((1 - var(--aparece)) * 10px));
+    transition:
+      opacity var(--dur-mid) var(--ease-out),
+      transform var(--dur-mid) var(--ease-out);
+  }
+
   .acciones {
     display: flex;
     flex-wrap: wrap;
@@ -340,7 +490,7 @@ const ETAPAS = [
     height: 64px;
     align-items: flex-end;
     justify-content: center;
-    opacity: calc(1 - var(--avance, 0) * 3);
+    opacity: calc(1 - var(--avance, 0) * 4);
   }
   @media (min-width: 900px) {
     .seguir {
