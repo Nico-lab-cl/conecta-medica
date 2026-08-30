@@ -1,24 +1,24 @@
 import type { ImageMetadata } from 'astro';
 
 /* --------------------------- escenas clínicas --------------------------- */
-import cHero from '../assets/imagenes/c-hero.png';
-import cConsulta from '../assets/imagenes/c-consulta.png';
-import cHemograma from '../assets/imagenes/c-hemograma.png';
-import cMicroscopio from '../assets/imagenes/c-microscopio.png';
-import cGastro from '../assets/imagenes/c-gastro.png';
-import cNutricion from '../assets/imagenes/c-nutricion.png';
-import cImagenes from '../assets/imagenes/c-imagenes.png';
-import cTelemedicina from '../assets/imagenes/c-telemedicina.png';
+import cHero from '../assets/imagenes/c-hero.jpg';
+import cConsulta from '../assets/imagenes/c-consulta.jpg';
+import cHemograma from '../assets/imagenes/c-hemograma.jpg';
+import cMicroscopio from '../assets/imagenes/c-microscopio.jpg';
+import cGastro from '../assets/imagenes/c-gastro.jpg';
+import cNutricion from '../assets/imagenes/c-nutricion.jpg';
+import cImagenes from '../assets/imagenes/c-imagenes.jpg';
+import cTelemedicina from '../assets/imagenes/c-telemedicina.jpg';
 
 /* ------------------------- contexto y ambiente -------------------------- */
-import edificioNunoa from '../assets/imagenes/edificio-nunoa.png';
-import calleNunoa from '../assets/imagenes/calle-nunoa.png';
-import mesaLectura from '../assets/imagenes/mesa-lectura.png';
-import escritorio from '../assets/imagenes/escritorio.png';
-import examenesPrevios from '../assets/imagenes/examenes-previos.png';
-import guiasImpresas from '../assets/imagenes/guias-impresas.png';
-import relojPared from '../assets/imagenes/reloj-pared.png';
-import heroAncho from '../assets/imagenes/hero-ancho.png';
+import edificioNunoa from '../assets/imagenes/edificio-nunoa.jpg';
+import calleNunoa from '../assets/imagenes/calle-nunoa.jpg';
+import mesaLectura from '../assets/imagenes/mesa-lectura.jpg';
+import escritorio from '../assets/imagenes/escritorio.jpg';
+import examenesPrevios from '../assets/imagenes/examenes-previos.jpg';
+import guiasImpresas from '../assets/imagenes/guias-impresas.jpg';
+import relojPared from '../assets/imagenes/reloj-pared.jpg';
+import heroAncho from '../assets/imagenes/hero-ancho.jpg';
 
 /* Registro único de imágenes.
 
@@ -45,7 +45,11 @@ export interface Foto {
 const f = (src: ImageMetadata, alt: string): Foto => ({ src, alt });
 
 /** Fotografía de cada prestación, por slug. */
-export const FOTO_PRESTACION: Record<string, Foto> = {
+/* Sin `Record<string, Foto>`: con `noUncheckedIndexedAccess` eso vuelve
+   opcional cada acceso, aunque las claves sean fijas. `satisfies` conserva la
+   comprobación de que cada valor es una Foto y además deja que TypeScript sepa
+   exactamente qué claves existen. */
+export const FOTO_PRESTACION = {
   hematologia: f(
     cHemograma,
     'Alguien sostiene un informe de laboratorio impreso a contraluz, marcando una línea con un lápiz.',
@@ -62,7 +66,15 @@ export const FOTO_PRESTACION: Record<string, Foto> = {
     cImagenes,
     'Una persona de espaldas revisa un estudio de imágenes en un monitor, en una sala en penumbra.',
   ),
-};
+} satisfies Record<string, Foto>;
+
+/* Los slugs vienen de la colección de contenido, así que son `string` y no las
+   claves literales de arriba. Esta función es el único punto donde se ensancha
+   el tipo, y devuelve `undefined` explícito para una prestación sin fotografía
+   en vez de dejar que el acceso mienta. */
+export function fotoDePrestacion(slug: string): Foto | undefined {
+  return (FOTO_PRESTACION as Record<string, Foto>)[slug];
+}
 
 /** Fotografía de cabecera de cada página. */
 export const FOTO_PAGINA = {

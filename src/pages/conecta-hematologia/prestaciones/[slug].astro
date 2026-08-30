@@ -15,7 +15,7 @@ import {
   type Servicio,
 } from '../../../lib/contenido';
 import { render } from 'astro:content';
-import { FOTO_PRESTACION } from '../../../lib/imagenes';
+import { fotoDePrestacion } from '../../../lib/imagenes';
 
 export async function getStaticPaths() {
   const servicios = await serviciosActivos();
@@ -33,7 +33,7 @@ const { servicio } = Astro.props;
 const { Content } = await render(servicio);
 const faqs = await faqsDeServicio(servicio.id);
 const profesionales = await profesionalesDeServicio(servicio);
-const foto = FOTO_PRESTACION[servicio.data.slug];
+const foto = fotoDePrestacion(servicio.data.slug);
 const ruta = migas(
   { label: 'Conecta Hematología', href: RUTAS.unidad },
   { label: 'Prestaciones', href: RUTAS.prestaciones },

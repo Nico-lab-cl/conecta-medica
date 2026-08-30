@@ -29,6 +29,7 @@ const { foto, proporcion = 'ancha', sangre = false, prioridad = false, pie } = A
     widths={[600, 1000, 1600, 2200]}
     sizes={sangre ? '100vw' : '(min-width: 1280px) 1200px, 100vw'}
     formats={['avif', 'webp']}
+    fallbackFormat="jpeg"
     loading={prioridad ? 'eager' : 'lazy'}
     {...(prioridad ? { fetchpriority: 'high' as const } : {})}
   />

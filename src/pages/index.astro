@@ -34,7 +34,7 @@ import {
   precioCLP,
 } from '../lib/contenido';
 import { faqJsonLd } from '../lib/schema';
-import { FOTO_PRESTACION, FOTO_PAGINA } from '../lib/imagenes';
+import { FOTO_PRESTACION, fotoDePrestacion, FOTO_PAGINA } from '../lib/imagenes';
 
 const a = await ajustes();
 const cl = (await pais('cl')).data;
@@ -141,6 +141,7 @@ const faqItems = destacadas.map((f) => ({
             widths={[500, 800]}
             sizes="(min-width: 1000px) 420px, 100vw"
             formats={['avif', 'webp']}
+            fallbackFormat="jpeg"
             loading="lazy"
           />
           <span class="como-hilo" aria-hidden="true">
@@ -188,8 +189,8 @@ const faqItems = destacadas.map((f) => ({
               resumen={s.data.resumen}
               href={RUTAS.prestacion(s.data.slug)}
               icono={s.data.icono}
-              imagen={FOTO_PRESTACION[s.data.slug]?.src}
-              altImagen={FOTO_PRESTACION[s.data.slug]?.alt}
+              imagen={fotoDePrestacion(s.data.slug)?.src}
+              altImagen={fotoDePrestacion(s.data.slug)?.alt}
               chips={s.data.modalidades}
             />
           ))
@@ -207,6 +208,7 @@ const faqItems = destacadas.map((f) => ({
         widths={[600, 1000, 1400]}
         sizes="(min-width: 1000px) 50vw, 100vw"
         formats={['avif', 'webp']}
+        fallbackFormat="jpeg"
         loading="lazy"
       />
     </figure>

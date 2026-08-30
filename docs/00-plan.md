@@ -361,3 +361,38 @@ descartó en vez de publicarla.
   marca aproximada es peor que un JPG. La O de CONECTA, que es un anillo con un
   guión dentro, exigió `fill-rule="evenodd"`: sin eso se rellenaba sólida y se
   perdía el elemento más distintivo del logotipo.
+
+---
+
+## 8. El hero, en su forma final (2026-08-30)
+
+Pasó por tres versiones antes de quedar en dos actos. Vale la pena dejar por qué,
+porque cada descarte responde a algo concreto que el cliente señaló.
+
+| Versión | Qué era | Por qué se descartó |
+|---|---|---|
+| 1 | Texto y CTA sobre blanco | "El Hero es un espacio blanco con texto y CTA" |
+| 2 | Viaje en video atado al scroll | "La resolución es asquerosa, se ve toda pixeleada" |
+| 3 | Cuatro etapas de zoom + dos videos | Demasiado recorrido antes de llegar a la clínica |
+| **4** | **Santiago en zoom → video de la clínica** | — |
+
+**Acto 1.** Zoom en CSS sobre Santiago. Responde la primera pregunta de quien
+entra a un sitio de salud: dónde queda esto. Es zoom en CSS y no video porque un
+zoom es el peor caso para comprimir video; el detalle técnico está en
+`docs/imagenes.md`.
+
+**Acto 2.** Al terminar el zoom entra `v-clinica.mp4` y aparecen los seis valores
+de la clínica y los dos CTA. Los valores son **los mismos** que se publican en
+Conócenos: si el hero prometiera otra cosa serían dos promesas distintas, y ahí se
+rompe el principio de repetición.
+
+El reparto del scroll es 55% zoom / 45% video sobre 200svh (175svh en móvil). La
+primera versión de esto tenía 300svh y dejaba casi la mitad del recorrido sin que
+pasara nada.
+
+**Lo que el acto 2 no afirma.** El video es material generado y el sitio no dice
+en ninguna parte que sean el equipo de Conecta ni que la clínica esté operando —
+todavía no abre. Planteé el reparo dos veces, el cliente decidió, y la forma de
+sostener las dos cosas fue esta: el video va, y ningún texto del sitio se apoya en
+él. Cuando haya grabación real se cambia un archivo. Ver `docs/preguntas-carlos.md`
+§F.

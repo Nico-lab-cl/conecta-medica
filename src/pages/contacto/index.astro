@@ -1,7 +1,7 @@
 ---
 import { FOTO_PAGINA } from '../../lib/imagenes';
 import { Picture } from 'astro:assets';
-import calleImg from '../../assets/imagenes/calle-nunoa.png';
+import calleImg from '../../assets/imagenes/calle-nunoa.jpg';
 import Pagina from '../../layouts/Pagina.astro';
 import FormularioHora from '../../components/forms/FormularioHora.astro';
 import Icono from '../../components/core/Icono.astro';
@@ -95,6 +95,7 @@ const mapa = `https://www.google.com/maps/search/?api=1&query=${consulta}`;
               widths={[400, 700]}
               sizes="(min-width: 1000px) 380px, 100vw"
               formats={['avif', 'webp']}
+              fallbackFormat="jpeg"
               loading="lazy"
             />
             <figcaption>El barrio, a pasos de Metro Plaza Egaña.</figcaption>

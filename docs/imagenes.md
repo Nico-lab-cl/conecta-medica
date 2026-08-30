@@ -320,91 +320,132 @@ Están en `Hero.astro` y `SeccionMedia.astro`, y valen para los tres videos:
 
 ---
 
-# El viaje del hero
+# El hero: dos actos
 
-Santiago → Ñuñoa → la avenida → llegar. El usuario baja y el viaje avanza con él.
+**Acto 1 · Santiago**, en zoom sobre una imagen fija.
+**Acto 2 · la clínica**, en video, con los valores y los CTA encima.
 
-## Por qué NO es un video
+La versión anterior tenía cuatro etapas de zoom (Santiago → Ñuñoa → la avenida →
+el edificio) y después dos videos. El cliente pidió quedarse con el zoom de
+Santiago y reemplazar todo lo que venía después por un solo video: la
+administración sonriendo de frente y luego un pasillo con gente trabajando.
 
-La primera versión fue un video recorrido con el scroll. Se veía pixelada, y la
-razón no era Higgsfield: **un zoom es el peor caso posible para comprimir video.**
+## Por qué el acto 1 es CSS y el acto 2 es video
 
-La compresión guarda lo que *no* cambia entre fotogramas. En un zoom continuo se
-mueve cada píxel en cada fotograma, así que no hay nada que reutilizar. Encima,
-poder saltar a cualquier punto con el scroll obliga a un fotograma clave cada 8, y
-cada uno es una imagen completa: todo el bitrate se gasta ahí. Para que ese viaje
+No es una preferencia estética: son dos problemas de compresión opuestos.
+
+La primera versión del viaje era un video recorrido con el scroll y se veía
+pixelada. La razón no era Higgsfield: **un zoom es el peor caso posible para
+comprimir video.** La compresión guarda lo que *no* cambia entre fotogramas; en un
+zoom continuo se mueve cada píxel en cada fotograma, así que no hay nada que
+reutilizar. Encima, poder saltar a cualquier punto con el scroll obliga a un
+fotograma clave cada 8, y cada uno es una imagen completa. Para que ese recorrido
 se viera nítido a 1080p harían falta entre **20 y 35 MB**.
 
-Un zoom, en el fondo, es una transformación geométrica: `scale()`. La versión en
-video la horneaba en píxeles y después comprimía mal esos píxeles. La versión
-actual se la deja al navegador sobre imágenes de 4096 px, así que la GPU
-remuestrea desde el original completo en cada paso: **nítido en todos los puntos
-del recorrido, siempre.**
+Un zoom, en el fondo, es una transformación geométrica: `scale()`. Dejársela al
+navegador sobre una imagen de 4096 px hace que la GPU remuestree del original en
+cada paso, y queda nítido en todo el recorrido por 1,08 MB.
 
-| | Video (descartado) | **Zoom en CSS** |
+El acto 2 es exactamente lo contrario: cámara casi fija, sujetos que se mueven
+poco. Ahí la compresión funciona como debe y los 9,44 s pesan **1,39 MB** — con
+movimiento real, que es lo que una foto no da.
+
+| | Acto 1 (zoom) | Acto 2 (clínica) |
 |---|---|---|
-| Nitidez | Pixelado | Perfecta en todo el zoom |
-| Peso | 2,51 MB | **1,08 MB en el peor caso** |
-| Fluidez | Depende de decodificar y buscar | GPU, sin decodificación |
-| Móvil | Archivo aparte, sin scroll | El mismo código |
+| Técnica | `scale()` sobre PNG de 4096 px | H.264 1920×1080, crf 29 |
+| Peso | 1,08 MB en el peor caso | 1,39 MB |
+| Cuándo se descarga | Con la página (`fetchpriority="high"`) | Recién al empezar el cruce |
 
-Lo que se perdió: el movimiento orgánico —las hojas, la calima—. En los planos
-aéreos no se nota, porque una ciudad desde el aire ya está casi inmóvil.
+## El detalle que decide la nitidez del acto 1
 
-## Las cuatro etapas
-
-| Etapa | Imagen | Rótulo | Movimiento de cámara |
-|---|---|---|---|
-| 1 | `viaje-1-santiago` | Santiago de Chile | Avanza hacia la cordillera |
-| 2 | `viaje-2-nunoa` | Comuna de Ñuñoa | Desciende sobre los techos |
-| 3 | `calle-nunoa` | A pasos de Metro Plaza Egaña | Entra caminando por la avenida |
-| 4 | `edificio-nunoa` | Aquí atendemos | Se acerca al edificio |
-
-Cada etapa tiene su propio encuadre de origen y de destino: un zoom idéntico
-cuatro veces se siente mecánico. Las etapas 3 y 4 nacen de fotografías que **ya
-estaban en el sitio**, así que el viaje termina en las mismas imágenes que el
-visitante vuelve a ver en contacto y en conócenos.
-
-Las cuatro se escalaron a 4096 px con **Topaz** (`topaz_image`, variante High
-Fidelity V2) desde los originales de 2048 px. Fuente en `src/assets/viaje/`.
-
-## El detalle que decide la nitidez
-
-`sizes="160vw"`, no `100vw`.
+`sizes="170vw"`, no `100vw`.
 
 `sizes` le dice al navegador cuántos píxeles va a necesitar. Con `100vw` pide una
-imagen del ancho de la pantalla — pero el zoom la amplía hasta 1,5×, así que en el
-punto de máximo acercamiento estaría estirando 1440 px para llenar 2160, y se
+imagen del ancho de la pantalla — pero el zoom la amplía hasta 1,55×, así que en el
+punto de máximo acercamiento estaría estirando 1440 px para llenar 2232, y se
 vería exactamente igual de blanda que el video que reemplazó.
 
-Verificado en una ventana de 1440 px: sirve una imagen de **2304 px**, 1,60× el
-ancho de pantalla, contra un zoom máximo de 1,5×. Sobran píxeles reales incluso en
-el punto más cerrado del recorrido.
+Verificado en el navegador: en un panel de 953 px sirve una imagen de **1645 px**,
+1,73× el ancho, contra un zoom máximo de 1,55×. Sobran píxeles reales en el punto
+más cerrado.
 
-## Hasta dónde llega, y por qué no entra
+## El video del acto 2
 
-El cliente pidió que el viaje llegara hasta los pasillos interiores. **Termina en
-la calle.**
+`public/video/v-clinica.mp4` — 1920×1080, 9,44 s, 1,39 MB. Dos planos de 5 s
+unidos con un fundido de 0,6 s:
 
-La clínica todavía no está construida y no hay fotografía del Edificio New Egaña
-real. Un paciente que ve un hero que baja hasta un edificio y entra a unos
-pasillos va a creer que ese es el lugar al que va a ir. Es distinto de una imagen
-de ambiente: acá hay una dirección específica. Por eso la última etapa muestra una
-fachada **de contexto**, sin señalética, y en ninguna parte se dice que sea esa.
+| Plano | Origen | Qué muestra | Cámara |
+|---|---|---|---|
+| 1 | `a-recepcion` | Dos personas de administración detrás del mesón, sonriendo a cámara | Fija |
+| 2 | `a-pasillo` | Dos personas caminando por el pasillo conversando, una tercera al fondo | Travelling lento hacia adelante |
 
-Los rótulos del descenso —Santiago, Ñuñoa, a pasos de Plaza Egaña— sí son verdad
-verificable.
+Generados con `text2image_soul_v2` y animados con `kling3_0_turbo`.
 
-**Cuando llegue una foto del edificio real**, se reemplaza solo la cuarta imagen y
-el viaje pasa a ser literalmente cierto. Cuando el espacio esté habilitado, se
-agrega una quinta etapa. Ninguna de las dos obliga a rehacer nada.
+**Dos parámetros que costaron caro:**
 
-## Dos defectos corregidos probando en el navegador
+- `kling3_0_turbo` recibe la imagen con `--start-image`, no `--image-references`.
+- `resolution` **cae a 720p por defecto**. La primera versión salió en 720p sin que
+  nadie lo pidiera, justo después de que el cliente reclamara por la pixelación.
+  Hay que pasar `--resolution 1080p` explícitamente.
 
-**El recorrido se quedaba corto.** La posición llegaba solo a `total - 1 + CRUCE`,
-con lo que la última etapa completaba apenas un 22% de su movimiento: el viaje
-terminaba a medio acercarse al edificio.
+**El crf se eligió mirando, no adivinando.** Al mismo cuadro ampliado 1,5×: crf 25
+pesa 2,1 MB, crf 29 pesa 1,2 MB y no se distingue del anterior, crf 31 pesa 0,95 MB
+y ya pierde el detalle del pelo. Queda en **29**.
 
-**El rótulo se adelantaba a la imagen.** Se elegía por redondeo de la posición, así
-que cambiaba a mitad de camino: se leía "Comuna de Ñuñoa" mientras seguías viendo
-Santiago entero. Ahora sigue a la etapa que más se ve.
+## Cómo se sacó el texto ilusorio (y qué NO funcionó)
+
+La primera versión del video traía tres delatores de IA: letras ilegibles pintadas
+en la pared del pasillo, una insignia inventada en el pecho de un uniforme y una
+credencial con texto falso. En un sitio de salud eso es doblemente malo: además de
+verse hecho con IA, una insignia inventada parece la marca de otra institución.
+
+**Lo que no funcionó:** reforzar el negativo. Al agregar *"absolutely no text
+anywhere, no badges, no crests, no name tags"* el modelo generó **más** texto que
+antes: párrafos en la pared, credenciales amarillas, bordados en el pecho. Nombrar
+algo en un negativo es igualmente nombrarlo.
+
+**Lo que sí funcionó**, en dos pasos:
+
+1. **Describir en positivo una escena donde no cabe texto.** Óptica de 50 mm a
+   diafragma abierto, poca profundidad de campo, encuadre cerrado sobre las
+   personas: la pared queda desenfocada y una pared desenfocada no puede mostrar
+   letras legibles. El pasillo salió limpio a la primera con esto.
+2. **Borrar lo que igual apareció, con un modelo de edición.** El plano de
+   recepción seguía trayendo insignia y credencial. `nano_banana_pro` con la
+   instrucción de cambiar *solo* la tela y no tocar caras, pose ni luz las quitó
+   sin alterar el resto.
+
+Recién después de eso se animaron los stills. Corregir en la imagen fija y no en
+el video es lo que evita tener que perseguir un borrón fotograma a fotograma.
+
+Comprobado cuadro por cuadro con una tira de contactos a 1 fps antes de publicar.
+
+## Lo que este material afirma, y lo que no
+
+El video es material generado. **En ninguna parte del sitio se dice que sean el
+equipo de Conecta ni que la clínica esté operando**, porque todavía no abre. El
+texto alternativo lo describe como lo que es y los seis valores encima son los
+mismos que se publican en Conócenos — afirmaciones sobre cómo se atiende, no sobre
+quién aparece en pantalla.
+
+Está construido para reemplazarse sin rehacer nada: cuando haya grabación real, se
+cambia `public/video/v-clinica.mp4` y su póster. Ningún otro archivo se toca. Ver
+`docs/preguntas-carlos.md` §F.
+
+## Encuadre en móvil
+
+Un video 16:9 en una pantalla vertical se recorta mucho. Medido a 390 px de ancho:
+la caja del video queda en 412×824 y se ven **540 de los 1920 px** horizontales, el
+28% central. Los dos planos están compuestos con los sujetos al centro justamente
+por eso, y en ambos el recorte móvil cae sobre una persona. La escala real es 0,76:
+el video se **reduce**, nunca se amplía, así que no hay pixelación en móvil.
+
+## Un defecto corregido probando en el navegador
+
+**Sobraba casi la mitad del scroll.** Con 300svh de alto, el zoom terminaba y
+quedaban unos 135svh en los que no pasaba nada más que el video en bucle. Bajado a
+**200svh** (175svh en móvil): 55% para el zoom, 45% para leer los seis valores.
+
+Y el acercamiento del video se ató a `--avance` en vez de a `--paso`, para que
+siga moviéndose mientras se leen los valores en lugar de congelarse apenas termina
+la transición.

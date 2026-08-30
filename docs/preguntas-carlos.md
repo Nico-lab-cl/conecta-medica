@@ -1,7 +1,7 @@
 # Pendientes y preguntas — conectamedica.com
 
 Documento vivo. Cada ítem resuelto se marca `[x]` con la fecha y la fuente.
-Última actualización: 2026-08-29 · sitio construido, despliegue pendiente
+Última actualización: 2026-08-30 · hero de dos actos, despliegue pendiente
 
 ---
 
@@ -99,24 +99,37 @@ Ver `docs/seo-keywords.md`. Los datos muestran que el tráfico está en las preg
 
 ## F. Material real que reemplaza al generado (2026-08-30)
 
-El hero tiene un segundo acto —la consulta y el laboratorio— que hoy usa las
-escenas anónimas generadas. **Está construido para que ese material se reemplace
-por el real sin rehacer nada:** basta cambiar la imagen y el nombre del video en
-el arreglo `ETAPAS` de `src/components/brand/HeroZoom.astro`.
+El hero tiene dos actos: Santiago en zoom, y después un video de la clínica con
+los valores y los CTA encima. **El video del segundo acto es material generado**:
+dos personas de administración sonriendo detrás de un mesón, y un pasillo con
+gente caminando.
+
+Está construido para reemplazarse sin rehacer nada. Se cambia
+`public/video/v-clinica.mp4` y su póster `v-clinica.jpg`; ningún otro archivo se
+toca.
+
+**Qué afirma hoy el sitio sobre ese video: nada.** No dice que sean el equipo de
+Conecta ni que la clínica esté operando, porque todavía no abre. El texto
+alternativo lo describe como lo que es y los seis valores que van encima son los
+mismos que se publican en Conócenos — afirmaciones sobre cómo se atiende, no sobre
+quién aparece en pantalla. Eso es deliberado y conviene no cambiarlo mientras el
+material siga siendo generado.
 
 Lo que hay que grabar cuando la clínica esté habilitada, en orden de valor:
 
-1. **El equipo real, de frente y sonriendo.** Es lo que el cliente pidió y lo que
-   más convierte en un sitio de salud: la gente quiere ver quién la va a atender.
-   No se puede generar porque afirmaría que existe un equipo contratado que hoy
-   no existe.
-2. **La recepción y el pasillo con la clínica funcionando.** Misma razón: mostrar
-   una clínica operando cuando todavía no abre es una afirmación falsa sobre el
-   estado del negocio, no ambientación.
+1. **El equipo real, de frente y sonriendo.** Es lo que más convierte en un sitio
+   de salud: la gente quiere ver quién la va a atender. Reemplaza el primer plano
+   del video y recién ahí se puede decir "este es nuestro equipo".
+2. **La recepción y el pasillo con la clínica funcionando.** Reemplaza el segundo
+   plano y permite afirmar que la clínica está operando.
 3. **El retrato del Dr. Flores.** Sigue pendiente desde el primer día (punto B-4).
-4. **Una fotografía del Edificio New Egaña.** Con ella, la cuarta etapa del viaje
-   del hero deja de ser una fachada de contexto y pasa a ser el edificio real, y
-   la promesa "aquí atendemos" se vuelve literalmente cierta.
+4. **Una fotografía del Edificio New Egaña.** Hoy no se usa ninguna fachada en el
+   hero, pero con una foto real se puede volver a mostrar el edificio y decir
+   "aquí atendemos" literalmente.
 
 Con 1 y 2 grabados, el hero pasa de "así es esta clase de atención" a "estos
 somos nosotros", que es una diferencia enorme en un sitio de salud.
+
+**Formato para la grabación:** dos planos de unos 5 segundos, horizontal 16:9, a
+1080p o más, cámara quieta en recepción y un travelling lento en el pasillo. Con
+eso entra en el mismo montaje sin retocar el código.

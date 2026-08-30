@@ -46,6 +46,7 @@ const { video, imagen, alt = '', velo = 'fuerte', id, clase } = Astro.props;
           widths={[800, 1280, 1920]}
           sizes="100vw"
           formats={['avif', 'webp']}
+          fallbackFormat="jpeg"
           loading="lazy"
         />
       )
