@@ -1,0 +1,957 @@
+---
+/* Portada, versión comercial.
+
+   Convive con `/` para poder compararlas. Esta sigue el formato de las clínicas
+   privadas chilenas que se estudiaron en `docs/competencia.md` y
+   `docs/clinicas-diseno.md`, con Clínica Alemana como referencia principal —el
+   mejor sitio de salud del país— pero sobre fondo blanco y con los azules
+   Conecta en vez de la pizarra oscura de Alemana.
+
+   Qué se copió, y por qué:
+
+   1. HERO COMPACTO CON RESERVA ENCIMA. Alemana no gasta la primera pantalla en
+      una imagen: la gasta en dejar la reserva al alcance. Acá el hero mide poco
+      más de media pantalla y el bloque de solicitar hora va integrado, no
+      superpuesto encima como en los otros doce.
+   2. "¿QUÉ NECESITAS HACER?" Es el patrón que mejor funciona de Alemana: una
+      grilla de tareas, no de servicios. La gente entra a hacer algo.
+   3. FRANJA DE CONFIANZA bajo el pliegue con los hechos verificables.
+
+   Qué NO se copió, deliberadamente:
+
+   - El carrusel promocional. Lo tienen 11 de los 13 sitios revisados, y nadie
+     ve el segundo slide.
+   - La barra de utilidad con accesos a intranet, webmail y portal de
+     prestadores: Conecta no tiene ninguno de esos sistemas, y ponerlos sería
+     inventar.
+   - Las tres o cinco tipografías. Acá siguen siendo dos, las del design system.
+   - Los cuatro o seis colores saturados. Acá manda un azul.
+
+   Y dos cosas que no hace ninguno de los trece: el precio va sobre el pliegue,
+   y hay contenido que responde preguntas en la portada misma. */
+import { Picture } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import Boton from '../../components/actions/Boton.astro';
+import Icono from '../../components/core/Icono.astro';
+import TarjetaPrestacion from '../../components/content/TarjetaPrestacion.astro';
+import Acordeon from '../../components/content/Acordeon.astro';
+import AvisoUrgencias from '../../components/notices/AvisoUrgencias.astro';
+import { RUTAS } from '../../lib/rutas';
+import {
+  ajustes,
+  pais,
+  serviciosActivos,
+  faqsDestacadas,
+  horarioLegible,
+  precioCLP,
+} from '../../lib/contenido';
+import { faqJsonLd } from '../../lib/schema';
+import { fotoDePrestacion, FOTO_PAGINA } from '../../lib/imagenes';
+
+const a = await ajustes();
+const cl = (await pais('cl')).data;
+const servicios = await serviciosActivos();
+const destacadas = await faqsDestacadas(4);
+
+/* La misma lista cerrada del formulario. Si acá hubiera un motivo que el
+   formulario no acepta, el paciente elegiría algo que después no puede enviar. */
+const MOTIVOS = [
+  'Hemograma alterado',
+  'Anemia',
+  'Plaquetas bajas o altas',
+  'Control de tratamiento hematológico',
+  'Interpretación de imágenes',
+  'Otra derivación de mi médico',
+];
+
+/* Tareas, no servicios. Es lo que Alemana pone primero y lo que la gente viene
+   a hacer. Cada una lleva a una página que ya existe. */
+const TAREAS = [
+  {
+    icono: 'calendar',
+    titulo: 'Solicitar una hora',
+    texto: 'Presencial en Ñuñoa o por telemedicina.',
+    href: RUTAS.agendar,
+  },
+  {
+    icono: 'file-text',
+    titulo: 'Ver cuánto cuesta',
+    texto: `Consulta ${precioCLP(a.precioConsulta)}, publicado.`,
+    href: RUTAS.precios,
+  },
+  {
+    icono: 'video',
+    titulo: 'Atenderme en línea',
+    texto: 'Desde cualquier región de Chile.',
+    href: RUTAS.telemedicina,
+  },
+  {
+    icono: 'activity',
+    titulo: 'Entender mi examen',
+    texto: 'Qué significa lo que te salió alterado.',
+    href: RUTAS.preguntas,
+  },
+];
+
+const HECHOS = [
+  { icono: 'file-text', titulo: precioCLP(a.precioConsulta), texto: 'Consulta particular, publicada' },
+  { icono: 'video', titulo: 'Todo Chile', texto: 'Atención por telemedicina' },
+  { icono: 'calendar', titulo: 'También sábado', texto: 'Sin derivación previa' },
+  { icono: 'clock', titulo: 'A la hora', texto: 'La hora que te damos se respeta' },
+];
+
+const foto = FOTO_PAGINA['inicio'];
+---
+
+<Base
+  titulo="Hematólogo en Ñuñoa y telemedicina — Clínica Conecta"
+  descripcion={`Atención hematológica en Ñuñoa y por telemedicina en todo Chile. Consulta particular ${precioCLP(a.precioConsulta)}. Sin derivación previa.`}
+  ruta="/v2/"
+  actual="inicio"
+  noindex={true}
+  jsonLd={destacadas.length ? [faqJsonLd(destacadas.map((f) => f.data))] : []}
+  heroSuelto={true}
+>
+  <!-- ==================== HERO COMPACTO + RESERVA ==================== -->
+  <section class="hero">
+    <div class="hero-fondo">
+      {
+        foto && (
+          <Picture
+            src={foto.src}
+            alt={foto.alt}
+            widths={[800, 1280, 1920]}
+            sizes="100vw"
+            formats={['avif', 'webp']}
+            fallbackFormat="jpeg"
+            loading="eager"
+            fetchpriority="high"
+          />
+        )
+      }
+      <span class="hero-velo" aria-hidden="true"></span>
+    </div>
+
+    <div class="contenedor hero-rejilla">
+      <div class="hero-texto">
+        <p class="hero-eyebrow">Ñuñoa · Santiago · y telemedicina en todo Chile</p>
+        <h1>Atención hematológica coordinada</h1>
+        <p class="hero-bajada">{a.tagline}.</p>
+      </div>
+
+      <!-- El bloque de reserva va DENTRO del hero, no encima. Es la diferencia
+           entre Alemana y los otros doce, y es lo que hace que se vea comercial
+           sin verse recargado. -->
+      <form class="reserva" method="get" action={RUTAS.agendar}>
+        <p class="reserva-titulo">Solicitar una hora</p>
+
+        <label class="campo">
+          <span>Motivo de consulta</span>
+          <select name="motivo">
+            <option value="">Selecciona un motivo</option>
+            {MOTIVOS.map((m) => <option value={m}>{m}</option>)}
+          </select>
+        </label>
+
+        <label class="campo">
+          <span>Modalidad</span>
+          <select name="modalidad">
+            <option value="presencial">Presencial en Ñuñoa</option>
+            <option value="telemedicina">Telemedicina</option>
+          </select>
+        </label>
+
+        <Boton type="submit" variante="primary" tam="lg" anchoCompleto icono="arrow-right" posicionIcono="right">
+          Continuar
+        </Boton>
+
+        <p class="reserva-nota">
+          Sin derivación previa. Te confirmamos por correo o WhatsApp.
+        </p>
+      </form>
+    </div>
+  </section>
+
+  <!-- ==================== FRANJA DE HECHOS ==================== -->
+  <section class="hechos">
+    <div class="contenedor hechos-rejilla">
+      {
+        HECHOS.map((h) => (
+          <div class="hecho">
+            <Icono nombre={h.icono} tam={22} color="var(--color-blue)" />
+            <div>
+              <p class="hecho-titulo">{h.titulo}</p>
+              <p class="hecho-texto">{h.texto}</p>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- ==================== ¿QUÉ NECESITAS HACER? ==================== -->
+  <section class="seccion tareas">
+    <div class="contenedor">
+      <div class="encabezado-seccion">
+        <h2>¿Qué necesitas hacer?</h2>
+        <p>Cuatro caminos, sin llamar por teléfono para averiguar.</p>
+      </div>
+      <div class="tareas-rejilla">
+        {
+          TAREAS.map((t) => (
+            <a class="tarea" href={t.href}>
+              <span class="tarea-icono">
+                <Icono nombre={t.icono} tam={24} color="var(--color-blue)" />
+              </span>
+              <span class="tarea-titulo">{t.titulo}</span>
+              <span class="tarea-texto">{t.texto}</span>
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== PRESTACIONES ==================== -->
+  <section class="seccion prestaciones">
+    <div class="contenedor">
+      <div class="encabezado-seccion con-enlace">
+        <div>
+          <p class="eyebrow">Conecta Hematología</p>
+          <h2>Qué atendemos</h2>
+          <p>
+            Una consulta que ordena el problema, y tres miradas que existen porque
+            un problema hematológico rara vez se resuelve mirando solo la sangre.
+          </p>
+        </div>
+        <Boton href={RUTAS.prestaciones} variante="secondary" icono="arrow-right" posicionIcono="right">
+          Ver todas
+        </Boton>
+      </div>
+
+      <div class="prestaciones-rejilla">
+        {
+          servicios.map((s) => (
+            <TarjetaPrestacion
+              nivel={s.data.nivel}
+              titulo={s.data.nombre}
+              resumen={s.data.resumen}
+              href={RUTAS.prestacion(s.data.slug)}
+              icono={s.data.icono}
+              imagen={fotoDePrestacion(s.data.slug)?.src}
+              altImagen={fotoDePrestacion(s.data.slug)?.alt}
+              chips={s.data.modalidades}
+            />
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== CÓMO ATENDEMOS · video de fondo ==================== -->
+  <section class="atencion">
+    <div class="atencion-fondo">
+      <picture>
+        <source media="(orientation: portrait)" srcset="/video/v-clinica-vertical.jpg" />
+        <img class="atencion-poster" src="/video/v-clinica.jpg" alt="" aria-hidden="true" />
+      </picture>
+      <video
+        class="atencion-video"
+        id="video-atencion"
+        preload="none"
+        muted
+        loop
+        playsinline
+        aria-hidden="true"
+        data-horizontal="/video/v-clinica.mp4"
+        data-vertical="/video/v-clinica-vertical.mp4"></video>
+      <span class="atencion-velo" aria-hidden="true"></span>
+    </div>
+
+    <div class="contenedor atencion-texto">
+      <p class="eyebrow claro">Cómo atendemos</p>
+      <h2>Cuatro compromisos, escritos para que nos los cobres</h2>
+      <ul class="compromisos">
+        {a.compromisos.map((c) => (
+          <li>
+            <Icono nombre="check" tam={20} color="#8fb8f0" />
+            <span>{c}</span>
+          </li>
+        ))}
+      </ul>
+      <div class="atencion-acciones">
+        <Boton href={RUTAS.conocenos} variante="secondary" icono="arrow-right" posicionIcono="right">
+          Conócenos
+        </Boton>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== DÓNDE ESTAMOS ==================== -->
+  <section class="seccion ubicacion">
+    <div class="contenedor ubicacion-rejilla">
+      <div>
+        <p class="eyebrow">Dónde estamos</p>
+        <h2>{cl.direccion.calle}</h2>
+        <p class="ubicacion-detalle">
+          {cl.direccion.comuna}, {cl.direccion.ciudad}. {cl.direccion.referencia}
+        </p>
+        <ul class="horario">
+          {cl.horarios.map((h) => <li>{horarioLegible(h)}</li>)}
+        </ul>
+        <div class="ubicacion-acciones">
+          <Boton href={RUTAS.contacto} variante="secondary" icono="map-pin">
+            Cómo llegar
+          </Boton>
+        </div>
+      </div>
+      <div class="ubicacion-nota">
+        <p class="ubicacion-nota-titulo">¿Vives fuera de Santiago?</p>
+        <p>
+          La consulta por telemedicina resuelve la mayor parte de los controles y
+          las segundas opiniones, sin que viajes.
+        </p>
+        <Boton href={RUTAS.telemedicina} variante="text" icono="arrow-right" posicionIcono="right">
+          Ver cómo funciona
+        </Boton>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== PREGUNTAS ==================== -->
+  <section class="seccion preguntas">
+    <div class="contenedor preguntas-rejilla">
+      <div class="preguntas-intro">
+        <p class="eyebrow">Preguntas frecuentes</p>
+        <h2>Lo que más nos preguntan</h2>
+        <p>
+          Las respuestas clínicas las revisa y firma un hematólogo antes de
+          publicarse.
+        </p>
+        <Boton href={RUTAS.preguntas} variante="secondary" icono="arrow-right" posicionIcono="right">
+          Ver todas
+        </Boton>
+      </div>
+      <div class="preguntas-lista">
+        <Acordeon
+          items={destacadas.map((f) => ({ q: f.data.pregunta, a: f.data.respuestaCorta }))}
+          abrirPrimera
+        />
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== CIERRE ==================== -->
+  <section class="cierre">
+    <div class="contenedor cierre-caja">
+      <div>
+        <h2>Solicita tu hora</h2>
+        <p>
+          Consulta particular {precioCLP(a.precioConsulta)}. {a.precioNota}
+        </p>
+      </div>
+      <Boton href={RUTAS.agendar} variante="primary" tam="lg" icono="calendar">
+        Solicitar hora
+      </Boton>
+    </div>
+  </section>
+
+  <div class="contenedor aviso-final">
+    <AvisoUrgencias />
+  </div>
+</Base>
+
+<script>
+  /* Mismo criterio que el hero de la portada actual: el video solo se descarga
+     cuando la sección se acerca, solo tapa su póster mientras corre de verdad, y
+     el teléfono recibe la versión vertical para no estirar píxeles ni recortar
+     el 73% del encuadre. */
+  const seccion = document.querySelector<HTMLElement>('.atencion');
+  const video = document.getElementById('video-atencion') as HTMLVideoElement | null;
+
+  if (seccion && video) {
+    const quietud = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const conexion = (navigator as { connection?: { saveData?: boolean } }).connection;
+    const sinVideo = quietud.matches || Boolean(conexion?.saveData);
+
+    if (!sinVideo) {
+      video.addEventListener('playing', () => video.classList.add('corriendo'));
+      for (const ev of ['pause', 'ended', 'error', 'stalled']) {
+        video.addEventListener(ev, () => video.classList.remove('corriendo'));
+      }
+
+      const observador = new IntersectionObserver(
+        (entradas) => {
+          for (const e of entradas) {
+            if (e.isIntersecting) {
+              if (!video.getAttribute('src')) {
+                const vertical = window.matchMedia('(orientation: portrait)').matches;
+                video.src =
+                  (vertical ? video.dataset['vertical'] : video.dataset['horizontal']) ?? '';
+                video.preload = 'auto';
+              }
+              video.play().catch(() => {});
+            } else if (!video.paused) {
+              video.pause();
+            }
+          }
+        },
+        { rootMargin: '200px 0px' },
+      );
+      observador.observe(seccion);
+    }
+  }
+</script>
+
+<style>
+  /* ==================== HERO ==================== */
+  .hero {
+    position: relative;
+    background: var(--color-blue-deep);
+    display: flex;
+    align-items: flex-end;
+    min-height: 62svh;
+    overflow: hidden;
+  }
+  @media (min-width: 900px) {
+    .hero {
+      min-height: 68svh;
+      align-items: center;
+    }
+  }
+
+  .hero-fondo {
+    position: absolute;
+    inset: 0;
+  }
+  .hero-fondo :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  /* Velo propio, no el `--velo` del sitio. Ese está calibrado para un hero de
+     pantalla completa, donde el texto va abajo; acá el hero mide 62svh y el
+     texto va al centro-izquierda, así que aplicado tal cual tapaba la fotografía
+     entera y el hero se veía como un bloque azul liso.
+
+     Este va de izquierda a derecha: fuerte donde está el titular, y se abre
+     hacia la derecha, que es donde va el bloque blanco de reserva y donde
+     conviene que la fotografía se vea. */
+  .hero-velo {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      rgba(6, 24, 54, 0.78) 0%,
+      rgba(6, 24, 54, 0.62) 45%,
+      rgba(6, 24, 54, 0.72) 100%
+    );
+  }
+  @media (min-width: 900px) {
+    .hero-velo {
+      background: linear-gradient(
+        to right,
+        rgba(6, 24, 54, 0.9) 0%,
+        rgba(6, 24, 54, 0.74) 40%,
+        rgba(6, 24, 54, 0.4) 72%,
+        rgba(6, 24, 54, 0.34) 100%
+      );
+    }
+  }
+
+  /* El padding superior tiene que despejar la cabecera transparente, que mide
+     80 px en escritorio y 64 en móvil. Con var(--space-16) el eyebrow quedaba
+     pegado al logo. */
+  .hero-rejilla {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    gap: var(--space-8);
+    padding-block: calc(64px + var(--space-8)) var(--space-12);
+    align-items: center;
+  }
+  @media (min-width: 900px) {
+    .hero-rejilla {
+      grid-template-columns: minmax(0, 1fr) 25rem;
+      gap: var(--space-16);
+      padding-block: calc(80px + var(--space-8)) var(--space-16);
+    }
+  }
+
+  .hero-texto {
+    color: #fff;
+  }
+  .hero-eyebrow {
+    font-size: var(--text-eyebrow);
+    font-weight: var(--weight-semibold);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #a9c4e8;
+    margin: 0;
+  }
+  .hero h1 {
+    color: #fff;
+    margin-top: var(--space-4);
+    font-size: clamp(2rem, 1.4rem + 2.4vw, 3.1rem);
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    max-width: 16ch;
+  }
+  .hero-bajada {
+    margin: var(--space-5) 0 0;
+    color: #dce7f7;
+    font-size: var(--text-body-lg);
+    line-height: 1.55;
+    max-width: 40ch;
+  }
+
+  /* El bloque de reserva. Fondo blanco sólido: es el único elemento del hero
+     que tiene que leerse como un control, no como una capa sobre la foto. */
+  .reserva {
+    background: #fff;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-2);
+    padding: var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+  @media (min-width: 900px) {
+    .reserva {
+      padding: var(--space-8);
+    }
+  }
+  .reserva-titulo {
+    font-family: var(--font-serif);
+    font-weight: var(--weight-semibold);
+    font-size: var(--text-h3);
+    color: var(--color-blue-deep);
+    margin: 0;
+  }
+  .campo {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+  .campo > span {
+    font-size: var(--text-body-sm);
+    font-weight: var(--weight-medium);
+    color: var(--color-ink);
+  }
+  .campo select {
+    appearance: none;
+    width: 100%;
+    height: 48px;
+    padding: 0 40px 0 var(--space-4);
+    font-family: inherit;
+    font-size: var(--text-body);
+    color: var(--color-ink);
+    background: #fff;
+    border: var(--border-width) solid var(--color-line-strong);
+    border-radius: var(--radius-md);
+    background-image: url('/iconos/chevron-down.svg');
+    background-repeat: no-repeat;
+    background-position: right var(--space-4) center;
+    background-size: 18px;
+  }
+  .campo select:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: var(--focus-offset);
+    border-color: var(--color-blue);
+  }
+  .reserva-nota {
+    margin: 0;
+    font-size: var(--text-body-sm);
+    color: var(--color-gray);
+    line-height: 1.45;
+  }
+
+  /* ==================== FRANJA DE HECHOS ==================== */
+  .hechos {
+    background: var(--color-blue-cloud);
+    border-bottom: var(--border-width) solid var(--color-line);
+  }
+  .hechos-rejilla {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-5) var(--space-6);
+    padding-block: var(--space-6);
+  }
+  @media (min-width: 900px) {
+    .hechos-rejilla {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      padding-block: var(--space-7);
+    }
+  }
+  .hecho {
+    display: flex;
+    gap: var(--space-3);
+    align-items: flex-start;
+  }
+  .hecho-titulo {
+    margin: 0;
+    font-weight: var(--weight-semibold);
+    color: var(--color-blue-deep);
+    font-size: var(--text-body);
+    line-height: 1.25;
+  }
+  .hecho-texto {
+    margin: 2px 0 0;
+    font-size: var(--text-body-sm);
+    color: var(--color-gray);
+    line-height: 1.35;
+  }
+
+  /* ==================== SECCIONES ==================== */
+  .seccion {
+    padding-block: var(--space-16);
+  }
+  @media (min-width: 900px) {
+    .seccion {
+      padding-block: var(--space-20);
+    }
+  }
+  .encabezado-seccion {
+    max-width: var(--measure-prose);
+    margin-bottom: var(--space-10);
+  }
+  .encabezado-seccion > p {
+    margin: var(--space-4) 0 0;
+    color: var(--color-gray);
+    font-size: var(--text-body-lg);
+    line-height: 1.55;
+  }
+  .encabezado-seccion.con-enlace {
+    max-width: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    align-items: flex-start;
+  }
+  @media (min-width: 900px) {
+    .encabezado-seccion.con-enlace {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+    .encabezado-seccion.con-enlace > div {
+      max-width: var(--measure-prose);
+    }
+  }
+  .eyebrow {
+    font-size: var(--text-eyebrow);
+    font-weight: var(--weight-semibold);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-gray);
+    margin: 0 0 var(--space-3);
+  }
+  .eyebrow.claro {
+    color: #a9c4e8;
+  }
+
+  /* ==================== TAREAS ==================== */
+  .tareas {
+    background: #fff;
+  }
+  .tareas-rejilla {
+    display: grid;
+    gap: var(--space-4);
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 640px) {
+    .tareas-rejilla {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (min-width: 1100px) {
+    .tareas-rejilla {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+  /* En columna, no en fila. Con el ícono al lado, a 1440 px cada título
+     disponía de 118 px y los cuatro se partían en dos líneas. Apilado, el título
+     recibe el ancho completo de la tarjeta. */
+  .tarea {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-6);
+    background: #fff;
+    border: var(--border-width) solid var(--color-line);
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    transition:
+      border-color var(--dur-fast) var(--ease-out),
+      box-shadow var(--dur-fast) var(--ease-out),
+      transform var(--dur-fast) var(--ease-out);
+  }
+  .tarea:hover {
+    border-color: var(--color-blue);
+    box-shadow: var(--shadow-1);
+    transform: translateY(-2px);
+  }
+  .tarea:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: var(--focus-offset);
+  }
+  .tarea-icono {
+    display: grid;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+    flex: none;
+    border-radius: var(--radius-md);
+    background: var(--color-blue-cloud);
+  }
+  /* Sin flecha al lado del título: se comía 25 de los 203 px disponibles y
+     obligaba a partir dos de los cuatro rótulos. La tarjeta entera es el enlace
+     y el hover ya lo indica. */
+  .tarea-titulo {
+    font-family: var(--font-serif);
+    font-weight: var(--weight-semibold);
+    font-size: var(--text-body-lg);
+    color: var(--color-blue-deep);
+    line-height: 1.25;
+    margin-top: var(--space-2);
+  }
+  .tarea-texto {
+    font-size: var(--text-body-sm);
+    color: var(--color-gray);
+    line-height: 1.4;
+  }
+
+  /* ==================== PRESTACIONES ==================== */
+  .prestaciones {
+    background: var(--color-blue-cloud);
+  }
+  .prestaciones-rejilla {
+    display: grid;
+    gap: var(--space-5);
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 700px) {
+    .prestaciones-rejilla {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (min-width: 1100px) {
+    .prestaciones-rejilla {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  /* ==================== CÓMO ATENDEMOS ==================== */
+  .atencion {
+    position: relative;
+    background: var(--color-blue-deep);
+    overflow: hidden;
+  }
+  .atencion-fondo {
+    position: absolute;
+    inset: 0;
+  }
+  .atencion-poster,
+  .atencion-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .atencion-video {
+    opacity: 0;
+    transition: opacity var(--dur-slow) var(--ease-out);
+  }
+  .atencion-video:global(.corriendo) {
+    opacity: 1;
+  }
+  .atencion-velo {
+    position: absolute;
+    inset: 0;
+    background: var(--velo);
+  }
+  .atencion-texto {
+    position: relative;
+    z-index: 2;
+    padding-block: var(--space-16);
+    color: #fff;
+  }
+  @media (min-width: 900px) {
+    .atencion-texto {
+      padding-block: var(--space-20);
+    }
+  }
+  .atencion h2 {
+    color: #fff;
+    max-width: 20ch;
+  }
+  .compromisos {
+    list-style: none;
+    margin: var(--space-8) 0 0;
+    padding: 0;
+    display: grid;
+    gap: var(--space-4);
+    max-width: 34ch;
+  }
+  @media (min-width: 800px) {
+    .compromisos {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-4) var(--space-10);
+      max-width: 62ch;
+    }
+  }
+  .compromisos li {
+    display: flex;
+    gap: var(--space-3);
+    align-items: flex-start;
+    color: #dce7f7;
+    font-size: var(--text-body);
+    line-height: 1.45;
+  }
+  .atencion-acciones {
+    margin-top: var(--space-10);
+  }
+  .atencion-acciones :global(.btn[data-variante='secondary']) {
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.08);
+  }
+  .atencion-acciones :global(.btn[data-variante='secondary']:hover) {
+    background: rgba(255, 255, 255, 0.18);
+    border-color: #fff;
+  }
+
+  /* ==================== UBICACIÓN ==================== */
+  .ubicacion {
+    background: #fff;
+  }
+  .ubicacion-rejilla {
+    display: grid;
+    gap: var(--space-10);
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+  @media (min-width: 900px) {
+    .ubicacion-rejilla {
+      grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+      gap: var(--space-16);
+    }
+  }
+  .ubicacion-detalle {
+    margin: var(--space-4) 0 0;
+    color: var(--color-gray);
+    font-size: var(--text-body-lg);
+    line-height: 1.55;
+    max-width: 42ch;
+  }
+  .horario {
+    list-style: none;
+    margin: var(--space-6) 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    color: var(--color-ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .ubicacion-acciones {
+    margin-top: var(--space-8);
+  }
+  .ubicacion-nota {
+    background: var(--color-blue-cloud);
+    border-radius: var(--radius-lg);
+    padding: var(--space-8);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    align-items: flex-start;
+  }
+  .ubicacion-nota-titulo {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-weight: var(--weight-semibold);
+    font-size: var(--text-h3);
+    color: var(--color-blue-deep);
+  }
+  .ubicacion-nota p {
+    margin: 0;
+    color: var(--color-gray);
+    line-height: 1.55;
+  }
+
+  /* ==================== PREGUNTAS ==================== */
+  .preguntas {
+    background: var(--color-blue-cloud);
+  }
+  .preguntas-rejilla {
+    display: grid;
+    gap: var(--space-10);
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+  @media (min-width: 900px) {
+    .preguntas-rejilla {
+      grid-template-columns: minmax(0, 20rem) minmax(0, 1fr);
+      gap: var(--space-16);
+    }
+    .preguntas-intro {
+      position: sticky;
+      top: var(--space-20);
+    }
+  }
+  .preguntas-intro p {
+    margin: var(--space-4) 0 var(--space-6);
+    color: var(--color-gray);
+    line-height: 1.55;
+  }
+
+  /* ==================== CIERRE ==================== */
+  .cierre {
+    background: #fff;
+    padding-block: var(--space-16);
+  }
+  .cierre-caja {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    align-items: flex-start;
+    padding: var(--space-10);
+    background: var(--color-blue-deep);
+    border-radius: var(--radius-lg);
+    color: #fff;
+  }
+  @media (min-width: 800px) {
+    .cierre-caja {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-10);
+      padding: var(--space-12);
+    }
+  }
+  .cierre h2 {
+    color: #fff;
+  }
+  .cierre p {
+    margin: var(--space-3) 0 0;
+    color: #dce7f7;
+    line-height: 1.5;
+    max-width: 50ch;
+  }
+  .cierre :global(.btn[data-variante='primary']) {
+    background: #fff;
+    color: var(--color-blue-deep);
+    flex: none;
+  }
+  .cierre :global(.btn[data-variante='primary']:hover) {
+    background: #d6e3f7;
+  }
+
+  .aviso-final {
+    padding-bottom: var(--space-16);
+  }
+</style>
