@@ -92,11 +92,42 @@ const TAREAS = [
   },
 ];
 
-const HECHOS = [
-  { icono: 'file-text', titulo: precioCLP(a.precioConsulta), texto: 'Consulta particular, publicada' },
-  { icono: 'video', titulo: 'Todo Chile', texto: 'Atención por telemedicina' },
-  { icono: 'calendar', titulo: 'También sábado', texto: 'Sin derivación previa' },
-  { icono: 'clock', titulo: 'A la hora', texto: 'La hora que te damos se respeta' },
+/* Cada razón lleva a la página que la prueba. Es el punto entero de la
+   sección: dejan de ser eslóganes y pasan a ser afirmaciones que el paciente
+   puede ir a comprobar. Ninguna de las trece clínicas revisadas lo hace.
+
+   El sábado se toma del horario real cargado en el CMS, no de una frase
+   escrita a mano: si Carlos cambia el horario, la ficha cambia con él. */
+const sabado = cl.horarios.find((h) => h.dia === 'Sábado');
+
+const RAZONES = [
+  {
+    cifra: precioCLP(a.precioConsulta),
+    titulo: 'Sabes cuánto cuesta antes de venir',
+    texto: a.precioNota,
+    enlace: { label: 'Ver los valores', href: RUTAS.precios },
+  },
+  {
+    cifra: 'Todo Chile',
+    titulo: 'No tienes que viajar a Santiago',
+    texto:
+      'La consulta por telemedicina resuelve la mayor parte de los controles y las segundas opiniones, desde cualquier región.',
+    enlace: { label: 'Cómo funciona', href: RUTAS.telemedicina },
+  },
+  {
+    cifra: sabado ? `Sábado ${sabado.desde}` : 'Sábado',
+    titulo: 'Sin derivación previa',
+    texto:
+      'También atendemos el sábado en la mañana, y no necesitas que otro médico te derive para pedir hora.',
+    enlace: { label: 'Ver horarios', href: RUTAS.contacto },
+  },
+  {
+    cifra: 'A la hora',
+    titulo: 'La hora que te damos se respeta',
+    texto:
+      'Y la consulta dura lo que tiene que durar: revisamos tu historia completa y los exámenes que traigas, incluidos los antiguos.',
+    enlace: { label: 'Cómo atendemos', href: RUTAS.conocenos },
+  },
 ];
 
 const foto = FOTO_PAGINA['inicio'];
@@ -173,20 +204,31 @@ const foto = FOTO_PAGINA['inicio'];
     </div>
   </section>
 
-  <!-- ==================== FRANJA DE HECHOS ==================== -->
-  <section class="hechos">
-    <div class="contenedor hechos-rejilla">
-      {
-        HECHOS.map((h, i) => (
-          <div class="hecho entra" style={`--retraso:${280 + i * 60}ms`}>
-            <Icono nombre={h.icono} tam={22} color="var(--color-blue)" />
-            <div>
-              <p class="hecho-titulo">{h.titulo}</p>
-              <p class="hecho-texto">{h.texto}</p>
-            </div>
-          </div>
-        ))
-      }
+  <!-- ==================== POR QUÉ CONECTA ====================
+       Misma estructura que cada sección de Clínica Alemana: un H2 corto, una
+       frase que lo explica, y debajo la grilla. -->
+  <section class="seccion razones" id="por-que">
+    <div class="contenedor">
+      <div class="encabezado-seccion centrado">
+        <h2>Por qué Conecta</h2>
+        <p>Cuatro cosas que puedes comprobar antes de pedir hora.</p>
+      </div>
+
+      <div class="razones-rejilla">
+        {
+          RAZONES.map((r, i) => (
+            <article class="razon" style={`--escalon:${i}`}>
+              <p class="razon-cifra">{r.cifra}</p>
+              <h3 class="razon-titulo">{r.titulo}</h3>
+              <p class="razon-texto">{r.texto}</p>
+              <a class="razon-enlace" href={r.enlace.href}>
+                {r.enlace.label}
+                <Icono nombre="arrow-right" tam={16} color="currentColor" />
+              </a>
+            </article>
+          ))
+        }
+      </div>
     </div>
   </section>
 
@@ -218,7 +260,6 @@ const foto = FOTO_PAGINA['inicio'];
     <div class="contenedor">
       <div class="encabezado-seccion con-enlace">
         <div>
-          <p class="eyebrow">Conecta Hematología</p>
           <h2>Qué atendemos</h2>
           <p>
             Una consulta que ordena el problema, y tres miradas que existen porque
@@ -271,7 +312,10 @@ const foto = FOTO_PAGINA['inicio'];
 
     <div class="contenedor atencion-texto">
       <p class="eyebrow claro">Cómo atendemos</p>
-      <h2>Cuatro compromisos, escritos para que nos los cobres</h2>
+      <h2>Cómo atendemos</h2>
+      <p class="atencion-bajada">
+        Cuatro compromisos, escritos para que nos los cobres.
+      </p>
       <ul class="compromisos">
         {a.compromisos.map((c) => (
           <li>
@@ -292,10 +336,10 @@ const foto = FOTO_PAGINA['inicio'];
   <section class="seccion ubicacion revelar">
     <div class="contenedor ubicacion-rejilla">
       <div>
-        <p class="eyebrow">Dónde estamos</p>
-        <h2>{cl.direccion.calle}</h2>
+        <h2>Dónde estamos</h2>
         <p class="ubicacion-detalle">
-          {cl.direccion.comuna}, {cl.direccion.ciudad}. {cl.direccion.referencia}
+          {cl.direccion.edificio}, {cl.direccion.calle}, {cl.direccion.oficina}.
+          {cl.direccion.comuna}, {cl.direccion.ciudad} — {cl.direccion.referencia}.
         </p>
         <ul class="horario">
           {cl.horarios.map((h) => <li>{horarioLegible(h)}</li>)}
@@ -323,11 +367,10 @@ const foto = FOTO_PAGINA['inicio'];
   <section class="seccion preguntas revelar">
     <div class="contenedor preguntas-rejilla">
       <div class="preguntas-intro">
-        <p class="eyebrow">Preguntas frecuentes</p>
-        <h2>Lo que más nos preguntan</h2>
+        <h2>Preguntas frecuentes</h2>
         <p>
-          Las respuestas clínicas las revisa y firma un hematólogo antes de
-          publicarse.
+          Lo que más nos preguntan. Las respuestas clínicas las revisa y firma un
+          hematólogo antes de publicarse.
         </p>
         <Boton href={RUTAS.preguntas} variante="secondary" icono="arrow-right" posicionIcono="right">
           Ver todas
@@ -348,7 +391,8 @@ const foto = FOTO_PAGINA['inicio'];
       <div>
         <h2>Solicita tu hora</h2>
         <p>
-          Consulta particular {precioCLP(a.precioConsulta)}. {a.precioNota}
+          Consulta {precioCLP(a.precioConsulta)}. {a.precioNota} Te confirmamos
+          día y hora por el canal que prefieras.
         </p>
       </div>
       <Boton href={RUTAS.agendar} variante="primary" tam="lg" icono="calendar">
@@ -708,45 +752,118 @@ const foto = FOTO_PAGINA['inicio'];
     line-height: 1.45;
   }
 
-  /* ==================== FRANJA DE HECHOS ==================== */
-  .hechos {
+  /* ==================== POR QUÉ CONECTA ====================
+
+     Azul nube de fondo con fichas blancas: un escalón entre el hero oscuro y el
+     blanco de la sección siguiente, y las fichas se despegan del fondo en vez de
+     leerse como texto suelto. Es el ritmo de superficies que usa Alemana.
+     ========================================================================== */
+  .razones {
     background: var(--color-blue-cloud);
     border-bottom: var(--border-width) solid var(--color-line);
   }
-  .hechos-rejilla {
+  .razones-rejilla {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-5) var(--space-6);
-    padding-block: var(--space-6);
+    gap: var(--space-5);
+    grid-template-columns: 1fr;
   }
-  @media (min-width: 900px) {
-    .hechos-rejilla {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      padding-block: var(--space-7);
+  @media (min-width: 640px) {
+    .razones-rejilla {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
-  .hecho {
+  @media (min-width: 1100px) {
+    .razones-rejilla {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  .razon {
+    background: #fff;
+    border-radius: var(--radius-lg);
+    padding: var(--space-7) var(--space-6) var(--space-6);
     display: flex;
+    flex-direction: column;
     gap: var(--space-3);
-    align-items: flex-start;
+    border: var(--border-width) solid transparent;
+    transition:
+      border-color var(--dur-fast) var(--ease-out),
+      box-shadow var(--dur-fast) var(--ease-out),
+      transform var(--dur-fast) var(--ease-out);
   }
-  .hecho-titulo {
+  .razon:hover {
+    border-color: var(--color-blue);
+    box-shadow: var(--shadow-1);
+    transform: translateY(-2px);
+  }
+
+  /* La cifra es lo que se lee desde lejos. Va en la serif del sitio, no en la
+     sans: es el dato, no una etiqueta. */
+  .razon-cifra {
     margin: 0;
+    font-family: var(--font-serif);
     font-weight: var(--weight-semibold);
-    color: var(--color-blue-deep);
-    font-size: var(--text-body);
-    line-height: 1.25;
+    font-size: clamp(1.75rem, 1.35rem + 1.5vw, 2.35rem);
+    line-height: 1.02;
+    letter-spacing: -0.028em;
+    color: var(--color-blue);
+    font-variant-numeric: tabular-nums;
+    text-wrap: balance;
   }
-  .hecho-texto {
-    margin: 2px 0 0;
+  .razon-titulo {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    font-weight: var(--weight-semibold);
+    line-height: 1.3;
+    color: var(--color-blue-deep);
+    text-wrap: balance;
+  }
+  .razon-texto {
+    margin: 0;
     font-size: var(--text-body-sm);
+    line-height: 1.5;
     color: var(--color-gray);
-    line-height: 1.35;
+    flex: 1;
+  }
+  .razon-enlace {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-2);
+    font-size: var(--text-body-sm);
+    font-weight: var(--weight-semibold);
+    color: var(--color-blue);
+    text-decoration: none;
+    align-self: flex-start;
+  }
+  .razon-enlace:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .razon-enlace:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: var(--focus-offset);
+    border-radius: var(--radius-sm);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      .razon {
+        animation: entrada linear both;
+        animation-timeline: view();
+        animation-range: entry 0% cover 24%;
+        animation-delay: calc(var(--escalon, 0) * -40ms);
+      }
+    }
   }
 
   /* ==================== SECCIONES ==================== */
   .seccion {
     padding-block: var(--space-16);
+    /* La cabecera es fija: sin esto, un salto a un ancla deja el título debajo
+       de ella. */
+    scroll-margin-top: 96px;
   }
   @media (min-width: 900px) {
     .seccion {
@@ -762,6 +879,11 @@ const foto = FOTO_PAGINA['inicio'];
     color: var(--color-gray);
     font-size: var(--text-body-lg);
     line-height: 1.55;
+  }
+  .encabezado-seccion.centrado {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
   }
   .encabezado-seccion.con-enlace {
     max-width: none;
@@ -925,6 +1047,13 @@ const foto = FOTO_PAGINA['inicio'];
     .atencion-texto {
       padding-block: var(--space-20);
     }
+  }
+  .atencion-bajada {
+    margin: var(--space-4) 0 0;
+    color: #dce7f7;
+    font-size: var(--text-body-lg);
+    line-height: 1.5;
+    max-width: 46ch;
   }
   .atencion h2 {
     color: #fff;
