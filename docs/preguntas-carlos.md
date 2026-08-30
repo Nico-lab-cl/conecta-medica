@@ -1,7 +1,7 @@
 # Pendientes y preguntas — conectamedica.com
 
 Documento vivo. Cada ítem resuelto se marca `[x]` con la fecha y la fuente.
-Última actualización: 2026-08-30 · hero de dos actos, despliegue pendiente
+Última actualización: 2026-08-30 · resolución auditada, despliegue pendiente
 
 ---
 
@@ -14,6 +14,7 @@ Documento vivo. Cada ítem resuelto se marca `[x]` con la fecha y la fuente.
 | ~~A-2~~ | ~~Decisión sobre fotografía realista~~ | **EJECUTADO 2026-08-29** bajo la regla §D, que Nico no objetó tras plantearla dos veces. 5 imágenes generadas, todas sin personas ni instrumental. Prompts en `docs/imagenes.md`. Si la regla no era la correcta, se regeneran | — |
 | A-3 | Repositorio GitHub destino (crear nuevo u organización existente) + permiso de push | Keystatic en modo GitHub y el deploy de Cloudflare dependen del repo | Se puede construir local, pero no desplegar ni dejar el CMS operativo |
 | A-4 | Acceso a la cuenta de Cloudflare del dominio | Pages, Worker, Turnstile, Web Analytics, DNS y CSP | Fase 1 no cierra ("desplegado y editable") |
+| A-7 | Recargar créditos de Higgsfield | La cuenta quedó en 2,46 créditos. Faltan cuatro fuentes a sangre completa en 4K (cabeceras de página, fondos de SeccionMedia y la banda ancha), que hoy se estiran hasta 2× en escritorio retina y 4K | El sitio funciona y se ve bien hasta 1920 px; en monitores grandes esas cuatro imágenes salen blandas |
 | A-5 | Número de WhatsApp de la clínica | Todos los CTA de WhatsApp del sitio | **Estado actual:** los botones no se renderizan. El sitio funciona, pero pierde el canal que más usa la gente en Chile |
 | ~~A-6~~ | ~~Cuenta de Higgsfield~~ | **RESUELTO.** Autenticada. 5 imágenes generadas con Soul Location | — |
 

@@ -15,7 +15,7 @@
    sobre una imagen de 4096 px, la GPU remuestrea del original y queda nítido en
    todo el recorrido.
 
-   Y `sizes="170vw"`, no `100vw`: el zoom amplía hasta 1,55×, así que pedir solo
+   Y `sizes="145vw"`, no `100vw`: el zoom amplía hasta 1,55×, así que pedir solo
    el ancho de pantalla dejaría la imagen estirada justo en el punto más cerrado.
 
    El acto 2 es lo contrario: cámara casi fija. Ahí la compresión funciona bien y
@@ -69,17 +69,22 @@ const CRUCE = 0.12;
       </div>
 
       <div class="acto2-fondo">
-        <img class="poster" src="/video/v-clinica.jpg" alt="" aria-hidden="true" />
+        {/* El póster se elige por orientación igual que el video, para que lo
+            que se ve antes de que arranque sea el mismo encuadre. */}
+        <picture>
+          <source media="(orientation: portrait)" srcset="/video/v-clinica-vertical.jpg" />
+          <img class="poster" src="/video/v-clinica.jpg" alt="" aria-hidden="true" />
+        </picture>
         <video
           class="pelicula"
           id="video-clinica"
-          poster="/video/v-clinica.jpg"
           preload="none"
           muted
           loop
           playsinline
           aria-hidden="true"
-          data-fuente="/video/v-clinica.mp4"></video>
+          data-horizontal="/video/v-clinica.mp4"
+          data-vertical="/video/v-clinica-vertical.mp4"></video>
       </div>
 
       <span class="velo" aria-hidden="true"></span>
@@ -156,7 +161,15 @@ const CRUCE = 0.12;
       if (video && !sinVideo) {
         if (paso > 0.02) {
           if (!video.getAttribute('src')) {
-            video.src = video.dataset['fuente'] ?? '';
+            /* Un video 16:9 en una pantalla vertical obliga a dos cosas malas a
+               la vez: recorta el 72% del ancho, y para cubrir una pantalla alta
+               tiene que ampliar el alto más del doble. Por eso el teléfono
+               recibe una versión vertical filmada como vertical, que no recorta
+               nada y solo se amplía 1,2×. La decisión se toma acá, en el mismo
+               punto donde el archivo se descarga por primera vez. */
+            const vertical = window.matchMedia('(orientation: portrait)').matches;
+            video.src =
+              (vertical ? video.dataset['vertical'] : video.dataset['horizontal']) ?? '';
             video.preload = 'auto';
           }
           if (video.paused) video.play().catch(() => {});
@@ -223,7 +236,7 @@ const CRUCE = 0.12;
     inset: 0;
     /* De 1 a 1,55 a lo largo del zoom, bajando levemente: la cámara se acerca
        y desciende, no solo se acerca. */
-    transform: scale(calc(1 + 0.55 * var(--zoom, 0)))
+    transform: scale(calc(1 + 0.38 * var(--zoom, 0)))
       translate3d(0, calc(var(--zoom, 0) * 4%), 0);
     transform-origin: center 42%;
     opacity: calc(1 - var(--paso, 0));

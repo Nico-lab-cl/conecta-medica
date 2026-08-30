@@ -371,74 +371,145 @@ más cerrado.
 
 ## El video del acto 2
 
-`public/video/v-clinica.mp4` — 1920×1080, 9,44 s, 1,39 MB. Dos planos de 5 s
-unidos con un fundido de 0,6 s:
+Dos archivos, uno por orientación. Ambos son dos planos de 5 s unidos con un
+fundido de 0,6 s, con **personal chileno** (rasgos latinoamericanos, tono de piel
+y pelo acordes): la clínica está en Ñuñoa y el material tiene que parecer de acá.
 
-| Plano | Origen | Qué muestra | Cámara |
+| Archivo | Resolución | Peso | Quién lo recibe |
 |---|---|---|---|
-| 1 | `a-recepcion` | Dos personas de administración detrás del mesón, sonriendo a cámara | Fija |
-| 2 | `a-pasillo` | Dos personas caminando por el pasillo conversando, una tercera al fondo | Travelling lento hacia adelante |
+| `v-clinica.mp4` | 1920×1080 | 3,49 MB | Pantallas horizontales |
+| `v-clinica-vertical.mp4` | 1080×1920 | 2,54 MB | Pantallas verticales |
+
+| Plano | Qué muestra | Cámara |
+|---|---|---|
+| 1 | Dos personas de administración detrás del mesón, sonriendo a cámara | Fija |
+| 2 | Dos personas caminando por el pasillo conversando, una tercera al fondo | Travelling lento |
 
 Generados con `text2image_soul_v2` y animados con `kling3_0_turbo`.
 
-**Dos parámetros que costaron caro:**
+### Por qué hay una versión vertical
+
+Un video 16:9 en una pantalla de teléfono obliga a dos cosas malas a la vez.
+Medido en el navegador, a 390×800 con densidad 2:
+
+| | 16:9 en un teléfono | 9:16 en un teléfono |
+|---|---|---|
+| Ampliación real | **1,48×** (estira) | **0,83×** (reduce) |
+| Del ancho del cuadro se ve | 27% | 87% |
+
+Es decir: con el horizontal el teléfono estiraba píxeles *y* además tiraba a la
+basura tres cuartas partes del encuadre. La versión vertical no estira nada y
+muestra casi todo. En un teléfono de densidad 3 la diferencia es 2,22× contra
+1,25×.
+
+La elección se hace en el mismo punto del script donde el archivo se descarga por
+primera vez, con `matchMedia('(orientation: portrait)')`, así que no se baja el
+archivo equivocado. El póster va por `<picture>` con `media`, que sí funciona
+—a diferencia de `media` dentro de `<video>`, que los navegadores dejaron de
+soportar.
+
+### Dos parámetros que costaron caro
 
 - `kling3_0_turbo` recibe la imagen con `--start-image`, no `--image-references`.
-- `resolution` **cae a 720p por defecto**. La primera versión salió en 720p sin que
-  nadie lo pidiera, justo después de que el cliente reclamara por la pixelación.
-  Hay que pasar `--resolution 1080p` explícitamente.
+- `resolution` **cae a 720p por defecto**. Una versión salió en 720p sin que nadie
+  lo pidiera, justo después de un reclamo por pixelación. Hay que pasar
+  `--resolution 1080p` explícitamente.
 
-**El crf se eligió mirando, no adivinando.** Al mismo cuadro ampliado 1,5×: crf 25
-pesa 2,1 MB, crf 29 pesa 1,2 MB y no se distingue del anterior, crf 31 pesa 0,95 MB
-y ya pierde el detalle del pelo. Queda en **29**.
+### El crf se eligió mirando el peor caso
+
+No al 100%, sino **ampliado 1,67×**, que es lo que ve un notebook retina. A esa
+escala crf 29 aplana la piel y borra el pelo; crf 26 aguanta; crf 23 conserva la
+textura. El horizontal, que es el que más se amplía, va en **23**. El vertical,
+que en un teléfono se reduce en vez de ampliarse, aguanta **25**.
+
+| crf | Peso | A 1,67× |
+|---|---|---|
+| 20 | 5,99 MB | Referencia |
+| **23** | **3,49 MB** | Sin pérdida apreciable |
+| 26 | 2,08 MB | Empieza a suavizar |
+| 29 | 1,38 MB | Piel plana, pelo perdido |
 
 ## Cómo se sacó el texto ilusorio (y qué NO funcionó)
 
-La primera versión del video traía tres delatores de IA: letras ilegibles pintadas
-en la pared del pasillo, una insignia inventada en el pecho de un uniforme y una
-credencial con texto falso. En un sitio de salud eso es doblemente malo: además de
-verse hecho con IA, una insignia inventada parece la marca de otra institución.
+Las primeras versiones traían delatores de IA: letras ilegibles pintadas en la
+pared, insignias inventadas en el pecho de los uniformes y credenciales con texto
+falso. En un sitio de salud eso es doblemente malo: además de verse hecho con IA,
+una insignia inventada parece la marca de otra institución. Una tanda incluso
+salió con "CUMSA" bordado en los uniformes.
 
 **Lo que no funcionó:** reforzar el negativo. Al agregar *"absolutely no text
 anywhere, no badges, no crests, no name tags"* el modelo generó **más** texto que
-antes: párrafos en la pared, credenciales amarillas, bordados en el pecho. Nombrar
-algo en un negativo es igualmente nombrarlo.
+antes: párrafos en la pared, credenciales amarillas, bordados en el pecho.
+Nombrar algo en un negativo es igualmente nombrarlo.
 
 **Lo que sí funcionó**, en dos pasos:
 
 1. **Describir en positivo una escena donde no cabe texto.** Óptica de 50 mm a
    diafragma abierto, poca profundidad de campo, encuadre cerrado sobre las
-   personas: la pared queda desenfocada y una pared desenfocada no puede mostrar
-   letras legibles. El pasillo salió limpio a la primera con esto.
-2. **Borrar lo que igual apareció, con un modelo de edición.** El plano de
-   recepción seguía trayendo insignia y credencial. `nano_banana_pro` con la
-   instrucción de cambiar *solo* la tela y no tocar caras, pose ni luz las quitó
-   sin alterar el resto.
+   personas: la pared queda desenfocada, y una pared desenfocada no puede mostrar
+   letras legibles. Los pasillos salieron limpios a la primera con esto.
+2. **Borrar lo que igual apareció, con un modelo de edición.** `nano_banana_pro`
+   con la instrucción de cambiar *solo* la tela y no tocar caras, pose ni luz
+   quitó bordados, credenciales y hasta un fonendoscopio sin alterar el resto.
 
-Recién después de eso se animaron los stills. Corregir en la imagen fija y no en
-el video es lo que evita tener que perseguir un borrón fotograma a fotograma.
-
-Comprobado cuadro por cuadro con una tira de contactos a 1 fps antes de publicar.
+Corregir sobre la imagen fija y no sobre el video es lo que evita tener que
+perseguir un borrón fotograma a fotograma. Comprobado cuadro por cuadro con una
+tira de contactos a 1 fps antes de publicar.
 
 ## Lo que este material afirma, y lo que no
 
 El video es material generado. **En ninguna parte del sitio se dice que sean el
 equipo de Conecta ni que la clínica esté operando**, porque todavía no abre. El
 texto alternativo lo describe como lo que es y los seis valores encima son los
-mismos que se publican en Conócenos — afirmaciones sobre cómo se atiende, no sobre
-quién aparece en pantalla.
+mismos que se publican en Conócenos — afirmaciones sobre cómo se atiende, no
+sobre quién aparece en pantalla.
 
-Está construido para reemplazarse sin rehacer nada: cuando haya grabación real, se
-cambia `public/video/v-clinica.mp4` y su póster. Ningún otro archivo se toca. Ver
+Está construido para reemplazarse sin rehacer nada: cuando haya grabación real se
+cambian los dos `.mp4` y sus pósters. Ningún otro archivo se toca. Ver
 `docs/preguntas-carlos.md` §F.
 
-## Encuadre en móvil
+---
 
-Un video 16:9 en una pantalla vertical se recorta mucho. Medido a 390 px de ancho:
-la caja del video queda en 412×824 y se ven **540 de los 1920 px** horizontales, el
-28% central. Los dos planos están compuestos con los sujetos al centro justamente
-por eso, y en ambos el recorte móvil cae sobre una persona. La escala real es 0,76:
-el video se **reduce**, nunca se amplía, así que no hay pixelación en móvil.
+# Resolución en todas las pantallas
+
+Se auditó cada `<Picture>` del sitio calculando, para ocho combinaciones de
+tamaño y densidad, cuántos píxeles reales necesita contra el mayor `widths` que
+declara. **Salieron 27 déficits**, el peor estirando 2,19×.
+
+La causa no era falta de material: varios componentes declaraban un tope de 700 u
+800 px cuando la fuente tenía más de 2000. El navegador nunca pidió lo que sí
+existía.
+
+| Componente | Antes | Ahora |
+|---|---|---|
+| Contacto · calle | 700 px, estiraba 2,19× en tablet retina | 1600 px, sin déficit |
+| Portada · cómo | 800 px, estiraba 1,92× | 1600 px, sin déficit |
+| Tarjeta prestación | 1000 px, estiraba 1,29× en móvil | 1400 px, sin déficit |
+| Portada · partida | 1400 px | 2000 px, sin déficit |
+| Banda contenida | 2200 px | 2560 px, sin déficit |
+
+**El zoom del hero además se bajó de 1,55× a 1,38×.** No es una decisión estética:
+con 1,55× un notebook retina de 1440 px pedía 4896 px y la fuente tiene 4096. Con
+1,38× pide 3974 y le sobran. Así el hero quedó sin déficit en todo salvo 4K, y
+`sizes` bajó de `170vw` a `145vw`.
+
+## Lo que sigue pendiente y por qué
+
+Quedan cuatro imágenes a sangre completa cortas en escritorio retina y 4K, y el
+motivo es la fuente, no el código: son de ~2000 px y un 4K a sangre pide 3840.
+
+| Imagen | Fuente | Falta |
+|---|---|---|
+| Cabeceras de página (`c-*`) | ~2000 px | hasta 2,00× en 4K |
+| Fondos de `SeccionMedia` | 1935 px | hasta 2,00× en 4K |
+| Banda ancha del hero | 2558 px | hasta 1,50× en 4K |
+| Santiago | 4096 px | 1,36× solo en 4K |
+
+**Escalar en local no sirve.** Se probó: subir `c-hero` a 3840 px con lanczos y
+enfoque triplica el peso del AVIF (93 KB → 266 KB) y la diferencia contra el
+estirado del navegador es imperceptible, porque no hay detalle nuevo que
+recuperar. Lo que corresponde es regenerar esas fuentes en 4K, y eso **requiere
+créditos de Higgsfield** (la cuenta quedó en 2,46 tras generar los videos).
 
 ## Un defecto corregido probando en el navegador
 
