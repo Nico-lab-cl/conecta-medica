@@ -20,6 +20,7 @@ import {
   ajustes,
   precioCLP,
   hayDirectorioDeEquipo,
+  serviciosActivos,
 } from '../../lib/contenido';
 
 interface Props {
@@ -34,6 +35,7 @@ const { actual = '', sobreHero = false } = Astro.props;
 
 const a = await ajustes();
 const conEquipo = await hayDirectorioDeEquipo();
+const especialidades = await serviciosActivos();
 
 /* Menú definido por el cliente. Seis ítems fijos, en su orden.
 
@@ -107,6 +109,29 @@ const itemsMovil = [
     </div>
   </div>
 
+  <!-- Fila de especialidades. Se muestra arriba del todo y cuando el visitante
+       vuelve a subir; se pliega cuando baja, para no robarle pantalla mientras
+       lee. Es una segunda fila, no un desplegable: no hay que acertarle a nada
+       con el mouse ni esperar a que abra. -->
+  <nav class="especialidades" aria-label="Especialidades">
+    <div class="especialidades-caja">
+    <div class="contenedor especialidades-fila">
+      <span class="especialidades-rotulo">Especialidades</span>
+      {
+        especialidades.map((e) => (
+          <a class="especialidad" href={RUTAS.prestacion(e.data.slug)}>
+            {e.data.nombre}
+          </a>
+        ))
+      }
+      <a class="especialidad especialidad-todas" href={RUTAS.prestaciones}>
+        Ver todas
+        <Icono nombre="arrow-right" tam={15} color="currentColor" />
+      </a>
+    </div>
+    </div>
+  </nav>
+
   <div class="menu-movil" id="menu-movil" hidden>
     <nav class="contenedor" aria-label="Principal">
       {
@@ -147,9 +172,133 @@ const itemsMovil = [
       { rootMargin: '0px' },
     ).observe(centinela);
   }
+
+  /* Dirección del scroll, para plegar y desplegar la fila de especialidades.
+
+     Se lee en un rAF y no en cada evento de scroll: el navegador dispara scroll
+     decenas de veces por segundo y medir el layout en cada uno provoca
+     recálculos sincrónicos. Acá se marca una bandera y se mide una vez por
+     fotograma.
+
+     El umbral de 6 px evita que el rebote del scroll en móvil —que devuelve dos
+     o tres píxeles al soltar— haga aparecer la fila sin que nadie subiera. */
+  if (cabecera) {
+    let ultimo = window.scrollY;
+    let pedido = false;
+
+    const revisar = () => {
+      pedido = false;
+      const y = window.scrollY;
+      const delta = y - ultimo;
+      if (Math.abs(delta) < 6) return;
+      // Arriba del todo la fila siempre se ve, sin importar la dirección.
+      cabecera.toggleAttribute('data-plegada', delta > 0 && y > 160);
+      ultimo = y;
+    };
+
+    addEventListener(
+      'scroll',
+      () => {
+        if (pedido) return;
+        pedido = true;
+        requestAnimationFrame(revisar);
+      },
+      { passive: true },
+    );
+  }
 </script>
 
 <style>
+  /* ==========================================================================
+     FILA DE ESPECIALIDADES
+
+     Sticky de verdad: la cabecera queda fija y esta fila se pliega al bajar y
+     se despliega al subir. Se anima `grid-template-rows` en lugar de `height`
+     porque permite ir de 0 a "el alto que necesite el contenido" sin fijar un
+     número mágico que se rompa si mañana hay una quinta especialidad.
+     ========================================================================== */
+  .especialidades {
+    display: grid;
+    grid-template-rows: 1fr;
+    background: var(--color-blue-cloud);
+    border-top: var(--border-width) solid var(--color-line);
+    transition:
+      grid-template-rows var(--dur-mid) var(--ease-out),
+      opacity var(--dur-fast) var(--ease-out);
+    overflow: hidden;
+  }
+  .cabecera[data-plegada] .especialidades {
+    grid-template-rows: 0fr;
+    opacity: 0;
+    border-top-color: transparent;
+  }
+  /* Sobre el hero la cabecera es transparente: la fila se esconde hasta que la
+     cabecera se vuelve sólida, para no poner una banda clara sobre la foto. */
+  .cabecera[data-sobre-hero]:not([data-comprimida]) .especialidades {
+    grid-template-rows: 0fr;
+    opacity: 0;
+    border-top-color: transparent;
+  }
+
+  /* La caja es el hijo del grid y es lo que colapsa. El padding vive dentro de
+     ella, no en ella: el padding no se pliega con `0fr` y dejaba la fila en
+     25 px cuando debía quedar en cero. */
+  .especialidades-caja {
+    min-height: 0;
+    overflow: hidden;
+  }
+  .especialidades-fila {
+    display: flex;
+    align-items: center;
+    gap: var(--space-5);
+    padding-block: var(--space-3);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .especialidades-fila::-webkit-scrollbar {
+    display: none;
+  }
+  @media (max-width: 767px) {
+    .especialidades {
+      display: none;
+    }
+  }
+
+  .especialidades-rotulo {
+    font-size: var(--text-eyebrow);
+    font-weight: var(--weight-semibold);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-gray);
+    white-space: nowrap;
+    flex: none;
+  }
+  .especialidad {
+    font-size: var(--text-body-sm);
+    font-weight: var(--weight-medium);
+    color: var(--color-blue-deep);
+    text-decoration: none;
+    white-space: nowrap;
+    padding: var(--space-1) 0;
+    border-bottom: 2px solid transparent;
+    flex: none;
+  }
+  .especialidad:hover {
+    border-bottom-color: var(--color-blue);
+    color: var(--color-blue);
+  }
+  .especialidad:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: var(--focus-offset);
+  }
+  .especialidad-todas {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--color-blue);
+    margin-left: auto;
+  }
+
   #centinela-cabecera {
     position: absolute;
     top: 0;

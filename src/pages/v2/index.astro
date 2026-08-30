@@ -103,30 +103,27 @@ const sabado = cl.horarios.find((h) => h.dia === 'Sábado');
 const RAZONES = [
   {
     cifra: precioCLP(a.precioConsulta),
-    titulo: 'Sabes cuánto cuesta antes de venir',
-    texto: a.precioNota,
-    enlace: { label: 'Ver los valores', href: RUTAS.precios },
+    titulo: 'El valor, publicado',
+    texto: 'Atención particular, sin Fonasa ni isapres.',
+    href: RUTAS.precios,
   },
   {
     cifra: 'Todo Chile',
-    titulo: 'No tienes que viajar a Santiago',
-    texto:
-      'La consulta por telemedicina resuelve la mayor parte de los controles y las segundas opiniones, desde cualquier región.',
-    enlace: { label: 'Cómo funciona', href: RUTAS.telemedicina },
+    titulo: 'Telemedicina',
+    texto: 'Sin viajar a Santiago.',
+    href: RUTAS.telemedicina,
   },
   {
     cifra: sabado ? `Sábado ${sabado.desde}` : 'Sábado',
-    titulo: 'Sin derivación previa',
-    texto:
-      'También atendemos el sábado en la mañana, y no necesitas que otro médico te derive para pedir hora.',
-    enlace: { label: 'Ver horarios', href: RUTAS.contacto },
+    titulo: 'También fin de semana',
+    texto: 'Y sin derivación de otro médico.',
+    href: RUTAS.contacto,
   },
   {
     cifra: 'A la hora',
-    titulo: 'La hora que te damos se respeta',
-    texto:
-      'Y la consulta dura lo que tiene que durar: revisamos tu historia completa y los exámenes que traigas, incluidos los antiguos.',
-    enlace: { label: 'Cómo atendemos', href: RUTAS.conocenos },
+    titulo: 'Puntualidad',
+    texto: 'La hora que te damos se respeta.',
+    href: RUTAS.conocenos,
   },
 ];
 
@@ -217,15 +214,11 @@ const foto = FOTO_PAGINA['inicio'];
       <div class="razones-rejilla">
         {
           RAZONES.map((r, i) => (
-            <article class="razon" style={`--escalon:${i}`}>
-              <p class="razon-cifra">{r.cifra}</p>
-              <h3 class="razon-titulo">{r.titulo}</h3>
-              <p class="razon-texto">{r.texto}</p>
-              <a class="razon-enlace" href={r.enlace.href}>
-                {r.enlace.label}
-                <Icono nombre="arrow-right" tam={16} color="currentColor" />
-              </a>
-            </article>
+            <a class="razon" href={r.href} style={`--escalon:${i}`}>
+              <span class="razon-cifra">{r.cifra}</span>
+              <span class="razon-titulo">{r.titulo}</span>
+              <span class="razon-texto">{r.texto}</span>
+            </a>
           ))
         }
       </div>
@@ -778,73 +771,55 @@ const foto = FOTO_PAGINA['inicio'];
     }
   }
 
+  /* Sin caja. Las fichas de Alemana miden 170×200 px y no tienen fondo, borde,
+     radio ni padding: son una ilustración, un título de dos o tres palabras y
+     una frase de cinco a siete. La versión anterior de esto era una tarjeta
+     blanca con sombra y un párrafo de treinta palabras, que es exactamente lo
+     que hace que un sitio se vea genérico.
+
+     Acá la cifra hace de ancla visual en lugar de la ilustración: es más
+     distintiva que un ícono, y es el dato que el paciente vino a buscar. */
   .razon {
-    background: #fff;
-    border-radius: var(--radius-lg);
-    padding: var(--space-7) var(--space-6) var(--space-6);
     display: flex;
     flex-direction: column;
-    gap: var(--space-3);
-    border: var(--border-width) solid transparent;
+    gap: var(--space-2);
+    padding: var(--space-5) var(--space-5) var(--space-5) var(--space-6);
+    border-left: 2px solid var(--color-line);
+    text-decoration: none;
     transition:
       border-color var(--dur-fast) var(--ease-out),
-      box-shadow var(--dur-fast) var(--ease-out),
       transform var(--dur-fast) var(--ease-out);
   }
   .razon:hover {
-    border-color: var(--color-blue);
-    box-shadow: var(--shadow-1);
-    transform: translateY(-2px);
+    border-left-color: var(--color-blue);
+    transform: translateX(2px);
+  }
+  .razon:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: var(--focus-offset);
+    border-radius: var(--radius-sm);
   }
 
-  /* La cifra es lo que se lee desde lejos. Va en la serif del sitio, no en la
-     sans: es el dato, no una etiqueta. */
   .razon-cifra {
-    margin: 0;
     font-family: var(--font-serif);
     font-weight: var(--weight-semibold);
-    font-size: clamp(1.75rem, 1.35rem + 1.5vw, 2.35rem);
-    line-height: 1.02;
-    letter-spacing: -0.028em;
+    font-size: clamp(1.7rem, 1.3rem + 1.5vw, 2.3rem);
+    line-height: 1;
+    letter-spacing: -0.03em;
     color: var(--color-blue);
     font-variant-numeric: tabular-nums;
-    text-wrap: balance;
+    text-wrap: nowrap;
   }
   .razon-titulo {
-    margin: 0;
-    font-family: var(--font-sans);
     font-size: var(--text-body);
     font-weight: var(--weight-semibold);
     line-height: 1.3;
     color: var(--color-blue-deep);
-    text-wrap: balance;
   }
   .razon-texto {
-    margin: 0;
     font-size: var(--text-body-sm);
-    line-height: 1.5;
+    line-height: 1.45;
     color: var(--color-gray);
-    flex: 1;
-  }
-  .razon-enlace {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-2);
-    margin-top: var(--space-2);
-    font-size: var(--text-body-sm);
-    font-weight: var(--weight-semibold);
-    color: var(--color-blue);
-    text-decoration: none;
-    align-self: flex-start;
-  }
-  .razon-enlace:hover {
-    text-decoration: underline;
-    text-underline-offset: 3px;
-  }
-  .razon-enlace:focus-visible {
-    outline: var(--focus-ring);
-    outline-offset: var(--focus-offset);
-    border-radius: var(--radius-sm);
   }
 
   @media (prefers-reduced-motion: no-preference) {
