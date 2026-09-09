@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="stylesheet" href="_ds/conectamedica-3fd8ff37-cb6c-47bd-9d63-a7bc6d08a1bf/styles.css">
+<script>
+/* El sistema resuelve sus iconos desde unpkg/lucide-static@latest. Dos problemas:
+   whatsapp no existe en lucide (quitaron las marcas) y el resto depende de una CDN
+   sin versión fija. El propio Icon expone este override; lo poblamos con los SVG
+   que ya viven en iconos/. */
+window.__CONECTA_ICONS = Object.assign({}, window.__CONECTA_ICONS, {
+  'simple:whatsapp': 'iconos/whatsapp.svg',
+  'lucide:whatsapp': 'iconos/whatsapp.svg',
+  'lucide:activity': 'iconos/activity.svg',
+  'lucide:arrow-right': 'iconos/arrow-right.svg',
+  'lucide:calendar': 'iconos/calendar.svg',
+  'lucide:check': 'iconos/check.svg',
+  'lucide:chevron-down': 'iconos/chevron-down.svg',
+  'lucide:chevron-right': 'iconos/chevron-right.svg',
+  'lucide:clock': 'iconos/clock.svg',
+  'lucide:download': 'iconos/download.svg',
+  'lucide:external-link': 'iconos/external-link.svg',
+  'lucide:file-text': 'iconos/file-text.svg',
+  'lucide:info': 'iconos/info.svg',
+  'lucide:map-pin': 'iconos/map-pin.svg',
+  'lucide:menu': 'iconos/menu.svg',
+  'lucide:message-circle': 'iconos/message-circle.svg',
+  'lucide:minus': 'iconos/minus.svg',
+  'lucide:phone': 'iconos/phone.svg',
+  'lucide:play': 'iconos/play.svg',
+  'lucide:plus': 'iconos/plus.svg',
+  'lucide:salad': 'iconos/salad.svg',
+  'lucide:stethoscope': 'iconos/stethoscope.svg',
+  'lucide:triangle-alert': 'iconos/triangle-alert.svg',
+  'lucide:video': 'iconos/video.svg',
+  'lucide:x': 'iconos/x.svg'
+});
+</script>
+<style>
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:#E8E9E6;font-family:var(--font-sans);color:var(--color-ink)}
+a{color:var(--color-blue);text-decoration:none}
+a:hover{color:var(--color-blue-deep)}
+</style>
+</helmet>
+
+<div style="padding:48px 64px 96px">
+
+<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px">
+  <span style="font:600 10px/1 var(--font-mono);letter-spacing:.1em;padding:6px 9px;background:var(--color-ink);color:#fff;border-radius:4px">PÁGINAS INTERNAS</span>
+  <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="6">
+    <button type="button" onClick="{{ t.pick }}" style="{{ t.estilo }}">{{ t.label }}</button>
+  </sc-for>
+</div>
+
+<div style="display:flex;align-items:flex-start;gap:56px">
+
+<div style="display:flex;flex-direction:column;gap:12px">
+<span style="font:600 10px/1 var(--font-mono);letter-spacing:.1em;color:rgba(0,0,0,.5)">ESCRITORIO 1440</span>
+<div data-screen-label="{{ pagina.label }}" style="width:1440px;background:#fff;border:1px solid rgba(0,0,0,.1);border-radius:10px;overflow:clip;box-shadow:0 2px 18px rgba(0,0,0,.09)">
+
+  <div style="background:var(--color-blue-deep);color:#fff">
+    <div style="max-width:1200px;margin:0 auto;padding:0 48px;height:42px;display:flex;align-items:center;justify-content:space-between">
+      <span style="font:400 14px/1 var(--font-mono);letter-spacing:.08em;color:#8FB0DE">ÑUÑOA, SANTIAGO · TELEMEDICINA EN TODO CHILE</span>
+      <div style="display:flex;align-items:center;gap:24px">
+        <a href="#" style="font:400 15px/1 var(--font-sans);color:#D6E3F7">Información para pacientes</a>
+        <a href="#" style="font:400 15px/1 var(--font-sans);color:#D6E3F7">Contacto</a>
+      </div>
+    </div>
+  </div>
+
+  <div style="{{ headerPegado }}">
+    <div style="{{ headerFila }}">
+      <a href="/" aria-label="Clínica Conecta, inicio" style="display:inline-flex;align-items:center;gap:11px;text-decoration:none">
+        <img src="marca/isotipo-entrada.svg" alt="" style="{{ marcaHeader }}">
+        <span style="display:inline-flex;align-items:baseline;gap:7px;white-space:nowrap;font-family:'Avenir Next','Avenir','Nunito Sans',var(--font-sans);font-size:{{ tamLockup }}px;line-height:1;letter-spacing:-.01em">
+          <span style="font-weight:400;color:#214478">Clínica</span>
+          <span style="font-weight:600;color:#214478">Conecta</span>
+        </span>
+      </a>
+      <nav aria-label="Principal" style="display:flex;align-items:center;gap:28px">
+        <sc-for list="{{ navLinks }}" as="n" hint-placeholder-count="5">
+          <a href="{{ n.href }}" style="{{ n.estilo }}">{{ n.label }}</a>
+        </sc-for>
+      </nav>
+      <x-import component-from-global-scope="ConectaDesignSystem_3fd8ff.Button" from="_ds/conectamedica-3fd8ff37-cb6c-47bd-9d63-a7bc6d08a1bf/_ds_bundle.js" as="a" href="/agendar" size="{{ tamBoton }}" icon="calendar" icon-position="left" hint-size="180px,48px">Agendar hora</x-import>
+    </div>
+  </div>
+
+  <div style="background:var(--color-blue-cloud);border-bottom:1px solid var(--color-line)">
+    <div style="max-width:1200px;margin:0 auto;padding:14px 48px">
+      <x-import component-from-global-scope="ConectaDesignSystem_3fd8ff.Breadcrumbs" from="_ds/conectamedica-3fd8ff37-cb6c-47bd-9d63-a7bc6d08a1bf/_ds_bundle.js" items="{{ migas }}" hint-size="300px,22px"></x-import>
+    </div>
+  </div>
+
+  <div style="position:relative;background:var(--color-blue-deep);height:340px;overflow:hidden">
+    <div role="img" aria-label="{{ pagina.heroAlt }}" style="{{ pagina.heroFondo }}"></div>
+    <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(10,43,94,.93) 0%,rgba(10,43,94,.72) 52%,rgba(10,43,94,.22) 100%)"></div>
+    <div style="position:absolute;inset:0;display:flex;align-items:center">
+      <div style="max-width:1200px;margin:0 auto;padding:0 48px;width:100%">
+        <div style="max-width:660px">
+          <p style="margin:0;font:400 14px/1 var(--font-mono);letter-spacing:.12em;color:#8FB0DE">{{ pagina.eyebrow }}</p>
+          <h1 style="margin:14px 0 0;font:600 44px/1.14 var(--font-serif);letter-spacing:-.018em;color:#fff;text-wrap:pretty">{{ pagina.titulo }}</h1>
+          <p style="margin:16px 0 0;font:400 18px/1.6 var(--font-sans);color:#D6E3F7">{{ pagina.bajada }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="max-width:1200px;margin:0 auto;padding:56px 48px 72px;display:grid;grid-template-columns:1fr 348px;gap:64px;align-items:start">
+    <div>
+      <sc-for list="{{ pagina.bloques }}" as="b" hint-placeholder-count="4">
+        <div style="margin-bottom:48px">
+          <sc-if value="{{ b.esTexto }}" hint-placeholder-val="{{ true }}">
+            <div>
+              <h2 style="margin:0 0 16px;font:600 30px/1.24 var(--font-serif);color:var(--color-blue);text-wrap:pretty">{{ b.h }}</h2>
+              <sc-for list="{{ b.parrafos }}" as="p" hint-placeholder-count="2">
+                <p style="margin:0 0 14px;font:400 17px/1.7 var(--font-sans);color:var(--color-ink);max-width:66ch">{{ p }}</p>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ b.esLista }}" hint-placeholder-val="{{ false }}">
+            <div>
+              <h2 style="margin:0 0 18px;font:600 30px/1.24 var(--font-serif);color:var(--color-blue);text-wrap:pretty">{{ b.h }}</h2>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+                <sc-for list="{{ b.items }}" as="i" hint-placeholder-count="4">
+                  <div style="display:flex;gap:12px;align-items:flex-start;background:var(--color-blue-cloud);border-radius:8px;padding:18px 20px">
+                    <x-import component-from-global-scope="ConectaDesignSystem_3fd8ff.Icon" from="_ds/conectamedica-3fd8ff37-cb6c-47bd-9d63-a7bc6d08a1bf/_ds_bundle.js" name="check" size="{{ n20 }}" color="var(--color-blue)" style="{{ iconoLinea }}" hint-size="20px,20px"></x-import>
+                    <span>
+                      <span style="display:block;font:600 17px/1.4 var(--font-sans);color:var(--color-ink)">{{ i.t }}</span>
+                      <sc-if value="{{ i.tieneD }}" hint-placeholder-val="{{ true }}">
+                        <span style="display:block;margin-top:5px;font:400 15px/1.6 var(--font-sans);color:var(--color-gray)">{{ i.d }}</span>
+                      </sc-if>
+                    </span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ b.esPasos }}" hint-placeholder-val="{{ false }}">
+            <div>
+              <h2 style="margin:0 0 8px;font:600 30px/1.24 var(--font-serif);color:var(--color-blue)">{{ b.h }}</h2>
+              <x-import component-from-global-scope="ConectaDesignSystem_3fd8ff.ConectaThread" from="_ds/conectamedica-3fd8ff37-cb6c-47bd-9d63-a7bc6d08a1bf/_ds_bundle.js" nodes="{{ b.n }}" style="{{ hiloPasos }}" hint-size="100%,14px"></x-import>
+              <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:32px;margin-top:20px">
+                <sc-for list="{{ b.pasos }}" as="s" hint-placeholder-count="4">
+                  <x-import component-from-global-scope="ConectaDesignSystem_3fd8ff.StepBlock" from="_ds/conectamedica-3fd8ff37-cb6c-47bd-9d63-a7bc6d08a1bf/_ds_bundle.js" number="{{ s.n }}" title="{{ s.t }}" hint-size="100%,180px">{{ s.d }}</x-import>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ b.esTabla }}" hint-placeholder-val="{{ false }}">
+            <div>
+              <h2 style="margin:0 0 18px;font:600 30px/1.24 var(--font-serif);color:var(--color-blue)">{{ b.h }}</h2>
+              <x-import component-from-global-scope="ConectaDesignSystem_3fd8ff.PriceBlock" from="_ds/conectamedica-3fd8ff37-cb6c-47bd-9d63-a7bc6d08a1bf/_ds_bundle.js" amount="$50.000" note="Consulta hematología · presencial o telemedicina" hint-size="100%,160px"></x-import>
+              <div style="border:1px solid var(--color-line);border-radius:16px;overflow:hidden;margin-top:20px">
+                <div style="display:grid;grid-template-columns:1.6fr 1fr .9fr;gap:16px;padding:14px 24px;background:var(--color-blue-cloud);border-bottom:1px solid var(--color-line)">
+                  <span style="font:400 14px/1 var(--font-mono);letter-spacing:.1em;color:var(--color-gray)">PRESTACIÓN</span>
+                  <span style="font:400 14px/1 var(--font-mono);letter-spacing:.1em;color:var(--color-gray)">MODALIDAD</span>
+                  <span style="font:400 14px/1 var(--font-mono);letter-spacing:.1em;color:var(--color-gray);text-align:right">VALOR</span>
+                </div>
+                <sc-for list="{{ b.filas }}" as="f" hint-placeholder-count="4">
+                  <div style="display:grid;grid-template-columns:1.6fr 1fr .9fr;gap:16px;align-items:center;padding:18px 24px;border-bottom:1px solid var(--color-line)">
+                    <span>
+                      <span style="display:block;font:600 17px/1.35 var(--font-sans);color:var(--color-ink)">{{ f.t }}</span>
+                      <span style="display:block;margin-top:5px;font:400 15px/1.5 var(--font-sans);color:var(--color-gray)">{{ f.d }}</span>
+                    </span>
+                    <span style="font:400 15px/1.45 var(--font-sans);color:var(--color-gray)">{{ f.m }}</span>
+                    <span style="font:400 22px/1 var(--font-mono);color:var(--color-blue-deep);text-align:right;white-space:nowrap">{{ f.v }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ b.esFaq }}" hint-placeholder-val="{{ false }}">
+            <div>
+              <h2 style="margin:0 0 10px;font:600 30px/1.24 var(--font-serif);color:var(--color-blue)">{{ b.h }}</h2>
+              <x-import component-from-global-scope="ConectaDesignSystem_3fd8ff.Accordion" from="_ds/conectamedica-3fd8ff37-cb6c-47bd-9d63-a7bc6d08a1bf/_ds_bundle.js" items="{{ b.faqs }}" default-open="{{ cero }}" hint-size="100%,320px"></x-import>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ b.esImagen }}" hint-placeholder-val="{{ false }}">
+            <figure style="margin:0">
+              <div role="img" aria-label="{{ b.alt }}" style="{{ b.fondoGrande }}"></div>
+              <figcaption style="margin-top:12px;font:400 15px/1.55 var(--font-sans);color:var(--color-gray)">{{ b.pie }}</figcaption>
+            </figure>
+          </sc-if>
+
+          <sc-if value="{{ b.esNota }}" hint-placeholder-val="{{ false }}">
+            <x-import component-from-global-scope="ConectaDesignSystem_3fd8ff.InfoNote" from="_ds/conectamedica-3fd8ff37-cb6c-47bd-9d63-a7bc6d08a1bf/_ds_bundle.js" title="{{ b.h }}" icon="{{ b.icono }}" hint-size="100%,120px">{{ b.texto }}</x-import>
+          </sc-if>
+
+          <sc-if value="{{ b.esUrgencia }}" hint-placeholder-val="{{ false }}">
+            <x-import component-from-global-scope="ConectaDesignSystem_3fd8ff.UrgencyNotice" from="_ds/conectamedica-3fd8ff37-cb6c-47bd-9d63-a7bc6d08a1bf/_ds_bundle.js" hint-size="100%,180px"></x-import>
+          </sc-if>
+        </div>
+      </sc-for>
+
+      <x-import component-from-global-scope="ConectaDesignSystem_3fd8ff.ClinicalDisclaimer" from="_ds/conectamedica-3fd8ff37-cb6c-47bd-9d63-a7bc6d08a1bf/_ds_bundle.js" hint-size="100%,80px"></x-import>
+    </div>
+
+    <aside style="position:sticky;top:24px;display:flex;flex-direction:column;gap:20px">
+      <div style="background:var(--color-blue-deep);border-radius:16px;padding:28px 26px 30px;--action-primary-bg:#fff;--action-primary-fg:var(--color-blue-deep);--action-secondary-fg:#fff;--color-blue:rgba(255,255,255,.55);">
+        <p style="margin:0;font:400 14px/1 var(--font-mono);letter-spacing:.1em;color:#8FB0DE">PEDIR HORA</p>
+        <p style="margin:12px 0 0;font:600 22px/1.3 var(--font-serif);color:#fff">Cuéntanos qué te pasa y te confirmamos una hora</p>
+        <p style="margin:12px 0 0;font:400 15px/1.6 var(--font-sans);color:#D6E3F7">Respondemos dentro del próximo día hábil. Sin derivación previa.</p>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-top:20px">
+          <button type="button" onClick="{{ enviar }}" disabled="{{ enviando }}" style="{{ estiloEnvio }}">
+            <sc-if value="{{ enviando }}" hint-placeholder-val="{{ false }}">
+            <img src="marca/isotipo-cargando.svg" alt="" style="height:24px;width:24px;flex:none;display:block">
+          </sc-if>
+          <sc-if value="{{ enReposo }}" hint-placeholder-val="{{ true }}">
+            <img src="marca/isotipo.svg" alt="" style="height:24px;width:24px;flex:none;display:block">
+          </sc-if>
+            <span>{{ textoEnvio }}</span>
+          </button>
+          <x-import component-from-global-scope="ConectaDesignSystem_3fd8ff.WhatsAppButton" from="_ds/conectamedica-3fd8ff37-cb6c-47bd-9d63-a7bc6d08a1bf/_ds_bundle.js" phone="56942394143" hint-size="100%,48px"></x-import>
+        </div>
+      </div>
+
+      <div style="border:1px solid var(--color-line);border-radius:16px;box-shadow:var(--shadow-1);padding:26px">
+        <p style="margin:0;font:400 14px/1 var(--font-mono);letter-spacing:.1em;color:var(--color-gray)">DATOS PRÁCTICOS</p>
+        <div style="display:flex;flex-direction:column;gap:16px;margin-top:18px">
+          <sc-for list="{{ datos }}" as="d" hint-placeholder-count="4">
+            <div style="display:flex;gap:12px;align-items:flex-start">
+              <x-import component-from-global-scope="ConectaDesignSystem_3fd8ff.Icon" from="_ds/conectamedica-3fd8ff37-cb6c-47bd-9d63-a7bc6d08a1bf/_ds_bundle.js" name="{{ d.icono }}" size="{{ n20 }}" color="var(--color-blue)" style="{{ iconoLinea }}" hint-size="20px,20px"></x-import>
+              <span>
+                <span style="display:block;font:600 16px/1.4 var(--font-sans);color:var(--color-ink)">{{ d.t }}</span>
+                <span style="display:block;margin-top:4px;font:400 15px/1.55 var(--font-sans);color:var(--color-gray)">{{ d.d }}</span>
+              </span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="border:1px solid var(--color-line);border-radius:16px;box-shadow:var(--shadow-1);padding:26px">
+        <p style="margin:0;font:400 14px/1 var(--font-mono);letter-spacing:.1em;color:var(--color-gray)">MODALIDADES</p>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:14px">
+          <sc-for list="{{ pagina.chips }}" as="c" hint-placeholder-count="2">
+            <x-import component-from-global-scope="ConectaDesignSystem_3fd8ff.StatusChip" from="_ds/conectamedica-3fd8ff37-cb6c-47bd-9d63-a7bc6d08a1bf/_ds_bundle.js" kind="{{ c }}" hint-size="120px,28px"></x-import>
+          </sc-for>
+        </div>
+        <p style="margin:22px 0 8px;font:400 14px/1 var(--font-mono);letter-spacing:.1em;color:var(--color-gray)">ENLACES RELACIONADOS</p>
+        <div style="display:flex;flex-direction:column;gap:12px;margin-top:10px">
+          <sc-for list="{{ pagina.relacionados }}" as="r" hint-placeholder-count="4">
+            <x-import component-from-global-scope="ConectaDesignSystem_3fd8ff.TextLink" from="_ds/conectamedica-3fd8ff37-cb6c-47bd-9d63-a7bc6d08a1bf/_ds_bundle.js" href="#" arrow="{{ true }}" hint-size="100%,22px">{{ r }}</x-import>
+          </sc-for>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <div style="background:var(--color-blue-deep);color:#fff">
+    <div style="max-width:1200px;margin:0 auto;padding:64px 48px 32px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:48px">
+      <div>
+        <a href="/" aria-label="Clínica Conecta, inicio" style="display:inline-flex;align-items:center;gap:12px;text-decoration:none">
+        <img src="marca/isotipo-blanco.svg" alt="" style="height:40px;width:auto;display:block">
+        <span style="display:inline-flex;align-items:baseline;gap:7px;white-space:nowrap;font-family:'Avenir Next','Avenir','Nunito Sans',var(--font-sans);font-size:27px;line-height:1;letter-spacing:-.01em">
+          <span style="font-weight:400;color:rgba(255,255,255,.78)">Clínica</span>
+          <span style="font-weight:600;color:#FFFFFF">Conecta</span>
+        </span>
+      </a>
+        <div style="margin-top:20px;font:400 15px/1.7 var(--font-sans);color:#D6E3F7">
+          <div>Clínica Conecta SpA · Av. Irarrázaval 5185, oficina 402</div>
+          <div>Ñuñoa, Santiago · Metro Plaza Egaña</div>
+          <div style="margin-top:8px;font-family:var(--font-mono)">+56 9 4239 4143</div>
+          <div style="font-family:var(--font-mono)">contacto@conectamedica.com</div>
+        </div>
+      </div>
+      <div>
+        <p style="margin:0 0 12px;font:400 14px/1 var(--font-mono);letter-spacing:.12em;color:#8FB0DE">HORARIOS</p>
+        <div style="font:400 15px/1.9 var(--font-sans);color:#D6E3F7">
+          <div>Lunes a viernes · 09:00–18:00</div>
+          <div>Sábado · 09:00–13:00</div>
+          <div>Domingo y festivos · cerrado</div>
+          <div style="margin-top:10px;color:#fff">Urgencias: llama al 131</div>
+        </div>
+      </div>
+      <div>
+        <p style="margin:0 0 12px;font:400 14px/1 var(--font-mono);letter-spacing:.12em;color:#8FB0DE">SITIO</p>
+        <div style="display:flex;flex-direction:column;gap:9px">
+          <sc-for list="{{ enlacesPie }}" as="l" hint-placeholder-count="6">
+            <a href="#" style="font:400 15px/1.5 var(--font-sans);color:#D6E3F7">{{ l }}</a>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+    <div style="max-width:1200px;margin:0 auto;padding:0 48px 40px">
+      <div style="border-top:1px solid rgba(255,255,255,.16);padding-top:20px;display:flex;align-items:center;justify-content:space-between;gap:24px">
+        <p style="margin:0;font:400 15px/1.55 var(--font-sans);color:#8FB0DE">© 2026 Clínica Conecta SpA. Información general, no reemplaza una evaluación médica.</p>
+        <div style="display:flex;gap:22px">
+          <a href="#" style="font:400 15px/1 var(--font-sans);color:#D6E3F7">Privacidad</a>
+          <a href="#" style="font:400 15px/1 var(--font-sans);color:#D6E3F7">Términos</a>
+          <a href="#" style="font:400 15px/1 var(--font-sans);color:#D6E3F7">Derechos del paciente</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:12px">
+<span style="font:600 10px/1 var(--font-mono);letter-spacing:.1em;color:rgba(0,0,0,.5)">MÓVIL 390</span>
+<div data-screen-label="{{ pagina.labelMovil }}" style="width:390px;background:#fff;border:1px solid rgba(0,0,0,.1);border-radius:26px;overflow:clip;box-shadow:0 2px 18px rgba(0,0,0,.09)">
+  <div style="{{ headerPegado }}">
+    <div style="{{ headerFilaMovil }}">
+      <a href="/" aria-label="Clínica Conecta, inicio" style="display:inline-flex;align-items:center;gap:9px;text-decoration:none">
+        <img src="marca/isotipo-entrada.svg" alt="" style="height:30px;width:auto;display:block">
+        <span style="display:inline-flex;align-items:baseline;gap:5px;white-space:nowrap;font-family:'Avenir Next','Avenir','Nunito Sans',var(--font-sans);font-size:19px;line-height:1;letter-spacing:-.01em">
+          <span style="font-weight:400;color:#214478">Clínica</span>
+          <span style="font-weight:600;color:#214478">Conecta</span>
+        </span>
+      </a>
+      <div style="display:flex;align-items:center;gap:8px">
+        <button type="button" onClick="{{ toggleMovil }}" aria-label="Menú" style="display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;background:none;border:0;cursor:pointer">
+          <x-import component-from-global-scope="ConectaDesignSystem_3fd8ff.Icon" from="_ds/conectamedica-3fd8ff37-cb6c-47bd-9d63-a7bc6d08a1bf/_ds_bundle.js" name="{{ iconoMenu }}" size="{{ n24 }}" color="var(--color-ink)" hint-size="24px,24px"></x-import>
+        </button>
+      </div>
+    </div>
+    <sc-if value="{{ movil }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:4px 20px 16px;border-top:1px solid var(--color-line);background:#fff;box-shadow:var(--shadow-2)">
+        <sc-for list="{{ navLinks }}" as="n" hint-placeholder-count="5">
+          <a href="{{ n.href }}" style="{{ n.estiloMovil }}">{{ n.label }}</a>
+        </sc-for>
+      </div>
+    </sc-if>
+  </div>
+
+  <div style="padding:12px 20px;background:var(--color-blue-cloud);border-bottom:1px solid var(--color-line)">
+    <x-import component-from-global-scope="ConectaDesignSystem_3fd8ff.Breadcrumbs" from="_ds/conectamedica-3fd8ff37-cb6c-47bd-9d63-a7bc6d08a1bf/_ds_bundle.js" items="{{ migas }}" hint-size="100%,22px"></x-import>
+  </div>
+
+  <div style="position:relative;height:340px;background:var(--color-blue-deep);overflow:hidden">
+    <div role="img" aria-label="{{ pagina.heroAlt }}" style="{{ pagina.heroFondo }}"></div>
+    <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,43,94,.55) 0%,rgba(10,43,94,.94) 66%)"></div>
+    <div style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;padding:22px 20px 24px">
+      <p style="margin:0;font:400 14px/1 var(--font-mono);letter-spacing:.12em;color:#8FB0DE">{{ pagina.eyebrow }}</p>
+      <h1 style="margin:11px 0 0;font:600 30px/1.16 var(--font-serif);color:#fff;text-wrap:pretty">{{ pagina.titulo }}</h1>
+      <p style="margin:12px 0 0;font:400 16px/1.6 var(--font-sans);color:#D6E3F7">{{ pagina.bajada }}</p>
+    </div>
+  </div>
+
+  <div style="padding:28px 20px 32px">
+    <sc-for list="{{ pagina.bloques }}" as="b" hint-placeholder-count="4">
+      <div style="margin-bottom:38px">
+        <sc-if value="{{ b.esTexto }}" hint-placeholder-val="{{ true }}">
+          <div>
+            <h2 style="margin:0 0 13px;font:600 25px/1.24 var(--font-serif);color:var(--color-blue);text-wrap:pretty">{{ b.h }}</h2>
+            <sc-for list="{{ b.parrafos }}" as="p" hint-placeholder-count="2">
+              <p style="margin:0 0 12px;font:400 16px/1.72 var(--font-sans);color:var(--color-ink)">{{ p }}</p>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ b.esLista }}" hint-placeholder-val="{{ false }}">
+          <div>
+            <h2 style="margin:0 0 14px;font:600 25px/1.24 var(--font-serif);color:var(--color-blue);text-wrap:pretty">{{ b.h }}</h2>
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <sc-for list="{{ b.items }}" as="i" hint-placeholder-count="4">
+                <div style="display:flex;gap:11px;align-items:flex-start;background:var(--color-blue-cloud);border-radius:8px;padding:16px 18px">
+                  <x-import component-from-global-scope="ConectaDesignSystem_3fd8ff.Icon" from="_ds/conectamedica-3fd8ff37-cb6c-47bd-9d63-a7bc6d08a1bf/_ds_bundle.js" name="check" size="{{ n20 }}" color="var(--color-blue)" style="{{ iconoLinea }}" hint-size="20px,20px"></x-import>
+                  <span>
+                    <span style="display:block;font:600 16px/1.4 var(--font-sans);color:var(--color-ink)">{{ i.t }}</span>
+                    <sc-if value="{{ i.tieneD }}" hint-placeholder-val="{{ true }}">
+                      <span style="display:block;margin-top:5px;font:400 15px/1.6 var(--font-sans);color:var(--color-gray)">{{ i.d }}</span>
+                    </sc-if>
+                  </span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ b.esPasos }}" hint-placeholder-val="{{ false }}">
+          <div>
+            <h2 style="margin:0 0 18px;font:600 25px/1.24 var(--font-serif);color:var(--color-blue)">{{ b.h }}</h2>
+            <div style="display:flex;flex-direction:column;gap:26px">
+              <sc-for list="{{ b.pasos }}" as="s" hint-placeholder-count="4">
+                <x-import component-from-global-scope="ConectaDesignSystem_3fd8ff.StepBlock" from="_ds/conectamedica-3fd8ff37-cb6c-47bd-9d63-a7bc6d08a1bf/_ds_bundle.js" number="{{ s.n }}" title="{{ s.t }}" hint-size="100%,170px">{{ s.d }}</x-import>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ b.esTabla }}" hint-placeholder-val="{{ false }}">
+          <div>
+            <h2 style="margin:0 0 14px;font:600 25px/1.24 var(--font-serif);color:var(--color-blue)">{{ b.h }}</h2>
+            <x-import component-from-global-scope="ConectaDesignSystem_3fd8ff.PriceBlock" from="_ds/conectamedica-3fd8ff37-cb6c-47bd-9d63-a7bc6d08a1bf/_ds_bundle.js" amount="$50.000" note="Consulta hematología" hint-size="100%,240px"></x-import>
+            <div style="border:1px solid var(--color-line);border-radius:16px;overflow:hidden;margin-top:16px">
+              <sc-for list="{{ b.filas }}" as="f" hint-placeholder-count="4">
+                <div style="padding:16px 18px;border-bottom:1px solid var(--color-line)">
+                  <div style="display:flex;align-items:baseline;justify-content:space-between;gap:14px">
+                    <span style="font:600 16px/1.35 var(--font-sans);color:var(--color-ink)">{{ f.t }}</span>
+                    <span style="font:400 19px/1 var(--font-mono);color:var(--color-blue-deep);white-space:nowrap">{{ f.v }}</span>
+                  </div>
+                  <p style="margin:6px 0 0;font:400 15px/1.5 var(--font-sans);color:var(--color-gray)">{{ f.d }} · {{ f.m }}</p>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ b.esFaq }}" hint-placeholder-val="{{ false }}">
+          <div>
+            <h2 style="margin:0 0 8px;font:600 25px/1.24 var(--font-serif);color:var(--color-blue)">{{ b.h }}</h2>
+            <x-import component-from-global-scope="ConectaDesignSystem_3fd8ff.Accordion" from="_ds/conectamedica-3fd8ff37-cb6c-47bd-9d63-a7bc6d08a1bf/_ds_bundle.js" items="{{ b.faqs }}" default-open="{{ cero }}" hint-size="100%,300px"></x-import>
+          </div>
+        </sc-if>
+        <sc-if value="{{ b.esImagen }}" hint-placeholder-val="{{ false }}">
+          <figure style="margin:0">
+            <div role="img" aria-label="{{ b.alt }}" style="{{ b.fondoChico }}"></div>
+            <figcaption style="margin-top:10px;font:400 15px/1.55 var(--font-sans);color:var(--color-gray)">{{ b.pie }}</figcaption>
+          </figure>
+        </sc-if>
+        <sc-if value="{{ b.esNota }}" hint-placeholder-val="{{ false }}">
+          <x-import component-from-global-scope="ConectaDesignSystem_3fd8ff.InfoNote" from="_ds/conectamedica-3fd8ff37-cb6c-47bd-9d63-a7bc6d08a1bf/_ds_bundle.js" title="{{ b.h }}" icon="{{ b.icono }}" hint-size="100%,140px">{{ b.texto }}</x-import>
+        </sc-if>
+        <sc-if value="{{ b.esUrgencia }}" hint-placeholder-val="{{ false }}">
+          <x-import component-from-global-scope="ConectaDesignSystem_3fd8ff.UrgencyNotice" from="_ds/conectamedica-3fd8ff37-cb6c-47bd-9d63-a7bc6d08a1bf/_ds_bundle.js" hint-size="100%,220px"></x-import>
+        </sc-if>
+      </div>
+    </sc-for>
+
+    <div style="background:var(--color-blue-deep);border-radius:16px;padding:24px 22px 26px;--action-primary-bg:#fff;--action-primary-fg:var(--color-blue-deep);--action-secondary-fg:#fff;--color-blue:rgba(255,255,255,.55);">
+      <p style="margin:0;font:600 21px/1.3 var(--font-serif);color:#fff">Cuéntanos qué te pasa y te confirmamos una hora</p>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:18px">
+        <x-import component-from-global-scope="ConectaDesignSystem_3fd8ff.Button" from="_ds/conectamedica-3fd8ff37-cb6c-47bd-9d63-a7bc6d08a1bf/_ds_bundle.js" as="a" href="#" icon="calendar" icon-position="left" full-width="{{ true }}" hint-size="100%,48px">Solicitar hora</x-import>
+        <x-import component-from-global-scope="ConectaDesignSystem_3fd8ff.WhatsAppButton" from="_ds/conectamedica-3fd8ff37-cb6c-47bd-9d63-a7bc6d08a1bf/_ds_bundle.js" phone="56942394143" hint-size="100%,48px"></x-import>
+      </div>
+    </div>
+
+    <x-import component-from-global-scope="ConectaDesignSystem_3fd8ff.ClinicalDisclaimer" from="_ds/conectamedica-3fd8ff37-cb6c-47bd-9d63-a7bc6d08a1bf/_ds_bundle.js" hint-size="100%,90px"></x-import>
+  </div>
+
+  <div style="position:sticky;bottom:0;z-index:40;background:#fff;border-top:1px solid var(--color-line);box-shadow:0 -2px 12px rgba(10,43,94,.10);display:grid;grid-template-columns:1fr 1fr 1.4fr 1fr;align-items:stretch">
+    <a href="#" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-height:60px;padding:8px 4px;font:500 12px/1.2 var(--font-sans);color:var(--color-ink)">
+      <x-import component-from-global-scope="ConectaDesignSystem_3fd8ff.Icon" from="_ds/conectamedica-3fd8ff37-cb6c-47bd-9d63-a7bc6d08a1bf/_ds_bundle.js" name="stethoscope" size="{{ n20 }}" color="var(--color-blue)" hint-size="20px,20px"></x-import>
+      Prestaciones
+    </a>
+    <a href="#" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-height:60px;padding:8px 4px;font:500 12px/1.2 var(--font-sans);color:var(--color-ink)">
+      <x-import component-from-global-scope="ConectaDesignSystem_3fd8ff.Icon" from="_ds/conectamedica-3fd8ff37-cb6c-47bd-9d63-a7bc6d08a1bf/_ds_bundle.js" name="video" size="{{ n20 }}" color="var(--color-blue)" hint-size="20px,20px"></x-import>
+      Telemedicina
+    </a>
+    <a href="/agendar" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-height:60px;padding:8px 6px;background:var(--color-blue);color:#fff;font:600 12.5px/1.2 var(--font-sans);text-align:center">
+      <x-import component-from-global-scope="ConectaDesignSystem_3fd8ff.Icon" from="_ds/conectamedica-3fd8ff37-cb6c-47bd-9d63-a7bc6d08a1bf/_ds_bundle.js" name="calendar" size="{{ n20 }}" color="#fff" hint-size="20px,20px"></x-import>
+      Agendamiento web
+    </a>
+    <a href="#" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-height:60px;padding:8px 4px;font:500 12px/1.2 var(--font-sans);color:var(--color-ink)">
+      <x-import component-from-global-scope="ConectaDesignSystem_3fd8ff.Icon" from="_ds/conectamedica-3fd8ff37-cb6c-47bd-9d63-a7bc6d08a1bf/_ds_bundle.js" name="message-circle" size="{{ n20 }}" color="var(--color-blue)" hint-size="20px,20px"></x-import>
+      WhatsApp
+    </a>
+  </div>
+  <div style="background:var(--color-blue-deep);color:#fff;padding:32px 20px 28px">
+    <a href="/" aria-label="Clínica Conecta, inicio" style="display:inline-flex;align-items:center;gap:10px;text-decoration:none">
+        <img src="marca/isotipo-blanco.svg" alt="" style="height:34px;width:auto;display:block">
+        <span style="display:inline-flex;align-items:baseline;gap:6px;white-space:nowrap;font-family:'Avenir Next','Avenir','Nunito Sans',var(--font-sans);font-size:22px;line-height:1;letter-spacing:-.01em">
+          <span style="font-weight:400;color:rgba(255,255,255,.78)">Clínica</span>
+          <span style="font-weight:600;color:#FFFFFF">Conecta</span>
+        </span>
+      </a>
+    <div style="margin-top:18px;font:400 15px/1.75 var(--font-sans);color:#D6E3F7">
+      <div>Clínica Conecta SpA · Av. Irarrázaval 5185, oficina 402</div>
+      <div>Ñuñoa, Santiago · Metro Plaza Egaña</div>
+      <div style="margin-top:8px;font-family:var(--font-mono)">+56 9 4239 4143</div>
+      <div style="font-family:var(--font-mono)">contacto@conectamedica.com</div>
+    </div>
+    <p style="margin:26px 0 10px;font:400 14px/1 var(--font-mono);letter-spacing:.12em;color:#8FB0DE">HORARIOS</p>
+    <div style="font:400 15px/1.9 var(--font-sans);color:#D6E3F7">
+      <div>Lunes a viernes · 09:00–18:00</div>
+      <div>Sábado · 09:00–13:00</div>
+      <div>Domingo y festivos · cerrado</div>
+      <div style="margin-top:8px;color:#fff">Urgencias: llama al 131</div>
+    </div>
+    <p style="margin:26px 0 10px;font:400 14px/1 var(--font-mono);letter-spacing:.12em;color:#8FB0DE">SITIO</p>
+    <div style="display:flex;flex-direction:column;gap:11px">
+      <sc-for list="{{ enlacesPie }}" as="l" hint-placeholder-count="6">
+        <a href="#" style="font:400 15px/1.5 var(--font-sans);color:#D6E3F7;min-height:24px">{{ l }}</a>
+      </sc-for>
+    </div>
+    <p style="margin:26px 0 0;padding-top:18px;border-top:1px solid rgba(255,255,255,.16);font:400 14px/1.6 var(--font-sans);color:#8FB0DE">© 2026 Clínica Conecta SpA. Información general, no reemplaza una evaluación médica.</p>
+  </div>
+</div>
+</div>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}">
+const bg = (img, extra) => ({
+  backgroundImage: `url(${img})`, backgroundSize: 'cover', backgroundPosition: 'center',
+  backgroundColor: 'var(--color-blue-cloud)', ...extra
+});
+
+const T = (h, ...parrafos) => ({tipo:'texto', h, parrafos});
+const LISTA = (h, items) => ({tipo:'lista', h, items});
+const PASOS = (h, pasos) => ({tipo:'pasos', h, pasos: pasos.map((p,i)=>({n:i+1, t:p[0], d:p[1]}))});
+const IMG = (img, alt, pie) => ({tipo:'imagen', img, alt, pie});
+const NOTA = (h, texto, icono='info') => ({tipo:'nota', h, texto, icono});
+const TABLA = (h, filas) => ({tipo:'tabla', h, filas});
+const FAQB = (h, faqs) => ({tipo:'faq', h, faqs});
+const URGENCIA = () => ({tipo:'urgencia'});
+
+const PAGINAS = {
+  hematologia: {
+    label: 'Unidad de hematología', labelMovil: 'Hematología móvil', href: '/hematologia',
+    eyebrow: 'PRESTACIÓN · PRESENCIAL Y TELEMEDICINA',
+    titulo: 'Hematología: evaluar, estudiar y acompañar',
+    bajada: 'La consulta que ordena el problema. Revisa los exámenes que ya tienes, define qué falta estudiar y te explica el plan en palabras que se entienden.',
+    heroImg: 'img/c-microscopio.jpg',
+    heroAlt: 'Microscopio de laboratorio sobre una mesa junto a una ventana.',
+    chips: ['presencial','telemedicina'],
+    relacionados: ['Qué llevar a la consulta','Precios y formas de pago','Telemedicina','Preguntas frecuentes'],
+    bloques: [
+      T('Cuándo consultar a un hematólogo',
+        'Un hemograma con valores fuera de rango, ganglios que llevan semanas aumentados de tamaño, cansancio que no cede, moretones que aparecen sin golpe, o un tratamiento con hierro que no está funcionando. Ninguno de esos hallazgos significa por sí solo que tengas una enfermedad grave, pero todos merecen que alguien los mire en orden.',
+        'También llegan pacientes con un diagnóstico ya hecho que quieren una segunda opinión antes de empezar un tratamiento largo, y personas cuyo médico general pidió exámenes que nadie ha interpretado en conjunto.'),
+      LISTA('Qué incluye la consulta', [
+        ['Revisión de tus exámenes previos','Aunque sean antiguos: sirven para ver la evolución en el tiempo.'],
+        ['Examen físico dirigido','En la modalidad presencial, orientado al hallazgo que motivó la consulta.'],
+        ['Definición de qué falta estudiar','Qué examen sigue, en qué orden y por qué, sin pedir todo a la vez.'],
+        ['Informe escrito el mismo día','Con el diagnóstico presuntivo, el plan y las indicaciones.']
+      ]),
+      IMG('img/c-hemograma.jpg','Informe de laboratorio impreso sostenido a contraluz, con una línea marcada a lápiz.','La mayor parte del trabajo de la primera consulta es leer bien lo que ya existe.'),
+      PASOS('Cómo es el proceso', [
+        ['Pides hora','Por el formulario del sitio o por WhatsApp. No necesitas derivación ni interconsulta. Confirmamos dentro del próximo día hábil.'],
+        ['Preparas lo que traes','Exámenes previos, la lista de medicamentos con su dosis, y los informes de otros médicos sobre el mismo problema.'],
+        ['Primera consulta','Treinta minutos: revisamos los antecedentes, examinamos si corresponde y definimos el plan de estudio.'],
+        ['Control con resultados','Cuando llegan los exámenes solicitados, revisamos qué mostraron y ajustamos el tratamiento o cerramos el estudio.']
+      ]),
+      NOTA('Las otras prestaciones entran cuando el estudio lo necesita','Gastroenterología, nutrición e imágenes no se ofrecen sueltas. Se activan cuando el estudio hematológico las requiere, y las coordina el mismo médico que lleva tu caso, sin que tengas que explicar tu historia de nuevo.')
+    ]
+  },
+
+  telemedicina: {
+    label: 'Telemedicina', labelMovil: 'Telemedicina móvil', href: '/telemedicina',
+    eyebrow: 'MODALIDAD · 16 REGIONES',
+    titulo: 'Atención hematológica a distancia, en todo Chile',
+    bajada: 'La mayor parte del trabajo hematológico es leer exámenes, decidir qué falta y ajustar tratamientos. Todo eso se puede hacer por videollamada.',
+    heroImg: 'img/c-telemedicina.jpg',
+    heroAlt: 'Escritorio con un notebook abierto junto a una ventana, listo para una videollamada.',
+    chips: ['telemedicina'],
+    relacionados: ['Requisitos técnicos','Precios y formas de pago','Unidad de hematología','Preguntas frecuentes'],
+    bloques: [
+      T('Para quién tiene sentido',
+        'Para quien vive fuera de la Región Metropolitana y no tiene hematólogo cerca; para quien ya está en tratamiento y necesita controles regulares sin viajar; y para quien quiere una segunda opinión sobre un diagnóstico ya emitido.',
+        'La consulta dura 30 minutos, es por videollamada, y recibes el informe escrito el mismo día. El valor es el mismo que la consulta presencial.'),
+      LISTA('Qué se resuelve por videollamada', [
+        ['Interpretación de exámenes','Hemogramas, ferritina, perfil de hierro, estudios de coagulación.'],
+        ['Ajuste de un tratamiento en curso','Dosis de hierro, seguimiento de anticoagulación, control de respuesta.'],
+        ['Segunda opinión','Revisión de un diagnóstico hematológico emitido por otro equipo.'],
+        ['Definir el plan de estudio','Qué examen falta, en qué orden y dónde tomártelo cerca de tu casa.']
+      ]),
+      LISTA('Qué necesita examen físico', [
+        ['Ganglios que hay que palpar','Tamaño, consistencia y adherencia solo se evalúan con las manos.'],
+        ['Bazo o hígado aumentados','Requiere palpación abdominal.'],
+        ['Sangrado activo','Necesita evaluación presencial, y a veces urgencia.'],
+        ['Procedimientos','Estudios que se realizan en la unidad, como una punción de médula ósea.']
+      ]),
+      NOTA('Te lo decimos antes de agendar','Si al leer tu motivo de consulta vemos que tu caso necesita examen físico, te lo decimos antes de cobrarte una telemedicina que no va a resolver el problema.','triangle-alert'),
+      PASOS('Cómo funciona', [
+        ['Pides hora indicando telemedicina','En el formulario o por WhatsApp, contando brevemente qué te pasa.'],
+        ['Envías tus exámenes','Por correo o WhatsApp, en foto o PDF, al menos un día antes. Se revisan antes de la videollamada.'],
+        ['Videollamada de 30 minutos','Desde tu casa, con un teléfono o computador con cámara. Te enviamos el enlace.'],
+        ['Informe y recetas el mismo día','Recibes el informe escrito, las órdenes de examen y las recetas por correo.']
+      ]),
+      LISTA('Requisitos técnicos', [
+        ['Teléfono o computador con cámara',''],
+        ['Conexión estable, idealmente wifi',''],
+        ['Un lugar tranquilo y con luz',''],
+        ['Tus exámenes a mano, en papel o pantalla','']
+      ])
+    ]
+  },
+
+  precios: {
+    label: 'Precios', labelMovil: 'Precios móvil', href: '/precios',
+    eyebrow: 'PRECIOS · SOLO ATENCIÓN PARTICULAR',
+    titulo: 'El precio publicado, antes de que te atendamos',
+    bajada: 'No trabajamos con Fonasa ni con isapres en convenio. Entregamos boleta para que solicites en tu isapre el reembolso que corresponda.',
+    heroImg: 'img/escritorio.jpg',
+    heroAlt: 'Escritorio ordenado con un monitor apagado y una libreta cerrada.',
+    chips: ['presencial','telemedicina'],
+    relacionados: ['Formas de pago','Unidad de hematología','Telemedicina','Preguntas frecuentes'],
+    bloques: [
+      TABLA('Valores vigentes', [
+        {t:'Consulta hematología', d:'Primera consulta o control, 30 minutos', m:'Presencial en Ñuñoa', v:'$50.000'},
+        {t:'Consulta por telemedicina', d:'Videollamada con informe escrito el mismo día', m:'Todo Chile', v:'$50.000'},
+        {t:'Interpretación de imágenes', d:'Segunda lectura de un estudio ya realizado', m:'Telemedicina', v:'$40.000'},
+        {t:'Nutrición y dietética', d:'Sesión de 45 minutos', m:'Presencial y telemedicina', v:'$35.000'},
+        {t:'Consulta gastroenterología', d:'Evaluación derivada del estudio hematológico', m:'Presencial en Ñuñoa', v:'$50.000'}
+      ]),
+      NOTA('Los exámenes se pagan aparte','Los exámenes de laboratorio y las imágenes se realizan fuera de la unidad y se pagan en el centro que los toma. Te indicamos qué pedir para que puedas comparar precios donde te quede cómodo.'),
+      LISTA('Formas de pago', [
+        ['Efectivo',''],
+        ['Débito y crédito','En la unidad, al momento de la atención.'],
+        ['Transferencia','Para telemedicina, antes de la videollamada.'],
+        ['Boleta para reembolso','Para que solicites el reembolso en tu isapre o seguro.']
+      ]),
+      T('Por qué no hay convenios',
+        'Es una unidad pequeña. Mantener convenios con isapres implica una estructura administrativa que hoy no existe, y trasladarla al precio de la consulta la haría más cara para todos. Preferimos publicar un valor único y que sepas exactamente cuánto vas a pagar.',
+        'Si tienes isapre, la boleta que entregamos te permite pedir el reembolso de libre elección que te corresponda según tu plan. El monto depende de tu plan, no de la unidad.')
+    ]
+  },
+
+  faq: {
+    label: 'Preguntas frecuentes', labelMovil: 'Preguntas frecuentes móvil', href: '/pacientes',
+    eyebrow: 'PREGUNTAS FRECUENTES',
+    titulo: 'Las dudas que llegan antes de agendar',
+    bajada: 'Respuestas cortas a lo que más nos preguntan por WhatsApp. Si tu duda no está acá, escríbenos y la respondemos.',
+    heroImg: 'img/mesa-lectura.jpg',
+    heroAlt: 'Mesa de lectura con documentos ordenados y una lámpara encendida.',
+    chips: ['presencial','telemedicina'],
+    relacionados: ['Qué llevar a la consulta','Precios','Telemedicina','Contacto'],
+    bloques: [
+      FAQB('Antes de agendar', [
+        {q:'¿Necesito una derivación o interconsulta?',
+         a:'No. Puedes pedir hora directamente. Si llegas con una derivación, tráela: ayuda a entender qué se estaba buscando.'},
+        {q:'¿Atienden Fonasa o isapre?',
+         a:'Solo atención particular, $50.000 la consulta. Entregamos boleta para que solicites en tu isapre el reembolso de libre elección que te corresponda. No trabajamos con Fonasa.'},
+        {q:'¿A qué edades atienden?',
+         a:'Adultos desde los 15 años. Bajo esa edad la evaluación hematológica corresponde a hematología pediátrica, y te orientamos sobre dónde acudir.'},
+        {q:'¿Cuánto demoran en confirmar la hora?',
+         a:'Dentro del próximo día hábil. Si escribes un sábado por la tarde, la respuesta llega el lunes.'},
+        {q:'¿Atienden sábado?',
+         a:'Sí, de 09:00 a 13:00. Los cupos de sábado son limitados y se ocupan con anticipación.'}
+      ]),
+      FAQB('Sobre la consulta', [
+        {q:'¿Qué debo llevar a la primera consulta?',
+         a:'Los exámenes que ya te hiciste, aunque sean antiguos, la lista de medicamentos que tomas con su dosis, y cualquier informe de otro médico sobre el mismo problema. Si no tienes nada de eso, ven igual: la consulta sirve para ordenar el estudio desde cero.'},
+        {q:'¿Cuánto dura la consulta?',
+         a:'Treinta minutos. Es tiempo suficiente para revisar antecedentes, examinar si corresponde y explicar el plan.'},
+        {q:'¿Me van a pedir muchos exámenes?',
+         a:'Se piden los que hacen falta, en orden. Pedir todo de una vez suele ser más caro y más confuso que pedir lo que resuelve la duda inmediata y avanzar desde ahí.'},
+        {q:'¿Entregan licencia médica?',
+         a:'Sí, cuando el cuadro clínico lo justifica. La licencia se emite en la consulta, no por mensaje posterior.'}
+      ]),
+      FAQB('Telemedicina', [
+        {q:'¿La telemedicina sirve para mi caso?',
+         a:'Sirve para interpretar exámenes, ajustar un tratamiento en curso, dar segunda opinión y decidir qué falta estudiar. Si tu caso necesita examen físico, te lo decimos antes de agendar.'},
+        {q:'¿Cómo envío mis exámenes?',
+         a:'Por correo o WhatsApp, en foto legible o PDF, al menos un día antes de la videollamada. Se revisan antes de la hora, no durante.'},
+        {q:'¿Reciben las recetas y órdenes por correo?',
+         a:'Sí, el mismo día de la consulta, junto con el informe escrito. Las recetas son válidas en cualquier farmacia del país.'}
+      ]),
+      URGENCIA()
+    ]
+  },
+
+  contacto: {
+    label: 'Contacto', labelMovil: 'Contacto móvil', href: '/contacto',
+    eyebrow: 'CONTACTO',
+    titulo: 'Ñuñoa, Santiago, a pasos del Metro Plaza Egaña',
+    bajada: 'Av. Irarrázaval 5185, oficina 402. Atención solo con hora agendada; te confirmamos el horario dentro del próximo día hábil.',
+    heroImg: 'img/calle-nunoa.jpg',
+    heroAlt: 'Vereda arbolada de Ñuñoa con edificios bajos, en una tarde despejada.',
+    chips: ['presencial','telemedicina','sabado'],
+    relacionados: ['Horarios de atención','Solicitar hora','Telemedicina','Preguntas frecuentes'],
+    bloques: [
+      LISTA('Cómo contactarnos', [
+        ['WhatsApp +56 9 4239 4143','La vía más rápida. Lunes a viernes 09:00–18:00, sábado 09:00–13:00.'],
+        ['contacto@conectamedica.com','Para enviar exámenes y documentos antes de una telemedicina.'],
+        ['Formulario de solicitud de hora','Cuentas qué te pasa y te confirmamos dentro del próximo día hábil.'],
+        ['Presencial','Solo con hora agendada previamente. No hay atención de público sin cita.']
+      ]),
+      IMG('img/edificio-nunoa.jpg','Fachada del edificio de oficinas en Ñuñoa donde atiende la unidad.','El acceso es por el hall principal. Anúnciate en conserjería al llegar.'),
+      PASOS('Cómo llegar', [
+        ['En metro','Estación Plaza Egaña, líneas 3 y 4. Salida oriente; el edificio queda a pocas cuadras.'],
+        ['En micro','Los recorridos que circulan por Irarrázaval y Vespucio tienen paradero a media cuadra.'],
+        ['En auto','Hay estacionamientos por hora en el mismo edificio y en el centro comercial vecino. No hay estacionamiento de visitas gratuito.'],
+        ['Al llegar','Anúnciate en conserjería y espera en la sala. Te recomendamos llegar diez minutos antes.']
+      ]),
+      LISTA('Horarios', [
+        ['Lunes a viernes','09:00 a 18:00'],
+        ['Sábado','09:00 a 13:00'],
+        ['Domingo y festivos','Cerrado'],
+        ['Urgencias','Llama al 131 o acude al servicio de urgencia más cercano.']
+      ]),
+      URGENCIA()
+    ]
+  },
+
+  pacientes: {
+    label: 'Información para pacientes', labelMovil: 'Pacientes móvil', href: '/pacientes',
+    eyebrow: 'INFORMACIÓN PARA PACIENTES',
+    titulo: 'Entender lo que te pasa, antes y después de la consulta',
+    bajada: 'Lo que conviene saber para llegar preparado, y lo que suele quedar dando vueltas cuando sales de la consulta.',
+    heroImg: 'img/guias-impresas.jpg',
+    heroAlt: 'Guías clínicas impresas y anilladas apiladas en un escritorio.',
+    chips: ['presencial','telemedicina'],
+    relacionados: ['Qué llevar a la consulta','Unidad de hematología','Preguntas frecuentes','Derechos del paciente'],
+    bloques: [
+      T('Qué llevar a la consulta',
+        'Tres cosas cambian de verdad la primera consulta: los exámenes que ya te hiciste, la lista de lo que tomas, y los informes de otros médicos sobre el mismo problema. Con eso, la media hora se usa en decidir el plan en vez de reconstruir la historia.',
+        'Los exámenes antiguos no son inútiles: la comparación en el tiempo suele decir más que un valor aislado de hoy. Si tienes hemogramas de hace tres años, tráelos.'),
+      LISTA('Lo que conviene preparar', [
+        ['Exámenes previos','En papel o PDF. Aunque sean de otro laboratorio o de años atrás.'],
+        ['Medicamentos con dosis','Incluye suplementos, hierro, anticoagulantes y lo que compras sin receta.'],
+        ['Informes de otros médicos','Especialmente si ya hubo un diagnóstico o un tratamiento iniciado.'],
+        ['Tus preguntas escritas','Anótalas antes: en la consulta siempre se olvida una.']
+      ]),
+      IMG('img/examenes-previos.jpg','Carpeta con exámenes de laboratorio antiguos ordenados sobre una mesa.','Una carpeta con los exámenes ordenados por fecha ahorra buena parte de la primera consulta.'),
+      LISTA('Artículos publicados', [
+        ['Qué significa tener el hemograma alterado','Los valores fuera de rango no siempre indican enfermedad. Qué mira primero un hematólogo. Ejemplo para el mockup.'],
+        ['Cuánto demora en mejorar una anemia por falta de hierro','La ferritina se recupera después que la hemoglobina. Los plazos reales. Ejemplo para el mockup.'],
+        ['Cuándo una consulta a distancia es suficiente','Qué se puede resolver por videollamada y qué necesita examen físico. Ejemplo para el mockup.'],
+        ['Ganglios aumentados: cuándo preocuparse','Duración, tamaño y síntomas acompañantes. Ejemplo para el mockup.']
+      ]),
+      T('Derechos y deberes del paciente',
+        'Tienes derecho a saber el precio antes de la atención, a recibir por escrito tu diagnóstico y tu plan, a pedir una copia de tu ficha, y a una segunda opinión sin que eso afecte tu atención acá.',
+        'La información publicada en este sitio es orientadora. Ningún contenido de estas páginas debe usarse para iniciar, suspender o modificar un tratamiento por cuenta propia.')
+    ]
+  }
+};
+
+const ORDEN = [
+  ['hematologia','Hematología'],
+  ['telemedicina','Telemedicina'],
+  ['precios','Precios'],
+  ['faq','Preguntas frecuentes'],
+  ['contacto','Contacto'],
+  ['pacientes','Info pacientes']
+];
+
+const NAV = [
+  {label:'Unidad de hematología', href:'/hematologia'},
+  {label:'Prestaciones', href:'/prestaciones'},
+  {label:'Telemedicina', href:'/telemedicina'},
+  {label:'Precios', href:'/precios'},
+  {label:'Contacto', href:'/contacto'}
+];
+
+class Component extends DCLogic {
+  componentDidMount() {
+    this._onScroll = () => {
+      const compacto = window.scrollY > 260;
+      if (compacto !== this.state.compacto) this.setState({compacto});
+    };
+    window.addEventListener('scroll', this._onScroll, {passive:true});
+  }
+  componentWillUnmount() {
+    window.removeEventListener('scroll', this._onScroll);
+    clearTimeout(this._t);
+  }
+  state = { compacto: false, enviando: false, actual: 'hematologia', movil: false };
+
+  renderVals() {
+    const key = this.state.actual;
+    const p = PAGINAS[key];
+    const RUTA = p.href;
+
+    const bloques = p.bloques.map(b => {
+      const base = {
+        esTexto: b.tipo === 'texto', esLista: b.tipo === 'lista', esPasos: b.tipo === 'pasos',
+        esTabla: b.tipo === 'tabla', esFaq: b.tipo === 'faq', esImagen: b.tipo === 'imagen',
+        esNota: b.tipo === 'nota', esUrgencia: b.tipo === 'urgencia', h: b.h
+      };
+      if (b.tipo === 'texto') return {...base, parrafos: b.parrafos};
+      if (b.tipo === 'lista') return {...base, items: b.items.map(([t, d]) => ({t, d, tieneD: !!d}))};
+      if (b.tipo === 'pasos') return {...base, pasos: b.pasos, n: b.pasos.length};
+      if (b.tipo === 'tabla') return {...base, filas: b.filas};
+      if (b.tipo === 'faq') return {...base, faqs: b.faqs};
+      if (b.tipo === 'nota') return {...base, texto: b.texto, icono: b.icono};
+      if (b.tipo === 'imagen') return {...base, alt: b.alt, pie: b.pie,
+        fondoGrande: bg(b.img, {width:'100%', height:'340px', borderRadius:'16px'}),
+        fondoChico: bg(b.img, {width:'100%', height:'200px', borderRadius:'16px'})};
+      return base;
+    });
+
+    const tab = activo => activo
+      ? 'cursor:pointer;border:0;background:var(--color-blue);color:#fff;font:600 12.5px/1 var(--font-sans);padding:9px 14px;border-radius:999px'
+      : 'cursor:pointer;border:1px solid rgba(0,0,0,.14);background:#fff;color:var(--color-ink);font:500 12.5px/1 var(--font-sans);padding:9px 14px;border-radius:999px';
+
+    return {
+      tabs: ORDEN.map(([k, label]) => ({label, estilo: tab(k === key), pick: () => this.setState({actual: k})})),
+      pagina: {...p, bloques, heroFondo: bg(p.heroImg, {position:'absolute', inset:0})},
+      migas: [{label:'Inicio', href:'#'}, {label:'Información para pacientes', href:'#'}, {label:p.label}],
+
+      enlacesPie: ['Unidad de hematología','Prestaciones','Telemedicina','Precios','Información para pacientes','Preguntas frecuentes','Contacto'],
+      compacto: this.state.compacto,
+      headerPegado: {position:'sticky', top:0, zIndex:40, background:'#fff',
+        borderBottom: this.state.compacto ? 'none' : '1px solid var(--color-line)',
+        boxShadow: this.state.compacto ? 'var(--shadow-1)' : 'none',
+        transition:'box-shadow 200ms ease'},
+      headerFila: {height: this.state.compacto ? 64 : 80, maxWidth:'var(--container-max, 1200px)',
+        margin:'0 auto', padding:'0 48px', display:'flex', alignItems:'center',
+        justifyContent:'space-between', gap:32},
+      headerFilaMovil: {height: this.state.compacto ? 64 : 80, padding:'0 20px',
+        display:'flex', alignItems:'center', justifyContent:'space-between', gap:16},
+      enviando: this.state.enviando,
+      textoEnvio: this.state.enviando ? 'Enviando tu solicitud…' : 'Solicitar hora',
+      estiloEnvio: {
+        display:'flex', alignItems:'center', justifyContent:'center', gap:10,
+        width:'100%', minHeight:48, padding:'0 20px', border:0,
+        borderRadius:'var(--radius-md, 8px)',
+        /* Los mismos tokens que usan los Button del sistema: en las superficies
+           azules la sección los invierte y el botón acompaña sin saber dónde está. */
+        background:'var(--action-primary-bg)',
+        color:'var(--action-primary-fg)',
+        fontFamily:'var(--font-sans)', fontSize:17, fontWeight:600,
+        opacity: this.state.enviando ? .82 : 1,
+        cursor: this.state.enviando ? 'progress' : 'pointer',
+        transition:'opacity 150ms var(--ease-out, ease)'
+      },
+      enReposo: !this.state.enviando,
+      enviar: () => {
+        if (this.state.enviando) return;
+        this.setState({enviando:true});
+        this._t = setTimeout(() => this.setState({enviando:false}), 2600);
+      },
+      marcaHeader: {height: this.state.compacto ? 34 : 44, width:'auto', display:'block',
+        transition:'height 200ms var(--ease-out, ease)'},
+      tamLockup: this.state.compacto ? 22 : 26,
+      tamBoton: this.state.compacto ? 'sm' : 'md',
+      iconoMenu: this.state.movil ? 'x' : 'menu',
+      navLinks: NAV.map(n => ({...n,
+        estilo: n.href === RUTA
+          ? 'font:500 15px/1 var(--font-sans);color:var(--color-blue);padding:6px 0;border-bottom:2px solid var(--color-blue)'
+          : 'font:500 15px/1 var(--font-sans);color:var(--color-ink);padding:6px 0',
+        estiloMovil: n.href === RUTA
+          ? 'display:block;font:500 17px/1.3 var(--font-sans);color:var(--color-blue);padding:14px 0;border-bottom:1px solid var(--color-line)'
+          : 'display:block;font:500 17px/1.3 var(--font-sans);color:var(--color-ink);padding:14px 0;border-bottom:1px solid var(--color-line)'
+      })),
+      n20: 20, n24: 24, n30: 30, n34: 34, cero: 0, cuatro: 4,
+      navItems: [
+        {label:'Unidad de hematología', href:'/hematologia'},
+        {label:'Prestaciones', href:'/prestaciones'},
+        {label:'Telemedicina', href:'/telemedicina'},
+        {label:'Precios', href:'/precios'},
+        {label:'Contacto', href:'/contacto'}
+      ],
+      movil: this.state.movil,
+      toggleMovil: () => this.setState(s => ({movil: !s.movil})),
+
+      iconoLinea: {marginTop:'2px'},
+      hiloPasos: {marginTop:'20px'},
+
+      datos: [
+        {t:'Consulta particular', d:'$50.000, presencial o telemedicina', icono:'info'},
+        {t:'Sin derivación previa', d:'Puedes pedir hora directamente', icono:'check'},
+        {t:'Lun a vie 09:00–18:00', d:'Sábado 09:00 a 13:00', icono:'clock'},
+        {t:'Metro Plaza Egaña', d:'Ñuñoa, Santiago', icono:'map-pin'}
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

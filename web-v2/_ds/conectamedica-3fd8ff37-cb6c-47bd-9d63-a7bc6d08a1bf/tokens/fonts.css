@@ -1,0 +1,5 @@
+/* Fuentes Conecta — en producción autoalojar desde Fontsource:
+   @fontsource-variable/source-serif-4, @fontsource-variable/inter, @fontsource/ibm-plex-mono
+   Aquí se cargan desde Google Fonts para que las fichas rendericen. */
+@import url("https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap");
+:root{--font-serif:"Source Serif 4",Georgia,"Times New Roman",serif;--font-sans:"Inter","Helvetica Neue",Arial,sans-serif;--font-mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace}

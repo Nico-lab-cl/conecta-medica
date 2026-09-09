@@ -1,0 +1,23 @@
+/* Escala de 8px, con 4px para ajustes finos. */
+:root{
+--space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--space-6:24px;
+--space-8:32px;--space-10:40px;--space-12:48px;--space-16:64px;--space-20:80px;
+--space-24:96px;--space-30:120px;--space-40:160px;
+
+/* Ritmo vertical entre secciones */
+--section-y:var(--space-16);        /* 390–767 */
+--section-y-md:var(--space-20);     /* 768–1365 */
+--section-y-lg:var(--space-24);     /* 1366+ */
+--section-y-hero:var(--space-30);
+
+/* Contenedores */
+--container-max:1200px;
+--container-prose:720px;
+--gutter:16px;--gutter-md:20px;--gutter-lg:24px;
+--margin-x:20px;--margin-x-md:32px;--margin-x-lg:48px;--margin-x-xl:64px;
+--grid-columns:12; /* @kind other */
+--touch-min:44px;
+
+/* Breakpoints (referencia; en Tailwind v4 se declaran como --breakpoint-*) */
+--bp-mobile:390px;--bp-tablet:768px;--bp-notebook:1366px;--bp-desktop:1600px;--bp-wide:1920px;
+}

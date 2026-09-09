@@ -1,0 +1,16 @@
+/* Micro-interacciones de 150–200ms en hover y foco. Nada más se anima. */
+:root{
+--dur-fast:150ms; /* @kind other */
+--dur-mid:200ms; /* @kind other */
+--dur-slow:400ms; /* @kind other */
+--dur-thread:1400ms; /* @kind other */ /* hilo Conecta, una sola vez al cargar */
+--ease-standard:cubic-bezier(.4,0,.2,1); /* @kind other */
+--ease-out:cubic-bezier(0,0,.2,1); /* @kind other */
+--ease-thread:cubic-bezier(.65,0,.35,1); /* @kind other */
+}
+@media (prefers-reduced-motion:reduce){:root{
+--dur-fast:1ms; /* @kind other */
+--dur-mid:1ms; /* @kind other */
+--dur-slow:1ms; /* @kind other */
+--dur-thread:1ms; /* @kind other */
+}}
