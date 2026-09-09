@@ -17,7 +17,25 @@ import { render } from 'astro:content';
    cuándo consultar. No es preferencia editorial: en los SERP de Chile para estas
    consultas, AI Overview y People Also Ask ocupan las posiciones 1 y 2, y el
    primer clic orgánico está en la 3. La respuesta directa arriba es lo que
-   permite ser la fuente de ese resumen. Ver docs/seo-keywords.md §3. */
+   permite ser la fuente de ese resumen. Ver docs/seo-keywords.md §3.
+
+   ACORDEÓN (2026-09-08). Antes las dieciséis respuestas iban desplegadas una
+   tras otra: la página medía varias pantallas y encontrar una pregunta concreta
+   era imposible. Ahora cada una es un <details> cerrado, como en la portada v3,
+   así que la página abre siendo la lista de preguntas y el visitante despliega
+   la suya.
+
+   Tres cosas que esto NO cambia:
+
+   · El SEO. <details> guarda el texto en el DOM, no lo carga después: Google lo
+     indexa igual, Ctrl+F lo encuentra dentro de un acordeón cerrado, y el
+     FAQPage de datos estructurados sigue llevando las respuestas completas.
+   · La accesibilidad. Es el elemento nativo, con su semántica de siempre y sin
+     una línea de JavaScript para abrir y cerrar.
+   · El encabezado de cada pregunta, que sigue siendo un <h3> real.
+
+   El índice "En esta página" se fue con el cambio: el acordeón cerrado ya es
+   ese índice, y tenerlo dos veces era repetir la misma lista. */
 
 const todas = await faqsPublicables();
 const clinicas = todas.filter((f) => f.data.categoria === 'clinica');
@@ -46,50 +64,49 @@ const fmt = new Intl.DateTimeFormat('es-CL', { day: 'numeric', month: 'long', ye
   jsonLd={[faqJsonLd(todas.map((f) => f.data))]}
 >
 
-  <div class="contenedor indice">
-    <nav aria-labelledby="indice-titulo">
-      <p class="eyebrow" id="indice-titulo">En esta página</p>
-      <ol>
-        {todas.map((f) => <li><a href={`#${f.data.slug}`}>{f.data.pregunta}</a></li>)}
-      </ol>
-    </nav>
-  </div>
-
   {
     clinicas.length > 0 && (
       <section class="seccion">
         <div class="contenedor">
           <h2 class="grupo">Sobre tus exámenes y tu tratamiento</h2>
           <div class="lista-faq">
-            {clinicas.map((f) => {
+            {clinicas.map((f, i) => {
               const Cuerpo = porId.get(f.id);
               return (
-                <article class="faq" id={f.data.slug}>
-                  <h3>{f.data.pregunta}</h3>
-                  <p class="corta">{f.data.respuestaCorta.trim()}</p>
-                  <div class="detalle contenido-mdx">{Cuerpo && <Cuerpo />}</div>
-                  {f.data.cuandoConsultar && (
-                    <div class="consultar">
-                      <Icono nombre="triangle-alert" tam={20} color="var(--color-blue)" />
-                      <div>
-                        <p class="consultar-titulo">Cuándo consultar</p>
-                        <p>{f.data.cuandoConsultar}</p>
+                <details class="faq" id={f.data.slug} open={i === 0}>
+                  <summary>
+                    <h3>
+                      <span>{f.data.pregunta}</span>
+                      <Icono nombre="plus" tam={22} color="var(--color-blue)" clase="mas" />
+                      <Icono nombre="minus" tam={22} color="var(--color-blue)" clase="menos" />
+                    </h3>
+                  </summary>
+                  <div class="respuesta">
+                    <p class="corta">{f.data.respuestaCorta.trim()}</p>
+                    <div class="detalle contenido-mdx">{Cuerpo && <Cuerpo />}</div>
+                    {f.data.cuandoConsultar && (
+                      <div class="consultar">
+                        <Icono nombre="triangle-alert" tam={20} color="var(--color-blue)" />
+                        <div>
+                          <p class="consultar-titulo">Cuándo consultar</p>
+                          <p>{f.data.cuandoConsultar}</p>
+                        </div>
                       </div>
-                    </div>
-                  )}
-                  <p class="firma">
-                    {f.data.revisado && f.data.fechaRevision ? (
-                      <>
-                        <Icono nombre="check" tam={16} color="var(--color-blue)" />
-                        Revisado por Dr. Carlos Flores Angulo · {fmt.format(f.data.fechaRevision)}
-                      </>
-                    ) : (
-                      <span class="borrador">
-                        Borrador. Pendiente de revisión del médico. No visible en producción.
-                      </span>
                     )}
-                  </p>
-                </article>
+                    <p class="firma">
+                      {f.data.revisado && f.data.fechaRevision ? (
+                        <>
+                          <Icono nombre="check" tam={16} color="var(--color-blue)" />
+                          Revisado por Dr. Carlos Flores Angulo · {fmt.format(f.data.fechaRevision)}
+                        </>
+                      ) : (
+                        <span class="borrador">
+                          Borrador. Pendiente de revisión del médico. No visible en producción.
+                        </span>
+                      )}
+                    </p>
+                  </div>
+                </details>
               );
             })}
           </div>
@@ -104,20 +121,43 @@ const fmt = new Intl.DateTimeFormat('es-CL', { day: 'numeric', month: 'long', ye
       <h2 class="grupo">Cómo funciona la atención</h2>
       <div class="lista-faq">
         {
-          operativas.map((f) => {
+          operativas.map((f, i) => {
             const Cuerpo = porId.get(f.id);
             return (
-              <article class="faq" id={f.data.slug}>
-                <h3>{f.data.pregunta}</h3>
-                <p class="corta">{f.data.respuestaCorta.trim()}</p>
-                <div class="detalle contenido-mdx">{Cuerpo && <Cuerpo />}</div>
-              </article>
+              <details class="faq" id={f.data.slug} open={clinicas.length === 0 && i === 0}>
+                <summary>
+                  <h3>
+                    <span>{f.data.pregunta}</span>
+                    <Icono nombre="plus" tam={22} color="var(--color-blue)" clase="mas" />
+                    <Icono nombre="minus" tam={22} color="var(--color-blue)" clase="menos" />
+                  </h3>
+                </summary>
+                <div class="respuesta">
+                  <p class="corta">{f.data.respuestaCorta.trim()}</p>
+                  <div class="detalle contenido-mdx">{Cuerpo && <Cuerpo />}</div>
+                </div>
+              </details>
             );
           })
         }
       </div>
     </div>
   </section>
+
+  <script>
+    /* Los enlaces con ancla —desde la portada, desde el buscador o compartidos—
+       apuntan a una pregunta concreta. Si esa pregunta está plegada, el
+       navegador no siempre la abre: acá se abre y se lleva a la vista. */
+    const abrirDelAncla = (desplazar: boolean) => {
+      if (!location.hash) return;
+      const destino = document.getElementById(decodeURIComponent(location.hash.slice(1)));
+      if (!(destino instanceof HTMLDetailsElement)) return;
+      destino.open = true;
+      if (desplazar) destino.scrollIntoView();
+    };
+    abrirDelAncla(true);
+    addEventListener('hashchange', () => abrirDelAncla(false));
+  </script>
 
   <section class="seccion">
     <div class="contenedor cierre">
@@ -131,50 +171,71 @@ const fmt = new Intl.DateTimeFormat('es-CL', { day: 'numeric', month: 'long', ye
 </Pagina>
 
 <style>
-  .indice {
-    margin-top: var(--space-8);
-  }
-  .indice nav {
-    background: var(--surface-alt);
-    border-radius: var(--radius-lg);
-    padding: var(--space-6);
-    max-width: 860px;
-  }
-  .indice ol {
-    margin: var(--space-4) 0 0;
-    padding-left: var(--space-5);
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-2);
-    font-size: var(--text-body-sm);
-  }
-  .indice a {
-    color: var(--color-blue);
-    text-decoration: underline;
-    text-underline-offset: 3px;
-  }
-
   .grupo {
     max-width: 24ch;
   }
+
+  /* Mismo acordeón que usa Acordeon.astro en el resto del sitio: <details>
+     nativo, el signo cambia de más a menos, y la línea divisoria es lo único
+     que separa una pregunta de la siguiente. */
   .lista-faq {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-16);
-    margin-top: var(--space-10);
+    margin-top: var(--space-8);
+    max-width: var(--measure-prose);
+    border-top: var(--border-width) solid var(--color-line);
   }
   .faq {
-    max-width: var(--measure-prose);
-    scroll-margin-top: 100px;
+    border-bottom: var(--border-width) solid var(--color-line);
+    scroll-margin-top: 120px;
+  }
+  .faq summary {
+    cursor: pointer;
+    list-style: none;
+  }
+  .faq summary::-webkit-details-marker {
+    display: none;
+  }
+  .faq summary:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: var(--focus-offset);
+    border-radius: var(--radius-sm);
   }
   .faq h3 {
-    font-size: var(--text-h2);
-    line-height: var(--text-h2-lh);
-    letter-spacing: var(--text-h2-ls);
+    display: flex;
+    gap: var(--space-4);
+    align-items: flex-start;
+    justify-content: space-between;
+    min-height: var(--touch-min);
+    padding-block: var(--space-5);
+    font-family: var(--font-sans);
+    font-size: var(--text-h4);
+    font-weight: var(--weight-semibold);
+    line-height: 1.4;
+    color: var(--color-ink);
+    text-wrap: pretty;
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+  .faq summary:hover h3 {
+    color: var(--color-blue);
+  }
+  .faq h3 :global(.mas),
+  .faq h3 :global(.menos) {
+    margin-top: 2px;
+  }
+  .faq h3 :global(.menos) {
+    display: none;
+  }
+  .faq[open] h3 :global(.mas) {
+    display: none;
+  }
+  .faq[open] h3 :global(.menos) {
+    display: inline-block;
+  }
+
+  .respuesta {
+    padding-bottom: var(--space-8);
   }
   /* La respuesta corta va primero y destacada: es la que se extrae. */
   .corta {
-    margin-top: var(--space-5);
     font-family: var(--font-serif);
     font-size: var(--text-body-lg);
     line-height: 1.6;
@@ -183,7 +244,7 @@ const fmt = new Intl.DateTimeFormat('es-CL', { day: 'numeric', month: 'long', ye
     padding-left: var(--space-5);
   }
   .detalle {
-    margin-top: var(--space-8);
+    margin-top: var(--space-6);
   }
   .consultar {
     display: flex;
