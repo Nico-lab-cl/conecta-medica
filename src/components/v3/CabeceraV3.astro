@@ -1,0 +1,409 @@
+---
+/* Cabecera del sitio, en el lenguaje de v3.
+
+   Traducción de la cabecera de `web-v2/Conectamedica v3 - Portada.dc.html`, que
+   desde el 2026-09-08 es la cabecera de todo el sitio. Reemplazó a
+   Encabezado.astro, que quedó en el historial de git.
+
+   Qué trae del diseño:
+
+     · Franja de utilidad arriba (azul profundo, 42 px) con la ubicación y los
+       destinos que no caben en el menú principal. Es el patrón de las clínicas
+       chilenas que se estudiaron en `docs/clinicas-diseno.md`, pero sin los
+       accesos a intranet, webmail ni portal de prestadores: Conecta no tiene
+       ninguno de esos sistemas y ponerlos sería inventar.
+     · Cabecera pegada que encoge de 80 a 64 px al bajar.
+     · El logo cambia: en vez del lockup trazado (34 KB de SVG sacados del JPG
+       original), el isotipo redibujado más el nombre en texto vivo. Pesa menos,
+       se lee nítido a cualquier tamaño y encoge sin perder definición.
+
+   Qué NO se copió del diseño: su menú de cinco ítems clínicos. El cliente pidió
+   estos seis y su orden (decisión confirmada el 2026-09-08), así que la
+   estructura es la de v3 y el contenido es el suyo —la misma regla que con la
+   dirección, los horarios y el precio—. La unidad, la telemedicina y los precios,
+   que en v3 iban en el menú, viven ahora en la franja de utilidad.
+
+   Tampoco hay fila de especialidades: v3 no la contempla y las prestaciones se
+   alcanzan desde la sección "Conecta Hematología" de la portada y desde la
+   franja de utilidad.
+
+   La compresión se resuelve con IntersectionObserver sobre un centinela: no se
+   escucha scroll. */
+import BotonAgendar from '../actions/BotonAgendar.astro';
+import Icono from '../core/Icono.astro';
+import { RUTAS } from '../../lib/rutas';
+import { ajustes, pais, precioCLP, hayDirectorioDeEquipo } from '../../lib/contenido';
+
+interface Props {
+  /** Ruta de la página actual, para marcar el ítem de menú. */
+  actual?: string;
+}
+const { actual = '' } = Astro.props;
+
+const a = await ajustes();
+const cl = (await pais('cl')).data;
+const conEquipo = await hayDirectorioDeEquipo();
+
+/* Los seis del cliente, en su orden.
+
+   Dos notas sobre por qué está lo que está:
+
+   - "Inicio" es redundante con el logo, que ya lleva a la portada. Va porque el
+     cliente lo pidió explícitamente, y en salud es un ítem que el público mayor
+     sí busca.
+   - "Agendar hora" repite el botón de la derecha. Se mantienen los dos: el
+     botón convierte, el ítem da la ruta a quien lee el menú antes de mirar los
+     botones.
+
+   "Equipo médico" aparece desde un solo profesional activo. Ver
+   hayDirectorioDeEquipo() en lib/contenido.ts. */
+const nav = [
+  { label: 'Inicio', href: RUTAS.inicio },
+  { label: 'Quiénes somos', href: RUTAS.conocenos },
+  { label: 'Agendar hora', href: RUTAS.agendar },
+  { label: 'Preguntas frecuentes', href: RUTAS.preguntas },
+  { label: 'Contacto', href: RUTAS.contacto },
+  ...(conEquipo ? [{ label: 'Equipo médico', href: RUTAS.equipo }] : []),
+];
+
+const utilidad = [
+  { label: 'Conecta Hematología', href: RUTAS.unidad },
+  { label: 'Telemedicina', href: RUTAS.telemedicina },
+  { label: 'Precios', href: RUTAS.precios },
+  { label: 'Información para pacientes', href: RUTAS.pacientes },
+];
+
+/* La franja dice dónde se atiende. Sale de la dirección cargada, no de una
+   frase escrita a mano: si la clínica se cambia de comuna, la franja cambia. */
+const ubicacion = `${cl.direccion.comuna}, ${cl.direccion.ciudad} · Telemedicina en todo Chile`;
+---
+
+<span id="centinela-v3" aria-hidden="true"></span>
+
+<div class="utilidad">
+  <div class="contenedor utilidad-fila">
+    <span class="utilidad-lugar">{ubicacion}</span>
+    <nav aria-label="Enlaces de utilidad">
+      {utilidad.map((u) => <a href={u.href}>{u.label}</a>)}
+    </nav>
+  </div>
+</div>
+
+<header class="cabecera" id="cabecera-v3">
+  <div class="contenedor fila">
+    <a class="marca" href={RUTAS.inicio} aria-label={`${a.nombre}, inicio`}>
+      <img class="isotipo" src="/marca/isotipo-limpio.svg" alt="" width="45" height="44" />
+      <span class="lockup" aria-hidden="true">
+        <span class="lockup-1">Clínica</span><span class="lockup-2">Conecta</span>
+      </span>
+    </a>
+
+    <nav class="nav-escritorio" aria-label="Principal">
+      {
+        nav.map((n) => (
+          <a class="nav-item" href={n.href} aria-current={actual === n.href ? 'page' : undefined}>
+            {n.label}
+          </a>
+        ))
+      }
+    </nav>
+
+    <div class="acciones">
+      <div class="solo-escritorio"><BotonAgendar tam="md" etiqueta="Agendar hora" /></div>
+      <button
+        class="hamburguesa"
+        id="btn-menu-v3"
+        aria-label="Abrir menú"
+        aria-expanded="false"
+        aria-controls="menu-v3"
+      >
+        <Icono nombre="menu" tam={24} clase="icono-abrir" />
+        <Icono nombre="x" tam={24} clase="icono-cerrar" />
+      </button>
+    </div>
+  </div>
+
+  <div class="menu-movil" id="menu-v3" hidden>
+    <nav class="contenedor" aria-label="Principal">
+      {
+        /* En móvil no hay problema de ancho: van los seis del menú y también
+           los cuatro de la franja de utilidad, que ahí arriba no se ven. */
+        [...nav, ...utilidad].map((n) => (
+          <a class="movil-item" href={n.href} aria-current={actual === n.href ? 'page' : undefined}>
+            {n.label}
+          </a>
+        ))
+      }
+      <div class="movil-cta"><BotonAgendar tam="md" anchoCompleto etiqueta="Agendar hora" /></div>
+      <p class="movil-nota">Atención solo particular · consulta {precioCLP(a.precioConsulta)}</p>
+    </nav>
+  </div>
+</header>
+
+<script>
+  const btn = document.getElementById('btn-menu-v3');
+  const menu = document.getElementById('menu-v3');
+  btn?.addEventListener('click', () => {
+    const abierto = btn.getAttribute('aria-expanded') === 'true';
+    btn.setAttribute('aria-expanded', String(!abierto));
+    btn.setAttribute('aria-label', abierto ? 'Abrir menú' : 'Cerrar menú');
+    if (menu) menu.hidden = abierto;
+  });
+
+  /* Compresión de la cabecera sin escuchar scroll.
+
+     El centinela es un punto de 1×1 px clavado a 260 px del borde del documento
+     —el mismo umbral del mockup—. Cuando deja de verse, el visitante ya bajó esa
+     distancia y la cabecera se comprime. Escuchar scroll costaría un recálculo
+     de layout por fotograma para llegar al mismo booleano. */
+  const centinela = document.getElementById('centinela-v3');
+  const cabecera = document.getElementById('cabecera-v3');
+  if (centinela && cabecera && 'IntersectionObserver' in window) {
+    new IntersectionObserver(
+      ([e]) => cabecera.toggleAttribute('data-comprimida', !e?.isIntersecting),
+      { rootMargin: '0px' },
+    ).observe(centinela);
+  }
+</script>
+
+<style>
+  /* Fuera del flujo, para que marcar los 260 px no empuje nada. */
+  #centinela-v3 {
+    position: absolute;
+    top: 260px;
+    height: 1px;
+    width: 1px;
+  }
+
+  /* ---------------------------- franja de utilidad ---------------------------- */
+
+  .utilidad {
+    display: none;
+    background: var(--color-blue-deep);
+    color: #fff;
+  }
+  .utilidad-fila {
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-6);
+  }
+  .utilidad-lugar {
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #8fb0de;
+  }
+  .utilidad nav {
+    display: flex;
+    align-items: center;
+    gap: var(--space-6);
+  }
+  .utilidad a {
+    font-size: var(--text-body-sm);
+    color: #d6e3f7;
+    text-decoration: none;
+  }
+  .utilidad a:hover {
+    color: #fff;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  /* -------------------------------- cabecera --------------------------------- */
+
+  .cabecera {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: var(--color-white);
+    border-bottom: var(--border-width) solid var(--color-line);
+    transition:
+      box-shadow var(--dur-mid) var(--ease-out),
+      border-color var(--dur-mid) var(--ease-out);
+  }
+  .cabecera[data-comprimida] {
+    border-bottom-color: transparent;
+    box-shadow: var(--shadow-1);
+  }
+
+  .fila {
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-6);
+    transition: height var(--dur-mid) var(--ease-out);
+  }
+  .cabecera[data-comprimida] .fila {
+    height: 64px;
+  }
+
+  /* ---------------------------------- marca ---------------------------------- */
+
+  .marca {
+    display: inline-flex;
+    align-items: center;
+    gap: 11px;
+    text-decoration: none;
+    flex-shrink: 0;
+  }
+  .isotipo {
+    height: 44px;
+    width: auto;
+    display: block;
+    transition: height var(--dur-mid) var(--ease-out);
+  }
+  .cabecera[data-comprimida] .isotipo {
+    height: 34px;
+  }
+  /* El nombre es texto, no imagen. Avenir Next es la fuente de la marca; donde
+     no exista cae a la sans del sistema de diseño, que es la misma familia
+     geométrica humanista y no desarma el lockup. */
+  .lockup {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 7px;
+    white-space: nowrap;
+    font-family: 'Avenir Next', Avenir, 'Nunito Sans', var(--font-sans);
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: -0.01em;
+    /* El mockup usa #214478, que no está en la paleta. Azul profundo es el
+       valor de la paleta más cercano y sube el contraste. */
+    color: var(--color-blue-deep);
+    transition: font-size var(--dur-mid) var(--ease-out);
+  }
+  .cabecera[data-comprimida] .lockup {
+    font-size: 22px;
+  }
+  .lockup-1 {
+    font-weight: var(--weight-regular);
+  }
+  .lockup-2 {
+    font-weight: var(--weight-semibold);
+  }
+
+  /* ------------------------------- navegación -------------------------------- */
+
+  /* Seis ítems, el logo con el nombre escrito y el botón de agendar en la misma
+     fila piden más ancho que la cabecera anterior, cuyo logo era la mitad de
+     ancho. Por eso el menú completo aparece recién en 1280 px y no en 1100:
+     debajo de eso, hamburguesa. */
+  .nav-escritorio {
+    display: none;
+    align-items: center;
+    gap: 14px;
+    white-space: nowrap;
+  }
+  /* 14 px, el piso de la escala tipográfica. El diseño usa 15, pero con cinco
+     ítems cortos; con los seis del cliente y el logo escrito, a 15 px la fila
+     quedaba llena al milímetro —y en un Mac, donde Avenir Next existe de
+     verdad, el nombre mide más que con la tipografía de reemplazo y se
+     desbordaba—. A 14 px sobran unos 40 px, que es el margen para que un
+     séptimo ítem no rompa nada. */
+  .nav-item {
+    font-size: var(--text-caption);
+    font-weight: var(--weight-medium);
+    color: var(--color-ink);
+    text-decoration: none;
+    padding: 6px 0;
+    border-bottom: var(--border-width-emph) solid transparent;
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+  .nav-item:hover {
+    color: var(--color-blue);
+  }
+  .nav-item[aria-current='page'] {
+    color: var(--color-blue);
+    border-bottom-color: var(--color-blue);
+  }
+
+  .acciones {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+  .solo-escritorio {
+    display: none;
+  }
+  /* El botón encoge con la cabecera. Boton.astro pone los tamaños en variables
+     inline, pero las propiedades que las consumen viven en su hoja: se pueden
+     ganar por especificidad, sin !important. */
+  .cabecera[data-comprimida] .acciones :global(.btn) {
+    min-height: 40px;
+    padding-inline: 16px;
+    font-size: var(--text-body-sm);
+  }
+
+  .hamburguesa {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--touch-min);
+    height: var(--touch-min);
+    background: none;
+    border: 0;
+    cursor: pointer;
+    color: var(--color-ink);
+  }
+  .hamburguesa:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: var(--focus-offset);
+    border-radius: var(--radius-sm);
+  }
+  .hamburguesa :global(.icono-cerrar) {
+    display: none;
+  }
+  .hamburguesa[aria-expanded='true'] :global(.icono-abrir) {
+    display: none;
+  }
+  .hamburguesa[aria-expanded='true'] :global(.icono-cerrar) {
+    display: inline-block;
+  }
+
+  /* ------------------------------- menú móvil -------------------------------- */
+
+  .menu-movil {
+    border-top: var(--border-width) solid var(--color-line);
+    box-shadow: var(--shadow-2);
+    padding-block: 4px 24px;
+    background: var(--color-white);
+  }
+  .movil-item {
+    display: block;
+    font-size: var(--text-body);
+    font-weight: var(--weight-medium);
+    color: var(--color-ink);
+    text-decoration: none;
+    padding: 14px 0;
+    border-bottom: var(--border-width) solid var(--color-line);
+  }
+  .movil-item[aria-current='page'] {
+    color: var(--color-blue);
+  }
+  .movil-cta {
+    margin-top: var(--space-5);
+  }
+  .movil-nota {
+    margin-top: var(--space-3);
+    font-size: var(--text-body-sm);
+    color: var(--color-gray);
+  }
+
+  @media (min-width: 1280px) {
+    .utilidad {
+      display: block;
+    }
+    .nav-escritorio,
+    .solo-escritorio {
+      display: flex;
+    }
+    .hamburguesa,
+    .menu-movil {
+      display: none;
+    }
+  }
+</style>

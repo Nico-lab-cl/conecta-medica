@@ -1,0 +1,107 @@
+---
+/* Barra de acciones fija al pie, solo en móvil. Viene del artboard de 390 px de
+   `Conectamedica v3 - Portada.dc.html`.
+
+   Cuatro destinos, con "agendar" destacado. El cuarto es WhatsApp cuando hay
+   número cargado; mientras no lo haya, es contacto. No se pinta un botón de
+   WhatsApp que lleve a un número inventado —la misma regla de
+   BotonWhatsApp.astro—, pero tampoco se deja el hueco: el destino existe.
+
+   Es `fixed`, no `sticky`: sticky depende de dónde caiga el elemento en el
+   flujo y de qué antepasado tenga overflow. Un `.espaciador` del mismo alto
+   evita que la barra tape el final del pie. */
+import Icono from '../core/Icono.astro';
+import { RUTAS } from '../../lib/rutas';
+import { ajustes } from '../../lib/contenido';
+import { enlaceWhatsApp } from '../../lib/whatsapp';
+
+const { whatsapp } = await ajustes();
+const wa = enlaceWhatsApp(whatsapp, 'inicio');
+
+const items = [
+  { label: 'Prestaciones', href: RUTAS.prestaciones, icono: 'stethoscope', externo: false },
+  { label: 'Telemedicina', href: RUTAS.telemedicina, icono: 'video', externo: false },
+  wa
+    ? { label: 'WhatsApp', href: wa, icono: 'whatsapp', externo: true }
+    : { label: 'Contacto', href: RUTAS.contacto, icono: 'message-circle', externo: false },
+];
+---
+
+<div class="espaciador" aria-hidden="true"></div>
+
+<nav class="barra" aria-label="Acciones rápidas">
+  <a class="item" href={items[0]!.href}>
+    <Icono nombre={items[0]!.icono} tam={20} color="var(--color-blue)" />
+    {items[0]!.label}
+  </a>
+  <a class="item" href={items[1]!.href}>
+    <Icono nombre={items[1]!.icono} tam={20} color="var(--color-blue)" />
+    {items[1]!.label}
+  </a>
+  <a class="item item-destacado" href={RUTAS.agendar}>
+    <Icono nombre="calendar" tam={20} color="#fff" />
+    Solicitar hora
+  </a>
+  <a
+    class="item"
+    href={items[2]!.href}
+    target={items[2]!.externo ? '_blank' : undefined}
+    rel={items[2]!.externo ? 'noopener noreferrer' : undefined}
+  >
+    <Icono nombre={items[2]!.icono} tam={20} color="var(--color-blue)" />
+    {items[2]!.label}
+  </a>
+</nav>
+
+<style>
+  .barra,
+  .espaciador {
+    display: none;
+  }
+
+  @media (max-width: 1279px) {
+    .espaciador {
+      display: block;
+      height: calc(60px + env(safe-area-inset-bottom, 0px));
+    }
+    .barra {
+      position: fixed;
+      inset-inline: 0;
+      bottom: 0;
+      z-index: 40;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1.4fr 1fr;
+      align-items: stretch;
+      background: var(--color-white);
+      border-top: var(--border-width) solid var(--color-line);
+      box-shadow: 0 -2px 12px rgba(10, 43, 94, 0.1);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+  }
+
+  .item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    min-height: 60px;
+    padding: 8px 4px;
+    font-size: 12px;
+    line-height: 1.2;
+    font-weight: var(--weight-medium);
+    color: var(--color-ink);
+    text-align: center;
+    text-decoration: none;
+  }
+  .item-destacado {
+    background: var(--color-blue);
+    color: var(--color-white);
+    font-size: 12.5px;
+    font-weight: var(--weight-semibold);
+  }
+  .item:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: -2px;
+  }
+</style>

@@ -1,7 +1,18 @@
 ---
+/* Armazón de todas las páginas.
+
+   Desde el 2026-09-08 monta la cabecera de v3 —franja de utilidad, cabecera
+   pegada que encoge, logo con el nombre en texto— y, en móvil, la barra de
+   acciones fija al pie. Es la decisión de tomar v3 como diseño del sitio
+   completo; Encabezado.astro, la cabecera anterior, quedó en el historial.
+
+   Ya no existe `heroSuelto`. Esa propiedad servía para montar la cabecera
+   transparente encima de un hero a pantalla completa; la cabecera de v3 es
+   siempre sólida y el contenido empieza debajo, como en el diseño. */
 import '../styles/global.css';
 import Meta from '../components/seo/Meta.astro';
-import Encabezado from '../components/navigation/Encabezado.astro';
+import CabeceraV3 from '../components/v3/CabeceraV3.astro';
+import BarraMovilV3 from '../components/v3/BarraMovilV3.astro';
 import PieDeSitio from '../components/navigation/PieDeSitio.astro';
 import { ajustes, pais } from '../lib/contenido';
 import { clinicaJsonLd, migasJsonLd } from '../lib/schema';
@@ -16,8 +27,6 @@ interface Props {
   migas?: Miga[];
   jsonLd?: unknown[];
   imagenOg?: string | undefined;
-  /** La página abre con un hero a pantalla completa: la cabecera va encima. */
-  heroSuelto?: boolean;
 }
 
 const {
@@ -29,7 +38,6 @@ const {
   migas = [],
   jsonLd = [],
   imagenOg,
-  heroSuelto = false,
 } = Astro.props;
 
 const a = await ajustes();
@@ -61,10 +69,11 @@ if (migas.length > 1) bloques.push(migasJsonLd(migas, sitio));
   </head>
   <body>
     <a class="salto-contenido" href="#contenido">Saltar al contenido</a>
-    <Encabezado actual={actual} sobreHero={heroSuelto} />
+    <CabeceraV3 actual={actual} />
     <main id="contenido">
       <slot />
     </main>
     <PieDeSitio />
+    <BarraMovilV3 />
   </body>
 </html>

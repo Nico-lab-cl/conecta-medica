@@ -26,10 +26,7 @@ export default defineConfig({
     mdx(),
     markdoc(),
     sitemap({
-      // /v2/ es la portada comercial en evaluación: lleva noindex, así que
-      // dejarla en el sitemap sería mandarle a Google dos señales opuestas.
-      filter: (page) =>
-        !page.includes('/admin') && !page.includes('/keystatic') && !page.includes('/v2'),
+      filter: (page) => !page.includes('/admin') && !page.includes('/keystatic'),
       i18n: { defaultLocale: 'es', locales: { es: 'es-CL' } },
     }),
   ],

@@ -1,0 +1,345 @@
+---
+/* Buscador de la portada v3.
+
+   En el mockup es estado de React sobre un catálogo escrito a mano. Acá el
+   catálogo se arma en el build desde el contenido publicado —prestaciones,
+   preguntas que ya pasaron revisión, y los destinos fijos del sitio—, así que
+   nunca ofrece un resultado que no exista. El filtrado en el navegador son
+   ~30 líneas sin framework: montar React para esto se comería la mitad del
+   presupuesto de 60 KB de JavaScript.
+
+   Dos diferencias deliberadas con el mockup:
+
+   1. Los chips de "lo más buscado" son enlaces, no botones que rellenan el
+      campo. Rellenar un campo de búsqueda para que el visitante después elija
+      el único resultado es un paso de más; el enlace lo lleva directo. Y sin
+      JavaScript siguen funcionando.
+   2. El estado vacío no manda a WhatsApp, porque todavía no hay número
+      cargado. Manda a contacto, que sí existe. */
+import Icono from '../core/Icono.astro';
+import { RUTAS } from '../../lib/rutas';
+import { serviciosActivos, faqsPublicables, ajustes, precioCLP } from '../../lib/contenido';
+
+const a = await ajustes();
+const servicios = await serviciosActivos();
+const faqs = await faqsPublicables();
+
+type Entrada = { t: string; k: string; href: string };
+
+const catalogo: Entrada[] = [
+  { t: 'Conecta Hematología', k: 'UNIDAD', href: RUTAS.unidad },
+  ...servicios.map((s) => ({
+    t: s.data.nombre,
+    k: 'PRESTACIÓN',
+    href: RUTAS.prestacion(s.data.slug),
+  })),
+  { t: 'Telemedicina en todo Chile', k: 'MODALIDAD', href: RUTAS.telemedicina },
+  {
+    t: `Precio de la consulta particular · ${precioCLP(a.precioConsulta)}`,
+    k: 'PRECIOS',
+    href: RUTAS.precios,
+  },
+  { t: 'Solicitar una hora', k: 'AGENDA', href: RUTAS.agendar },
+  { t: 'Cómo llegar', k: 'CONTACTO', href: RUTAS.contacto },
+  { t: 'Información para pacientes', k: 'PACIENTES', href: RUTAS.pacientes },
+  ...faqs.map((f) => ({
+    t: f.data.pregunta,
+    k: 'PREGUNTA',
+    href: `${RUTAS.preguntas}#${f.data.slug}`,
+  })),
+];
+
+/* Los cuatro atajos salen del mismo catálogo, en este orden de preferencia, y
+   solo si la entrada existe. Si mañana una pregunta se despublica, el chip
+   desaparece con ella en vez de quedar apuntando a un ancla muerta. */
+const preferidos = [
+  'cuanto-cuesta-la-consulta',
+  'que-llevar-a-la-consulta',
+  'necesito-derivacion',
+  'como-funciona-la-telemedicina',
+  'atienden-fonasa-o-isapre',
+];
+const chips = preferidos
+  .map((slug) => faqs.find((f) => f.data.slug === slug))
+  .filter((f) => f !== undefined)
+  .slice(0, 4)
+  .map((f) => ({ t: f.data.pregunta, href: `${RUTAS.preguntas}#${f.data.slug}` }));
+---
+
+<div class="buscador">
+  <form class="campo" action={RUTAS.preguntas} method="get" role="search">
+    <label class="rotulo" for="q-portada">¿Qué necesitas?</label>
+    <div class="caja">
+      <Icono nombre="search" tam={20} color="var(--color-blue)" />
+      <input
+        id="q-portada"
+        name="q"
+        type="search"
+        autocomplete="off"
+        placeholder="Busca una prestación, un examen o una pregunta"
+        aria-describedby="q-ayuda"
+      />
+    </div>
+    <p id="q-ayuda" class="visualmente-oculto">
+      Los resultados aparecen bajo el campo a medida que escribes.
+    </p>
+    <div
+      class="resultados"
+      id="q-resultados"
+      data-contacto={RUTAS.contacto}
+      hidden
+      aria-live="polite"
+    >
+    </div>
+  </form>
+
+  <span class="division" aria-hidden="true"></span>
+
+  <div class="atajos">
+    <span class="rotulo tenue">Lo más buscado</span>
+    <div class="chips">
+      {chips.map((c) => <a class="chip" href={c.href}>{c.t}</a>)}
+    </div>
+  </div>
+</div>
+
+<script type="application/json" id="q-catalogo" set:html={JSON.stringify(catalogo)} is:inline
+></script>
+
+<script>
+  const campo = document.getElementById('q-portada') as HTMLInputElement | null;
+  const salida = document.getElementById('q-resultados');
+  const datos = document.getElementById('q-catalogo');
+
+  if (campo && salida && datos) {
+    const catalogo: { t: string; k: string; href: string }[] = JSON.parse(datos.textContent ?? '[]');
+    const forma = campo.form;
+    const contacto = salida.dataset.contacto ?? '/contacto/';
+
+    /* Sin acentos y en minúsculas: quien escribe "anemia" desde el teléfono no
+       tiene por qué acertarle a la tilde de "interpretación". */
+    const plano = (s: string) =>
+      s
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/\p{Diacritic}/gu, '');
+
+    const indice = catalogo.map((e) => ({ ...e, plano: plano(e.t) }));
+
+    const escapar = (s: string) =>
+      s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+    const pintar = () => {
+      const q = plano(campo.value.trim());
+      if (!q) {
+        salida.hidden = true;
+        salida.innerHTML = '';
+        return;
+      }
+      const hallados = indice.filter((e) => e.plano.includes(q)).slice(0, 6);
+      salida.hidden = false;
+      salida.innerHTML = hallados.length
+        ? hallados
+            .map(
+              (e) =>
+                `<a class="resultado" href="${escapar(e.href)}"><span>${escapar(e.t)}</span><span class="clase">${escapar(e.k)}</span></a>`,
+            )
+            .join('')
+        : `<p class="vacio">No encontramos nada con esas palabras. <a href="${escapar(contacto)}">Escríbenos</a> y te decimos si es algo que atendemos.</p>`;
+    };
+
+    campo.addEventListener('input', pintar);
+    campo.addEventListener('focus', pintar);
+
+    /* Con JavaScript el formulario no se envía: los resultados ya están abajo.
+       Sin JavaScript, enviar lleva a las preguntas frecuentes, que es la página
+       del sitio que responde. */
+    forma?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      pintar();
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!forma?.contains(e.target as Node)) salida.hidden = true;
+    });
+    campo.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') salida.hidden = true;
+    });
+  }
+</script>
+
+<style>
+  .buscador {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    background: var(--surface-card);
+    border: var(--border-width) solid var(--color-line);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-1);
+    padding: 24px 20px;
+  }
+
+  .campo {
+    flex: 1;
+    position: relative;
+    min-width: 0;
+  }
+
+  .rotulo {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-ink);
+  }
+  .rotulo.tenue {
+    color: var(--color-gray);
+  }
+
+  .caja {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-top: 10px;
+    height: 48px;
+    padding-inline: 14px;
+    border: var(--border-width) solid var(--border-control);
+    border-radius: var(--radius-md);
+    background: var(--color-white);
+  }
+  .caja:focus-within {
+    border-color: var(--color-blue);
+    outline: var(--focus-ring);
+    outline-offset: 1px;
+  }
+  .caja input {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    outline: none;
+    background: transparent;
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    color: var(--color-ink);
+  }
+  .caja input::placeholder {
+    color: var(--color-gray);
+  }
+  /* La cruz nativa de Safari se pisa con el borde de la caja. */
+  .caja input::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+  }
+
+  .resultados {
+    position: absolute;
+    inset-inline: 0;
+    top: 100%;
+    margin-top: var(--space-2);
+    z-index: 6;
+    background: var(--surface-card);
+    border: var(--border-width) solid var(--color-line);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-2);
+    padding: var(--space-2);
+  }
+  .resultados :global(.resultado) {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-4);
+    padding: 12px 14px;
+    border-radius: var(--radius-md);
+    color: var(--color-ink);
+    font-size: var(--text-body-sm);
+    font-weight: var(--weight-medium);
+    line-height: 1.35;
+    text-decoration: none;
+  }
+  .resultados :global(.resultado:hover) {
+    background: var(--surface-alt);
+  }
+  .resultados :global(.clase) {
+    flex: none;
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    font-weight: var(--weight-regular);
+    letter-spacing: 0.08em;
+    color: var(--color-gray);
+  }
+  .resultados :global(.vacio) {
+    margin: 0;
+    padding: 14px;
+    font-size: var(--text-body-sm);
+    line-height: 1.55;
+    color: var(--color-gray);
+  }
+  .resultados :global(.vacio a) {
+    color: var(--text-link);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    font-weight: var(--weight-medium);
+  }
+
+  .division {
+    display: none;
+    width: 1px;
+    align-self: center;
+    height: 60px;
+    background: var(--color-line);
+  }
+
+  .atajos {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    min-height: 36px;
+    padding-inline: 14px;
+    border-radius: var(--radius-pill);
+    border: var(--border-width) solid #d3e1f6;
+    background: var(--surface-alt);
+    color: var(--color-blue-deep);
+    font-size: var(--text-caption);
+    font-weight: var(--weight-medium);
+    line-height: 1.2;
+    text-decoration: none;
+  }
+  .chip:hover {
+    border-color: var(--color-blue);
+  }
+
+  .visualmente-oculto {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  @media (min-width: 900px) {
+    .buscador {
+      flex-direction: row;
+      align-items: center;
+      gap: 28px;
+      padding: 24px 28px;
+    }
+    .division {
+      display: block;
+    }
+    .atajos {
+      flex: none;
+      max-width: 460px;
+    }
+  }
+</style>
