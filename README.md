@@ -79,9 +79,8 @@ scripts/presupuesto.mjs  presupuesto de rendimiento y de honestidad
 
 Fases 1 a 4 construidas. El repositorio ya está en GitHub.
 
-**Despliegue: Worker de Cloudflare con assets estáticos** (no Pages). La
-configuración está en `wrangler.jsonc` y `npm run deploy` hace build y publica.
-En Cloudflare, el Worker tiene que tener el comando de build en `npm run build`:
-sin él no se genera `dist/` y `wrangler deploy` no encuentra ni el punto de
-entrada ni los assets. Lo que falta —dominio, DNS, correo y variables de
-entorno— está en [docs/dns-checklist.md](docs/dns-checklist.md).
+**Despliegue: Worker de Cloudflare con assets estáticos** (no Pages). Todo está
+en `wrangler.jsonc`, incluido el comando de build, así que `wrangler deploy`
+construye y publica en un solo paso y no hay forma de subir algo sin compilar.
+Lo que falta —dominio, DNS, correo y variables de entorno— está en
+[docs/dns-checklist.md](docs/dns-checklist.md).

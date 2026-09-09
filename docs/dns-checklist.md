@@ -91,13 +91,17 @@ La configuración vive en `wrangler.jsonc`, en la raíz del repositorio. El `nam
 de ese archivo tiene que ser **exactamente** el del Worker que tiene enganchado
 el dominio: si no coinciden, el despliegue falla o publica en otro Worker.
 
+El build va dentro de `wrangler.jsonc`, en `build.command`, y no en el campo del
+panel. Es a propósito: los dos primeros intentos de despliegue fallaron porque
+el panel saltaba de instalar dependencias a desplegar sin construir nada. Con el
+build amarrado a la configuración, `wrangler deploy` no puede publicar sin haber
+construido antes, venga de Cloudflare o de un computador.
+
 - [x] Repositorio creado en GitHub y el proyecto empujado
-- [x] `wrangler.jsonc` en el repositorio, con el punto de entrada y los assets
+- [x] `wrangler.jsonc` con el punto de entrada, los assets y el comando de build
 - [ ] Worker conectado al repositorio (Workers → Builds)
-- [ ] **Comando de build: `npm run build`.** Sin esto no se genera `dist/` y el
-      despliegue falla con *"Missing entry-point to Worker script or to assets
-      directory"*, que fue el error del primer intento
-- [ ] Comando de despliegue: `npx wrangler deploy`
+- [ ] Comando de despliegue: `npx wrangler deploy` (el de por defecto; el campo
+      de build puede quedar vacío)
 - [ ] Versión de Node fijada en 22 o superior
 - [ ] Dominio `conectamedica.com` asignado al proyecto
 - [ ] **Una sola canónica.** Recomendación: `conectamedica.com` sin www, con una

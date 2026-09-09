@@ -20,6 +20,19 @@
   "name": "conecta-medica",
   "main": "./dist/_worker.js/index.js",
 
+  /* Wrangler corre esto antes de desplegar.
+
+     Sin esta línea, `wrangler deploy` da por hecho que `dist/` ya existe. En el
+     panel de Cloudflare hay un campo de "build command" que debería encargarse,
+     pero el despliegue seguía saltando de instalar dependencias a desplegar, y
+     fallaba con "The entry-point file at dist/_worker.js/index.js was not
+     found". Acá el build queda amarrado al despliegue: no hay forma de publicar
+     sin haber construido, ni en Cloudflare ni desde un computador. */
+  "build": {
+    "command": "npm run build"
+  },
+
+
   /* Fecha de compatibilidad del runtime. No conviene adelantarla más allá del
      workerd que trae wrangler: si el runtime del build no la conoce, falla. */
   "compatibility_date": "2026-01-14",
