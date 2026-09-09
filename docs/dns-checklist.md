@@ -71,8 +71,9 @@ propios:
 - [ ] Registro DKIM de Resend agregado (`resend._domainkey`)
 - [ ] SPF ajustado si Resend lo pide. **Cuidado:** no crear un segundo registro
       SPF; hay que agregar el `include` dentro del que ya existe
-- [ ] `RESEND_API_KEY`, `CORREO_DESTINO` y `CORREO_REMITENTE` cargados como
-      variables de entorno en Cloudflare Pages
+- [ ] `RESEND_API_KEY`, `CORREO_DESTINO` y `CORREO_REMITENTE` cargados en el
+      Worker (Settings → Variables and Secrets). `RESEND_API_KEY` va como
+      **Secret**, no como texto plano
 
 Mientras `RESEND_API_KEY` no exista, el formulario responde **503 y no finge que
 envió**. Es deliberado: preferimos un error visible antes que un paciente
@@ -82,9 +83,21 @@ convencido de que pidió hora.
 
 ## 4. Sitio
 
-- [ ] Repositorio creado en GitHub y el proyecto empujado
-- [ ] Proyecto de Cloudflare Pages conectado al repositorio
-- [ ] Comando de build: `npm run build` · Directorio de salida: `dist`
+El sitio se despliega como **Worker de Cloudflare con assets estáticos**, no como
+Pages. Las veinte páginas ya renderizadas se sirven como archivos y el Worker
+solo atiende `/api/contacto`, `/keystatic` y `/_image`.
+
+La configuración vive en `wrangler.jsonc`, en la raíz del repositorio. El `name`
+de ese archivo tiene que ser **exactamente** el del Worker que tiene enganchado
+el dominio: si no coinciden, el despliegue falla o publica en otro Worker.
+
+- [x] Repositorio creado en GitHub y el proyecto empujado
+- [x] `wrangler.jsonc` en el repositorio, con el punto de entrada y los assets
+- [ ] Worker conectado al repositorio (Workers → Builds)
+- [ ] **Comando de build: `npm run build`.** Sin esto no se genera `dist/` y el
+      despliegue falla con *"Missing entry-point to Worker script or to assets
+      directory"*, que fue el error del primer intento
+- [ ] Comando de despliegue: `npx wrangler deploy`
 - [ ] Versión de Node fijada en 22 o superior
 - [ ] Dominio `conectamedica.com` asignado al proyecto
 - [ ] **Una sola canónica.** Recomendación: `conectamedica.com` sin www, con una
@@ -98,7 +111,8 @@ convencido de que pidió hora.
 
 ## 5. Cabeceras de seguridad
 
-Crear `public/_headers` cuando exista el proyecto en Cloudflare:
+Crear `public/_headers`. Los assets estáticos del Worker lo respetan igual que
+Pages:
 
 ```
 /*

@@ -1,0 +1,42 @@
+/* Configuración de despliegue en Cloudflare Workers.
+
+   El proyecto se conectó a Cloudflare como Worker (no como Pages), y el comando
+   de despliegue es `npx wrangler deploy`. Wrangler necesita saber dos cosas que
+   hasta ahora no estaban en el repositorio: dónde está el código del servidor y
+   dónde están los archivos estáticos. Sin este archivo el build falla con
+   "Missing entry-point to Worker script or to assets directory".
+
+   Las dos rutas las genera `npm run build` con @astrojs/cloudflare:
+
+     dist/_worker.js/index.js   el Worker: /api/contacto, /keystatic y /_image
+     dist/                      las veinte páginas ya renderizadas, más las
+                                imágenes, los íconos y los videos
+
+   OJO CON `name`: tiene que ser exactamente el nombre del Worker que ya existe
+   en Cloudflare, el que tiene enganchado el dominio. Si no coinciden, el
+   despliegue falla o publica en un Worker nuevo y vacío. */
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "conecta-medica",
+  "main": "./dist/_worker.js/index.js",
+
+  /* Fecha de compatibilidad del runtime. No conviene adelantarla más allá del
+     workerd que trae wrangler: si el runtime del build no la conoce, falla. */
+  "compatibility_date": "2026-01-14",
+
+  /* Astro y sus dependencias usan APIs de Node (node:path, node:buffer) tanto
+     en el renderizado como en el endpoint del formulario. */
+  "compatibility_flags": ["nodejs_compat"],
+
+  /* Los estáticos se sirven antes que el Worker, así que las páginas ya
+     renderizadas no gastan invocación. Wrangler excluye solo `_worker.js` de la
+     subida; `_redirects` sí se aplica, y con él sigue vivo /admin → /keystatic. */
+  "assets": {
+    "binding": "ASSETS",
+    "directory": "./dist"
+  },
+
+  "observability": {
+    "enabled": true
+  }
+}

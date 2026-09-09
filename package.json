@@ -8,7 +8,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
-    "presupuesto": "node scripts/presupuesto.mjs"
+    "presupuesto": "node scripts/presupuesto.mjs",
+    "deploy": "astro build && wrangler deploy"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^12.6.13",
@@ -32,6 +33,7 @@
     "@types/react-dom": "^19.2.1",
     "potrace": "^2.1.8",
     "sharp": "^0.34.4",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "wrangler": "4.59.2"
   }
 }
