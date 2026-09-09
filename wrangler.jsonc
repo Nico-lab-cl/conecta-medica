@@ -42,8 +42,14 @@
   "compatibility_flags": ["nodejs_compat"],
 
   /* Los estáticos se sirven antes que el Worker, así que las páginas ya
-     renderizadas no gastan invocación. Wrangler excluye solo `_worker.js` de la
-     subida; `_redirects` sí se aplica, y con él sigue vivo /admin → /keystatic. */
+     renderizadas no gastan invocación.
+
+     Wrangler NO excluye el código del servidor por su cuenta: qué no subir se
+     declara en `public/.assetsignore`, que Astro copia a la raíz de dist/. Sin
+     ese archivo el despliegue se detiene avisando que `_worker.js` quedaría
+     descargable desde internet.
+
+     `_redirects` sí se aplica, y con él sigue vivo /admin → /keystatic. */
   "assets": {
     "binding": "ASSETS",
     "directory": "./dist"

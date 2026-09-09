@@ -1,0 +1,17 @@
+# Qué NO se sube como archivo público del Worker.
+#
+# Wrangler no excluye solo el código del servidor: sin este archivo, el
+# despliegue se detiene con "Uploading a Pages _worker.js directory as an
+# asset. This could expose your private server-side code to the public
+# Internet". Tiene razón en preguntarlo.
+#
+# Vive en public/ porque dist/ se regenera en cada build, y Astro copia todo
+# lo de public/ a la raíz de dist/, que es donde Wrangler lo busca.
+
+# El Worker. Ya entra por "main" en wrangler.jsonc; subirlo además como archivo
+# público dejaría el código del servidor descargable.
+_worker.js
+
+# Enrutamiento de Cloudflare Pages. Acá no es Pages, así que no lo lee nadie:
+# servirlo solo publicaría el mapa de rutas del sitio.
+_routes.json
