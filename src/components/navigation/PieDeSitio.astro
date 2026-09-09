@@ -11,10 +11,14 @@
      · "Lunes a viernes 09:00–18:00"    → contradice el horario real
                                           (martes, miércoles, viernes y sábado)
    Todo eso sale ahora del contenido, no del componente. Lo que no existe
-   todavía (teléfono, WhatsApp) simplemente no se renderiza. */
+   todavía (teléfono, WhatsApp) simplemente no se renderiza.
+
+   CAMBIO PEDIDO POR EL CLIENTE (2026-09-08): salen del pie el hilo de cierre y
+   el aviso de urgencias, para que el pie quede como el del diseño v3 —tres
+   columnas y la línea legal, nada más—. El aviso de urgencias no desaparece del
+   sitio: sigue en agendar, contacto, telemedicina y preguntas frecuentes, que
+   son las páginas donde alguien puede estar decidiendo si esperar una hora. */
 import Logo from '../brand/Logo.astro';
-import Icono from '../core/Icono.astro';
-import Hilo from '../brand/Hilo.astro';
 import { RUTAS } from '../../lib/rutas';
 import { ajustes, pais, horarioLegible, precioCLP } from '../../lib/contenido';
 
@@ -25,10 +29,6 @@ const anio = new Date().getFullYear();
 ---
 
 <footer class="pie">
-  <div class="hilo-cierre" aria-hidden="true">
-    <Hilo nodos={3} animar={false} />
-  </div>
-
   <div class="contenedor rejilla">
     <div>
       {/* Ya no hace falta la placa blanca detrás: existe una versión monocroma
@@ -68,14 +68,6 @@ const anio = new Date().getFullYear();
     </div>
   </div>
 
-  <div class="contenedor aviso">
-    <Icono nombre="triangle-alert" tam={20} color="#F0B4A4" style="margin-top:2px" />
-    <p>
-      <b>{a.avisoUrgencias.titulo}.</b>
-      {a.avisoUrgencias.cuerpo}
-    </p>
-  </div>
-
   <div class="contenedor legal">
     <span>© {anio} {a.razonSocial}</span>
     <nav aria-label="Legal">
@@ -91,15 +83,11 @@ const anio = new Date().getFullYear();
     background: var(--surface-footer);
     color: #fff;
   }
-  .hilo-cierre {
-    padding-block: 0 var(--space-10);
-    padding-inline: var(--margin-x);
-    opacity: 0.5;
-  }
+  /* El espacio superior lo daba el hilo de cierre; sin él lo toma la rejilla. */
   .rejilla {
     display: grid;
     gap: var(--space-10);
-    padding-block: 0 var(--space-8);
+    padding-block: var(--space-16) var(--space-8);
   }
   @media (min-width: 768px) {
     .rejilla {
@@ -165,22 +153,6 @@ const anio = new Date().getFullYear();
     outline: 2px solid #fff;
     outline-offset: 2px;
     border-radius: 2px;
-  }
-
-  .aviso {
-    display: flex;
-    gap: 12px;
-    padding-block: var(--space-6);
-    border-top: 1px solid rgba(255, 255, 255, 0.18);
-  }
-  .aviso p {
-    font-size: var(--text-body-sm);
-    line-height: 1.6;
-    color: #d6e3f7;
-    max-width: 78ch;
-  }
-  .aviso b {
-    color: #f0b4a4;
   }
 
   .legal {
