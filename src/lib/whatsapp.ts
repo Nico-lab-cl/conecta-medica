@@ -34,6 +34,36 @@ const MENSAJES: Record<OrigenWhatsApp, string> = {
     'Hola, vengo de la información para pacientes de Clínica Conecta y necesito orientación.',
 };
 
+/* El globo flotante vive en el armazón, así que aparece en todas las páginas y
+   no sabe por sí mismo de cuál. Esta tabla se lo dice a partir de la ruta, para
+   que siga cumpliendo la regla 1: quien contesta tiene que saber de entrada de
+   qué se trata. Sin esto, las veinte páginas mandarían el mismo mensaje.
+
+   El orden importa: la prestación individual tiene que evaluarse antes que la
+   unidad, porque su ruta empieza igual. */
+const ORIGEN_POR_RUTA: ReadonlyArray<readonly [string, OrigenWhatsApp]> = [
+  ['/conecta-hematologia/prestaciones/', 'prestacion'],
+  ['/conecta-hematologia/', 'unidad'],
+  ['/informacion-para-pacientes/', 'recursos'],
+  ['/preguntas-frecuentes/', 'preguntas'],
+  ['/telemedicina/', 'telemedicina'],
+  ['/contacto/', 'contacto'],
+  ['/agendar/', 'agendar'],
+  ['/precios/', 'precios'],
+];
+
+/**
+ * Origen del mensaje según la ruta. Las páginas sin mensaje propio —conócenos,
+ * equipo, legales, 404— caen en 'inicio', cuyo texto sirve para cualquiera:
+ * dice que la persona viene de la web y que quiere agendar.
+ */
+export function origenDesdeRuta(ruta: string): OrigenWhatsApp {
+  for (const [prefijo, origen] of ORIGEN_POR_RUTA) {
+    if (ruta.startsWith(prefijo)) return origen;
+  }
+  return 'inicio';
+}
+
 /** Deja solo dígitos: wa.me no acepta espacios, signos ni paréntesis. */
 function normalizarNumero(numero: string): string {
   return numero.replace(/\D/g, '');

@@ -14,6 +14,7 @@ import Meta from '../components/seo/Meta.astro';
 import CabeceraV3 from '../components/v3/CabeceraV3.astro';
 import BarraMovilV3 from '../components/v3/BarraMovilV3.astro';
 import PieDeSitio from '../components/navigation/PieDeSitio.astro';
+import GloboWhatsApp from '../components/actions/GloboWhatsApp.astro';
 import { ajustes, pais } from '../lib/contenido';
 import { clinicaJsonLd, migasJsonLd } from '../lib/schema';
 import type { Miga } from '../lib/rutas';
@@ -75,5 +76,8 @@ if (migas.length > 1) bloques.push(migasJsonLd(migas, sitio));
     </main>
     <PieDeSitio />
     <BarraMovilV3 />
+    {/* Recibe la ruta para que el mensaje precargado diga de qué página viene
+        la persona; el globo vive acá, así que por sí solo no lo sabría. */}
+    <GloboWhatsApp ruta={ruta} />
   </body>
 </html>

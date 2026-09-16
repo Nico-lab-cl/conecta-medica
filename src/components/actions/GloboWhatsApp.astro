@@ -1,0 +1,117 @@
+---
+/* El globo de WhatsApp: botón redondo fijo en la esquina inferior derecha.
+
+   Convive con `BotonWhatsApp.astro` sin repetirlo. Son dos trabajos distintos:
+   el botón inline es una acción dentro de la lectura —al final de una
+   prestación, junto al precio— y el globo es el atajo permanente, el que la
+   gente ya busca en esa esquina sin pensarlo.
+
+   TRES DECISIONES QUE NO SON OBVIAS:
+
+   1. NO USA EL VERDE DE WHATSAPP. El #25D366 de la marca deja el glifo blanco
+      en 1,97:1, muy por debajo del 3:1 que WCAG pide para un ícono que ES el
+      control. Va en #0f7a46, que da 5,4:1 y es el mismo verde que ya usan los
+      botones inline del sitio. Se reconoce igual: la forma del glifo y la
+      posición hacen el trabajo que haría el tono exacto.
+
+   2. EN MÓVIL NO EXISTE. Bajo 1280 px hay una barra de acciones fija al pie, y
+      su cuarto ítem YA es WhatsApp en cuanto hay número cargado —lo arma
+      `BarraMovilV3.astro` con el mismo `enlaceWhatsApp`—. La primera versión de
+      este globo se subía por encima de la barra para no taparla, y quedaban dos
+      botones de WhatsApp a 13 px uno del otro, en la misma esquina: medido en
+      el navegador a 375 px. Eso no se lee como dos atajos, se lee como un
+      error. En móvil manda la barra, que es la superficie de acciones del
+      sitio; el globo aparece desde 1280 px, que es justo donde la barra
+      desaparece.
+
+   3. NO RENDERIZA NADA SIN NÚMERO REAL. `enlaceWhatsApp` devuelve null mientras
+      `site.json` tenga `whatsapp: null`, y acá eso significa no pintar el
+      globo. Un globo que abre WhatsApp con un número inventado, en un sitio de
+      salud, es peor que no tener globo. */
+import Icono from '../core/Icono.astro';
+import { enlaceWhatsApp, origenDesdeRuta } from '../../lib/whatsapp';
+import { ajustes } from '../../lib/contenido';
+
+interface Props {
+  ruta: string;
+}
+const { ruta } = Astro.props;
+
+const { whatsapp } = await ajustes();
+const href = enlaceWhatsApp(whatsapp, origenDesdeRuta(ruta));
+---
+
+{
+  href && (
+    <a
+      class="globo"
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="Escribir por WhatsApp a Clínica Conecta"
+    >
+      <Icono nombre="whatsapp" tam={30} color="#fff" />
+    </a>
+  )
+}
+
+<style>
+  .globo {
+    /* Oculto por defecto: sólo aparece cuando la barra móvil ya no está. */
+    display: none;
+    position: fixed;
+    z-index: 45;
+    right: max(16px, env(safe-area-inset-right, 0px));
+    bottom: 24px;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-pill);
+    background: #0f7a46;
+    box-shadow:
+      0 4px 14px rgba(6, 24, 54, 0.26),
+      0 1px 3px rgba(6, 24, 54, 0.18);
+    text-decoration: none;
+    transition:
+      background-color var(--dur-fast) var(--ease-out),
+      transform var(--dur-fast) var(--ease-out);
+  }
+
+  /* 1280 px es exactamente el punto donde BarraMovilV3 deja de mostrarse. Si
+     ese corte cambia allá, tiene que cambiar acá: son la misma decisión. */
+  @media (min-width: 1280px) {
+    .globo {
+      display: flex;
+    }
+  }
+
+  .globo:hover {
+    background: #0b5f36;
+    transform: translateY(-2px);
+  }
+  .globo:active {
+    background: #094d2c;
+    transform: none;
+  }
+  .globo:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: var(--focus-offset);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .globo {
+      transition: background-color var(--dur-fast) var(--ease-out);
+    }
+    .globo:hover {
+      transform: none;
+    }
+  }
+
+  /* En papel un botón flotante es una mancha verde sobre el texto. */
+  @media print {
+    .globo {
+      display: none;
+    }
+  }
+</style>

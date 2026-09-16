@@ -4,7 +4,14 @@
    CAMBIO RESPECTO DEL ORIGINAL: el design system trae un número de ejemplo
    ("56912345678") como valor por defecto. Acá NO hay valor por defecto: si la
    clínica todavía no tiene número configurado, el componente no renderiza nada.
-   Un número falso en un sitio de salud es peor que no tener botón. */
+   Un número falso en un sitio de salud es peor que no tener botón.
+
+   Este botón es SIEMPRE inline: una acción dentro de la lectura. Tenía además
+   una variante "flotante" que ninguna página usó nunca y que sólo cambiaba el
+   radio y la sombra —nunca la posición—, así que no flotaba. El globo fijo de
+   la esquina es ahora `GloboWhatsApp.astro`, que sí se posiciona y se aparta de
+   la barra móvil. Dos nombres para lo mismo era la manera de que el día de
+   mañana alguien arreglara el que no se ve. */
 import Icono from '../core/Icono.astro';
 import { enlaceWhatsApp, type OrigenWhatsApp } from '../../lib/whatsapp';
 import { ajustes } from '../../lib/contenido';
@@ -12,28 +19,25 @@ import { ajustes } from '../../lib/contenido';
 interface Props {
   origen: OrigenWhatsApp;
   tema?: string | undefined;
-  variante?: 'flotante' | 'inline';
   etiqueta?: string;
 }
-const { origen, tema, variante = 'inline', etiqueta = 'Escribir por WhatsApp' } = Astro.props;
+const { origen, tema, etiqueta = 'Escribir por WhatsApp' } = Astro.props;
 
 const { whatsapp } = await ajustes();
 const href = enlaceWhatsApp(whatsapp, origen, tema);
-const flotante = variante === 'flotante';
 ---
 
 {
   href && (
     <a
       class="wa"
-      data-variante={variante}
       href={href}
       target="_blank"
       rel="noopener noreferrer"
       aria-label={etiqueta}
     >
       <Icono nombre="whatsapp" tam={22} color="#fff" />
-      <span>{flotante ? 'WhatsApp' : etiqueta}</span>
+      <span>{etiqueta}</span>
     </a>
   )
 }
@@ -54,11 +58,6 @@ const flotante = variante === 'flotante';
     line-height: 1;
     text-decoration: none;
     transition: background-color var(--dur-fast) var(--ease-out);
-  }
-  .wa[data-variante='flotante'] {
-    padding: 0 20px;
-    border-radius: var(--radius-pill);
-    box-shadow: var(--shadow-1);
   }
   .wa:hover {
     background: #0b5f36;
