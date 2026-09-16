@@ -282,6 +282,10 @@ const SECUENCIA = [
           mismo lugar: entran cuando el estudio hematológico las necesita, y las coordina el mismo
           médico que lleva tu caso.
         </p>
+        <p>
+          Todo lo que se agenda acá es hematología. Si tu motivo de consulta es otro, preferimos
+          decírtelo antes de que tomes la hora.
+        </p>
       </div>
 
       <div class="rejilla-prestaciones">
@@ -602,11 +606,26 @@ const SECUENCIA = [
     height: 100%;
     object-fit: cover;
   }
+  /* El velo usa la misma tinta que el resto del sitio —`--velo-tinta`— en vez
+     de repetir un rgb a mano, que es como las cuatro versiones anteriores
+     terminaron con valores distintos entre sí. */
+  /* En móvil el texto ocupa todo el ancho y cae abajo, así que el velo carga
+     abajo y no a un costado.
+
+     Los tres slides se midieron con las tres fotografías cargadas a la fuerza.
+     Esto importa más de lo que parece: los slides 2 y 3 son `loading="lazy"` y
+     en la primera medición no habían llegado, así que el lienzo estaba en negro
+     y devolvía contrastes de 14:1 —espectaculares y falsos—. Con las fotos de
+     verdad, c-hemograma es la más clara de las tres y es la que manda.
+
+     Valores elegidos entre 64 combinaciones, la que menos oscurece cumpliendo
+     AA con 8 % de margen en los tres slides. El oscurecimiento medio baja de
+     0,841 del velo original a 0,715. */
   .slide-velo {
     background: linear-gradient(
       180deg,
-      rgba(10, 43, 94, 0.62) 0%,
-      rgba(10, 43, 94, 0.94) 62%
+      rgba(var(--velo-tinta), 0.52) 0%,
+      rgba(var(--velo-tinta), 0.78) 50%
     );
   }
 
@@ -626,13 +645,16 @@ const SECUENCIA = [
     letter-spacing: -0.02em;
     color: #fff;
     text-wrap: pretty;
+    text-shadow: var(--sombra-sobre-foto);
   }
   .slide .bajada {
     margin-top: var(--space-4);
     font-size: var(--text-body-lg);
     line-height: 1.6;
-    color: #d6e3f7;
+    /* Con el velo más claro la bajada necesita más luz propia que antes. */
+    color: #e8f0fb;
     max-width: 46ch;
+    text-shadow: var(--sombra-sobre-foto);
   }
   .slide .acciones {
     display: flex;
@@ -712,12 +734,30 @@ const SECUENCIA = [
       align-items: center;
       padding-block: var(--space-16);
     }
+    /* Esta forma no se eligió a ojo. Se compusieron las TRES fotografías del
+       hero con el degradado en el navegador y se midió el contraste sólo donde
+       hay letras, recorriendo 180 combinaciones de paradas y quedándose con la
+       que menos oscurece cumpliendo AA en los tres slides.
+
+       Ganó una meseta: 0,70 plano hasta el 55 % —justo donde termina la columna
+       de texto— y caída a 0,06 en el borde derecho. El oscurecimiento medio baja
+       de 0,633 a 0,556 respecto del velo original, y el lado derecho de la foto
+       queda prácticamente sin velo en vez de al 0,18.
+
+       Un degradado continuo no servía: para sostener la bajada hasta el 55 %
+       tenía que empezar mucho más oscuro a la izquierda. La meseta gasta la
+       opacidad sólo donde hay texto. */
     .slide-velo {
       background: linear-gradient(
         90deg,
-        rgba(10, 43, 94, 0.93) 0%,
-        rgba(10, 43, 94, 0.74) 46%,
-        rgba(10, 43, 94, 0.18) 100%
+        rgba(var(--velo-tinta), 0.7) 0%,
+        rgba(var(--velo-tinta), 0.7) 55%,
+        rgba(var(--velo-tinta), 0.653) 62.5%,
+        rgba(var(--velo-tinta), 0.534) 70.0%,
+        rgba(var(--velo-tinta), 0.38) 77.5%,
+        rgba(var(--velo-tinta), 0.226) 85.0%,
+        rgba(var(--velo-tinta), 0.107) 92.5%,
+        rgba(var(--velo-tinta), 0.06) 100.0%
       );
     }
     .slide .acciones {
@@ -1026,7 +1066,7 @@ const SECUENCIA = [
     position: absolute;
     inset: 0;
     z-index: -1;
-    opacity: 0.26;
+    opacity: 0.34;
   }
   .cierre-foto :global(img) {
     width: 100%;

@@ -2,7 +2,7 @@
    Contrastes verificados sobre blanco (#FFFFFF) y azul nube (#EDF3FC). */
 :root{
 --color-blue:#12489E;        /* azul Conecta — 8.35:1 sobre blanco (AAA) */
---color-blue-deep:#0A2B5E;   /* azul profundo — 13.81:1 sobre blanco (AAA) */
+--color-blue-deep:#16437F;   /* azul profundo — 9.78:1 sobre blanco (AAA) */
 --color-blue-cloud:#EDF3FC;  /* azul nube — fondo, nunca texto */
 --color-ink:#14181D;         /* tinta — 17.82:1 sobre blanco (AAA) */
 --color-gray:#5B646E;        /* gris — 6.01:1 sobre blanco (AA) */

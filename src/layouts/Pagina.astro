@@ -144,28 +144,102 @@ const {
     }
   }
 
-  /* Las migas sobre fotografía necesitan su propia tinta. */
+  /* Las migas y el eyebrow sobre fotografía necesitan su propia tinta.
+
+     Subieron dos escalones, no uno. Contra el velo anterior el celeste #a9c4e8
+     daba 9,8:1; contra el nuevo, 4,0 —bajo AA para texto pequeño—. Midiendo las
+     ocho cabeceras del sitio, el primer ajuste todavía dejaba /conocenos/ en
+     4,13 y /telemedicina/ en 3,70.
+
+     Aclarar la tinta es la palanca barata: gana contraste sin oscurecer un solo
+     píxel de la fotografía, que es justo lo contrario de subir el velo. Lo que
+     se pierde es la jerarquía de color entre eyebrow y titular; se sostiene con
+     tamaño, versalitas y espaciado, que sobre foto funcionan mejor igual. */
   .texto :global(.migas a) {
-    color: #d6e3f7;
+    color: #fff;
   }
   .texto :global(.migas a:hover) {
     color: #fff;
   }
+  /* La miga de la pagina actual no es enlace, asi que no lleva subrayado que
+     la ayude: todo su contraste es color. En /contacto/ y /prestaciones/ se
+     quedaba en 4,4:1. */
   .texto :global(.migas span[aria-current]) {
-    color: #a9c4e8;
+    color: #f2f7fd;
   }
 
+  /* Blanco puro, como el titular. En /contacto/, /prestaciones/ y la
+     prestación de hematología —tres fotografías claras— el celeste se quedaba
+     entre 4,1 y 4,4:1. Blanco da un 11 % más de contraste sin tocar el velo, y
+     el eyebrow no necesita el color para distinguirse: ya lo hacen el cuerpo
+     chico, la versalita y el espaciado de letras. */
   .portada .eyebrow {
-    color: #a9c4e8;
+    color: #fff;
   }
   .portada .titulo {
     color: #fff;
     font-size: clamp(2.15rem, 1.5rem + 2.6vw, 3.6rem);
     line-height: 1.08;
     letter-spacing: -0.02em;
+    text-shadow: var(--sombra-sobre-foto);
   }
   .portada .bajada {
-    color: #dce7f7;
+    color: #f2f7fd;
+    text-shadow: var(--sombra-sobre-foto);
+    /* La medida de prosa —pensada para un párrafo sobre blanco— dejaba la
+       bajada corriendo hasta el 55 % del ancho, fuera de la meseta del velo.
+       En /precios/ eso la hundía a 3,2:1 y subir la meseta no la salvaba: los
+       píxeles que fallaban estaban pasada la meseta, no dentro.
+
+       46ch la devuelve adentro. Es además la medida que ya usa el hero de la
+       portada, y a 1200 px de contenedor la línea pasa de ~110 caracteres a
+       ~46: la cabecera se lee mejor aparte de medir mejor. */
+    max-width: 46ch;
+  }
+
+  /* ---------- en móvil la foto es banda, no fondo ----------
+
+     Medido a 375 px sobre esta misma cabecera: con el texto ocupando todo el
+     ancho —la bajada llega al 90 %—, el velo original daba 1,67:1 en las migas
+     y 1,94:1 en el eyebrow. Es decir: la cabecera en móvil YA incumplía AA
+     antes de tocar nada, y no por poco.
+
+     Buscando un velo vertical que lo arreglara, lo único que pasaba era 0,90 de
+     opacidad sobre el 64 % del alto: oscurecimiento medio 0,758 contra 0,470 de
+     hoy. Arreglar la accesibilidad tapando la fotografía es justo lo contrario
+     de lo que se pidió.
+
+     Así que en móvil el texto deja de ir encima. La fotografía pasa a ser una
+     banda y el texto cae debajo, sobre azul sólido: la foto se ve casi limpia
+     —velo de 0,14, sólo para que no se despegue de la paleta— y el texto queda
+     en 8,5:1 sin depender de qué haya detrás. Es más claro Y accesible, que
+     sobre una foto con una ventana quemada no se podía a la vez.
+
+     En escritorio no hace falta: ahí el texto ocupa la mitad izquierda y la
+     meseta del velo lo sostiene. */
+  @media (max-width: 899px) {
+    .portada {
+      display: grid;
+      grid-template-rows: auto auto;
+      align-items: stretch;
+      min-height: 0;
+    }
+    .fondo {
+      position: relative;
+      inset: auto;
+      aspect-ratio: 16 / 10;
+    }
+    .velo {
+      background: rgba(var(--velo-tinta), 0.14);
+    }
+    .texto {
+      padding-block: var(--space-7) var(--space-9);
+    }
+    /* Sobre azul sólido la sombra ya no defiende de nada y ensucia el trazo. */
+    .portada .titulo,
+    .portada .bajada {
+      text-shadow: none;
+    }
   }
 
   .borde-inferior {

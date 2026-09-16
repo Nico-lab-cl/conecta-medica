@@ -264,8 +264,8 @@ video {
   --text-link: #ffffff;
   --text-link-hover: #d6e3f7;
   --surface-page: var(--color-blue-deep);
-  --surface-alt: #0d3572;
-  --surface-card: #0d3572;
+  --surface-alt: #1d5091;
+  --surface-card: #1d5091;
   --border-hairline: rgba(255, 255, 255, 0.16);
   --border-control: rgba(255, 255, 255, 0.42);
   --action-primary-bg: #ffffff;
@@ -287,7 +287,7 @@ video {
 }
 
 .seccion-oscura .eyebrow {
-  color: #8fb0dc;
+  color: #9dbce4;
 }
 
 /* El botón secundario sobre oscuro necesita su propio borde. */
@@ -368,38 +368,102 @@ video {
    diferencia mirando una pantalla; se nota al recorrer el sitio, como una
    sensación de que algo no termina de cuadrar.
 
-   Ahora es un solo tratamiento, en tres capas con trabajos distintos:
-     · `--velo-pie`      oscurece abajo, donde cae el texto;
-     · `--velo-costado`  carga el lado izquierdo, donde vive el bloque;
-     · `--velo-techo`    una franja corta arriba, para que la cabecera
-                         transparente tenga contraste garantizado.
-   El centro y la derecha quedan casi limpios: ahí se ve la fotografía.
+   Ahora es un solo tratamiento, en dos capas con trabajos distintos:
+     · `--velo-columna`  sostiene la columna donde vive el texto;
+     · `--velo-base`     asienta el borde inferior contra la fotografía.
+   El tercio derecho queda casi limpio: ahí se ve la fotografía.
+
+   Eran tres capas. La tercera, `--velo-techo`, protegía una cabecera
+   transparente sobre la foto; la cabecera v3 es blanca y opaca, así que la capa
+   sólo estaba oscureciendo cuadro sin que nadie leyera nada encima.
    =========================================================================== */
 
 :root {
-  --velo-tinta: 6, 24, 54;
+  /* La tinta del velo es AZUL, no negra. La versión anterior —6, 24, 54— era un
+     azul tan cerrado que sobre la fotografía leía como negro, y eso es lo que
+     hacía sentir oscuro al sitio en vez de azul. Ahora comparte tono con el
+     azul profundo: la foto se tiñe, no se apaga. */
+  --velo-tinta: 22, 67, 127;
 
-  --velo-pie: linear-gradient(
-    to top,
-    rgba(var(--velo-tinta), 0.88) 0%,
-    rgba(var(--velo-tinta), 0.58) 24%,
-    rgba(var(--velo-tinta), 0.1) 56%,
-    rgba(var(--velo-tinta), 0) 78%
-  );
-  --velo-costado: linear-gradient(
+  /* ---------------------------------------------------------------------------
+     POR QUÉ EL VELO TIENE ESTA FORMA, Y POR QUÉ NO SE PUDO ACLARAR MÁS
+
+     El encargo era bajar el contraste. El primer intento fue el obvio —bajarle
+     la opacidad a las tres capas que ya existían— y se midió en el navegador:
+     componiendo cada fotografía real con los degradados y evaluando el
+     contraste píxel a píxel SOLO donde hay letras. Esto último importa: se
+     miden rangos palabra por palabra, no la caja del elemento, porque la caja
+     de un h1 ocupa todo el ancho aunque el texto llegue a la mitad, y medir la
+     caja estaba evaluando trozos de fotografía donde no hay nada escrito.
+
+     Con el velo aligerado la bajada caía a 2,7:1 contra el 4,5:1 que pide AA.
+     La causa no es el degradado sino la fotografía: varias del set tienen una
+     ventana quemada justo detrás del texto.
+
+     Entonces se buscó, entre 864 combinaciones, la que minimiza el
+     oscurecimiento medio sujeto a que todas las tintas del hero pasen AA. El
+     resultado es incómodo y conviene dejarlo escrito: EN LAS CABECERAS
+     INTERIORES NO SE PUDO BAJAR EL PROMEDIO. Quedó en 0,535 contra 0,468 del
+     original. Con texto blanco sobre estas fotos, esa oscuridad es el precio de
+     que se lea, no una decisión de estilo.
+
+     Lo que sí se ganó:
+
+       · La tinta dejó de ser negra. Ese es el cambio que de verdad se nota: el
+         velo tiñe la foto de azul en vez de apagarla.
+       · La parte de fotografía que se ve casi limpia subió de 16,1 % a 21,1 %,
+         porque el velo se concentró en la columna del texto en vez de repartirse
+         por toda la cabecera.
+       · Las once cabeceras con foto del sitio pasan AA medidas una por una. La
+         versión anterior no: en móvil daba 1,67:1 en las migas.
+
+     En la portada sí se pudo bajar, y bastante, porque su texto ocupa una
+     columna más angosta: ver el velo del hero en `src/pages/index.astro`.
+
+     Si se quiere bajar el promedio de las interiores hay una sola vía, y no es
+     de CSS: que el texto deje de ir sobre la foto —como ya pasa en móvil, donde
+     la foto es banda y el texto va debajo— o que detrás del texto no haya un
+     blanco quemado.
+
+     Cómo se rehace la medición: abrir la página, componer en un canvas la
+     fotografía con estos degradados, y recorrer los rangos de texto de
+     `.titulo`, `.bajada`, `.eyebrow` y `.migas` buscando el peor píxel.
+     --------------------------------------------------------------------------- */
+
+  /* La meseta cubre la columna de texto y suelta el tercio derecho. La caída
+     va en curva suave, no en rampa: la rampa lineal dejaba una costura vertical
+     visible sobre la fotografía —bandas de Mach en los dos quiebres de
+     pendiente—. Una smoothstep tiene la misma media que la rampa que reemplaza,
+     así que quita la costura sin oscurecer un píxel más. */
+  --velo-columna: linear-gradient(
     to right,
-    rgba(var(--velo-tinta), 0.62) 0%,
-    rgba(var(--velo-tinta), 0.14) 46%,
-    rgba(var(--velo-tinta), 0) 70%
+    rgba(var(--velo-tinta), 0.76) 0%,
+    rgba(var(--velo-tinta), 0.76) 52%,
+    rgba(var(--velo-tinta), 0.707) 56.3%,
+    rgba(var(--velo-tinta), 0.573) 60.7%,
+    rgba(var(--velo-tinta), 0.4) 65.0%,
+    rgba(var(--velo-tinta), 0.227) 69.3%,
+    rgba(var(--velo-tinta), 0.093) 73.7%,
+    rgba(var(--velo-tinta), 0.04) 78.0%,
+    rgba(var(--velo-tinta), 0.04) 100%
   );
-  --velo-techo: linear-gradient(
-    to bottom,
-    rgba(var(--velo-tinta), 0.52) 0%,
-    rgba(var(--velo-tinta), 0) 18%
+
+  /* Asiento inferior: sin él, el borde de abajo corta en seco contra la foto. */
+  --velo-base: linear-gradient(
+    to top,
+    rgba(var(--velo-tinta), 0.24) 0%,
+    rgba(var(--velo-tinta), 0) 45%
   );
 
   /* El velo completo, para fondos con texto blanco encima. */
-  --velo: var(--velo-pie), var(--velo-costado), var(--velo-techo);
+  --velo: var(--velo-base), var(--velo-columna);
+
+  /* Las once cabeceras con foto pasan AA sin necesitar esta sombra; la más
+     justa es /contacto/ con 4,87:1. La sombra está para las fotografías que
+     todavía no existen: es lo que evita que reencuadrar una imagen, o cambiarla
+     por la del local cuando se pueda fotografiar, rompa la legibilidad sin que
+     nadie se entere. */
+  --sombra-sobre-foto: 0 1px 2px rgba(6, 24, 54, 0.34), 0 2px 18px rgba(6, 24, 54, 0.26);
 
   /* Variante para secciones claras: el texto va en tinta sobre la fotografía. */
   --velo-claro: linear-gradient(
