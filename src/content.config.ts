@@ -118,26 +118,49 @@ const services = defineCollection({
 
 const professionals = defineCollection({
   loader: glob({ pattern: '**/*.mdx', base: './src/content/professionals' }),
-  schema: z.object({
-    nombreCompleto: z.string(),
-    slug: z.string(),
-    // Sin foto real no se inventa una: ProfessionalCard cae al monograma.
-    foto: z.string().nullable().default(null),
-    especialidad: z.string(),
-    subespecialidad: pendiente(),
-    formacion: z.array(z.object({ titulo: z.string(), institucion: z.string(), anio: pendiente() })).default([]),
-    experiencia: z.array(z.string()).default([]),
-    areasAtencion: z.array(z.string()).default([]),
-    instituciones: z.array(z.string()).default([]),
-    // Permite al paciente verificar al médico en el registro público.
-    registroSuperintendencia: pendiente(),
-    paises: z.array(reference('countries')).default([]),
-    servicios: z.array(reference('services')).default([]),
-    modalidades,
-    bio: z.string(),
-    activo: z.boolean().default(false),
-    orden: z.number().default(0),
-  }),
+  /* `image()` en vez de una ruta de texto: así el retrato entra al pipeline de
+     Astro —AVIF y WebP en varios anchos, con sus dimensiones— en vez de servirse
+     crudo desde /public. Importa porque la misma foto se usa a 320 px en
+     Conócenos y a 88 px en la tarjeta: el original pesa 173 KB y mandarlo entero
+     a un avatar de 88 px es justo lo que audita docs/imagenes.md. El archivo va
+     al lado del .mdx y se referencia con ruta relativa. */
+  schema: ({ image }) =>
+    z.object({
+      nombreCompleto: z.string(),
+      slug: z.string(),
+      // Sin foto real no se inventa una: la tarjeta cae al monograma.
+      foto: image().nullable().default(null),
+      /* Recorte cuadrado de busto, para el avatar de 88 px de la tarjeta.
+
+         No es duplicar por duplicar. El retrato del Dr. Flores es de cuerpo
+         sentado: midiendo la silueta, la cara queda al 19 % del alto. Metido en
+         un círculo de 88 px con object-fit:cover, el encuadre no puede acercarse
+         —cover encuadra, no amplía— y la cabeza saldría de unos 20 px. Con el
+         recorte, la cara queda al 40 % del cuadro y se reconoce.
+
+         Si falta, la tarjeta usa `foto`; si tampoco hay, el monograma. */
+      avatar: image().nullable().default(null),
+      especialidad: z.string(),
+      subespecialidad: pendiente(),
+      /* La institución es opcional a propósito. El cliente puede entregar un
+         título sin decir dónde lo cursó, y la plantilla de Conócenos ya lo
+         contemplaba —`{f.institucion && ...}`— mientras el esquema lo exigía:
+         era imposible cargar un posgrado sin inventarle una universidad. */
+      formacion: z
+        .array(z.object({ titulo: z.string(), institucion: pendiente(), anio: pendiente() }))
+        .default([]),
+      experiencia: z.array(z.string()).default([]),
+      areasAtencion: z.array(z.string()).default([]),
+      instituciones: z.array(z.string()).default([]),
+      // Permite al paciente verificar al médico en el registro público.
+      registroSuperintendencia: pendiente(),
+      paises: z.array(reference('countries')).default([]),
+      servicios: z.array(reference('services')).default([]),
+      modalidades,
+      bio: z.string(),
+      activo: z.boolean().default(false),
+      orden: z.number().default(0),
+    }),
 });
 
 /* -------------------------------- recursos ------------------------------- */

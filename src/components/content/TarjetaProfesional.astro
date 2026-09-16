@@ -1,10 +1,26 @@
 ---
 /* Tarjeta de profesional. Portado de ProfessionalCard.jsx.
    Sin foto se usa un monograma sobre azul nube: nunca una foto de archivo ni
-   un avatar generado. */
+   un avatar generado.
+
+   La foto entra como ImageMetadata, no como ruta: así Astro la sirve al tamaño
+   que ocupa de verdad. Antes era un <img> con la ruta cruda, que le mandaba el
+   original de 173 KB a un avatar de 88 px.
+
+   Va con <Image> y no con <Picture>, que es lo que usa el resto del sitio, y
+   sin `srcset`. A 88 px el negocio se da vuelta: el <picture> con sus <source>
+   costaba 903 bytes de HTML en cada página que muestre la tarjeta, y el srcset
+   de densidades otros 140, para ahorrar unos pocos cientos de bytes de imagen.
+
+   En vez de eso se pide UNA imagen de 176 px y se muestra a 88 por CSS: nítida
+   en pantallas retina, 200 bytes de marcado, y una pantalla de 1x baja de más
+   un archivo que igual pesa 4 KB. La portada tenía 127 bytes de margen contra
+   el presupuesto de 60 KB; con srcset no entraba. */
+import { Image } from 'astro:assets';
 import Icono from '../core/Icono.astro';
 interface Props {
-  nombre: string; rol: string; subtitulo?: string | null; foto?: string | null; href: string;
+  nombre: string; rol: string; subtitulo?: string | null;
+  foto?: ImageMetadata | null; href: string;
 }
 const { nombre, rol, subtitulo, foto, href } = Astro.props;
 const monograma = nombre.replace(/^Dr\.?a?\.?\s+/i, '').split(' ').slice(0, 2)
@@ -12,7 +28,8 @@ const monograma = nombre.replace(/^Dr\.?a?\.?\s+/i, '').split(' ').slice(0, 2)
 ---
 <article class="prof">
   {foto
-    ? <img class="foto" src={foto} alt={`Retrato de ${nombre}`} width="88" height="88" loading="lazy" />
+    ? <Image class="foto" src={foto} alt={`Retrato de ${nombre}`} width={176} height={176}
+        format="webp" loading="lazy" />
     : <span class="foto mono" aria-hidden="true">{monograma}</span>}
   <div class="datos">
     <span class="nombre">{nombre}</span>
@@ -27,9 +44,15 @@ const monograma = nombre.replace(/^Dr\.?a?\.?\s+/i, '').split(' ').slice(0, 2)
     border: var(--border-width) solid var(--color-line); border-radius: var(--radius-lg);
     box-shadow: var(--shadow-1);
   }
+  /* El archivo se pide a 176 px y se muestra a 88: el CSS manda sobre los
+     atributos width/height, que están para reservar la proporción. */
   .foto {
     width: 88px; height: 88px; border-radius: var(--radius-pill); flex-shrink: 0;
     object-fit: cover;
+    /* El recorte viene con fondo transparente. Sin esto el círculo no existe:
+       se ve la cabeza flotando sobre el blanco de la tarjeta. Es el mismo azul
+       nube que usa el monograma cuando no hay foto. */
+    background: var(--surface-alt);
   }
   .mono {
     display: flex; align-items: center; justify-content: center;

@@ -72,12 +72,22 @@ export function medicoJsonLd(
     nombreCompleto: string;
     especialidad: string;
     bio: string;
-    foto: string | null;
-    formacion: { titulo: string; institucion: string }[];
+    /* Desde que el retrato pasa por el pipeline de Astro, esto ya no es una
+       ruta sino los metadatos de la imagen procesada. */
+    foto: { src: string } | null;
+    formacion: { titulo: string; institucion: string | null }[];
   },
   url: string,
   sitio: string,
 ) {
+  /* `image` de schema.org pide una URL absoluta, y `foto.src` es la ruta con
+     hash que genera el build. */
+  const imagen = p.foto ? new URL(p.foto.src, sitio).toString() : undefined;
+
+  /* Sólo entran a `alumniOf` las formaciones que traen institución: el resto
+     emitiría una EducationalOrganization sin nombre, que es un dato roto. */
+  const casas = p.formacion.filter((f) => f.institucion);
+
   return sinVacios({
     '@context': 'https://schema.org',
     '@type': 'Physician',
@@ -86,10 +96,10 @@ export function medicoJsonLd(
     medicalSpecialty: 'Hematologic',
     description: p.bio,
     url,
-    image: p.foto,
+    image: imagen,
     worksFor: { '@id': `${sitio}#clinica` },
-    alumniOf: p.formacion.length
-      ? p.formacion.map((f) => ({ '@type': 'EducationalOrganization', name: f.institucion }))
+    alumniOf: casas.length
+      ? casas.map((f) => ({ '@type': 'EducationalOrganization', name: f.institucion }))
       : undefined,
   });
 }

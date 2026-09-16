@@ -431,6 +431,19 @@ const SECUENCIA = [
           recibe en la primera consulta es quien sigue tu caso.
         </p>
 
+        {/* SIN FOTO, Y ES UNA DECISIÓN DE PRESUPUESTO, NO UN OLVIDO.
+
+            El retrato del médico existe y está recortado para este avatar; se
+            enciende con `foto={medico.data.avatar}` y se ve en Conócenos y en
+            /equipo/. Acá no, porque cuesta 179 bytes de HTML y esta página
+            cierra a 11 bytes del presupuesto de 60 KB que comprueba
+            scripts/presupuesto.mjs. Once bytes.
+
+            No se resuelve achicando el marcado —ya se bajó de <Picture> a un
+            <Image> sin srcset, de 903 bytes a 200—: hay que liberar espacio en
+            la página. El acordeón de preguntas son 4,4 KB y repite contenido de
+            /preguntas-frecuentes/. Mientras no se decida eso, la tarjeta cae al
+            monograma, que es como está publicada hoy. */}
         {
           medico && (
             <div class="ficha-medico">
@@ -438,7 +451,6 @@ const SECUENCIA = [
                 nombre={medico.data.nombreCompleto}
                 rol={medico.data.especialidad}
                 subtitulo={medico.data.subespecialidad}
-                foto={medico.data.foto}
                 href={RUTAS.perfil(medico.data.slug)}
               />
             </div>

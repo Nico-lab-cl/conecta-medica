@@ -7,6 +7,8 @@
    paciente quiere saber es quién lo va a atender. Ver docs/00-plan.md §5.3.
 
    De los 14 valores del brief se publican 6: listar 14 diluye el mensaje. */
+import { Picture } from 'astro:assets';
+import { render } from 'astro:content';
 import { FOTO_PAGINA } from '../../lib/imagenes';
 import Pagina from '../../layouts/Pagina.astro';
 import Icono from '../../components/core/Icono.astro';
@@ -21,6 +23,10 @@ import { medicoJsonLd } from '../../lib/schema';
 const a = await ajustes();
 const profesionales = await profesionalesActivos();
 const fundador = profesionales.find((p) => p.data.slug === 'carlos-flores-angulo');
+/* El cuerpo del .mdx es la biografía larga. Hasta ahora sólo se renderizaba en
+   /equipo/[slug]/, así que Conócenos —que es donde el paciente va a leer quién
+   lo atiende— mostraba únicamente la línea corta de `bio`. */
+const Biografia = fundador ? (await render(fundador)).Content : null;
 const ruta = migas({ label: 'Conócenos' });
 const sitio = Astro.site?.toString() ?? 'https://conectamedica.com/';
 
@@ -56,11 +62,14 @@ const VALORES = [
         <div class="contenedor perfil">
           <div class="retrato">
             {fundador.data.foto ? (
-              <img
+              <Picture
                 src={fundador.data.foto}
                 alt={`Retrato de ${fundador.data.nombreCompleto}`}
-                width="320"
-                height="400"
+                widths={[320, 640, 960]}
+                sizes="(min-width: 900px) 320px, 80vw"
+                formats={['avif', 'webp']}
+                fallbackFormat="webp"
+                loading="eager"
               />
             ) : (
               <span class="monograma" aria-hidden="true">CF</span>
@@ -71,7 +80,7 @@ const VALORES = [
             <p class="eyebrow">Quién atiende</p>
             <h2>{fundador.data.nombreCompleto}</h2>
             <p class="rol">{fundador.data.especialidad}</p>
-            <p class="bio">{fundador.data.bio}</p>
+            <div class="bio">{Biografia ? <Biografia /> : <p>{fundador.data.bio}</p>}</div>
 
             {fundador.data.formacion.length > 0 ? (
               <>
@@ -199,10 +208,14 @@ const VALORES = [
     justify-content: center;
     overflow: hidden;
   }
-  .retrato img {
+  .retrato :global(img) {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    /* El recorte de 4:5 sobre una foto de 3:4 sobra 27 px de alto. Centrado, se
+       llevaría la mitad de arriba, y la coronilla está a 13 px del borde: con
+       eso queda rapado. Anclado arriba, lo que sobra se corta abajo. */
+    object-position: 50% 0%;
   }
   .monograma {
     font-family: var(--font-serif);
@@ -218,11 +231,18 @@ const VALORES = [
     text-transform: uppercase;
     color: var(--color-blue);
   }
+  /* Antes era un <p>; ahora envuelve los párrafos que vienen del .mdx, así que
+     el estilo baja a los hijos y el bloque sólo pone el margen y la medida. */
   .bio {
     margin-top: var(--space-5);
+    max-width: var(--measure-prose);
+  }
+  .bio :global(p) {
     font-size: var(--text-body-lg);
     line-height: 1.6;
-    max-width: var(--measure-prose);
+  }
+  .bio :global(p + p) {
+    margin-top: var(--space-4);
   }
   .sub {
     margin-top: var(--space-10);

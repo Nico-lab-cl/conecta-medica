@@ -31,6 +31,14 @@ interface Props {
   equipo: Profesional[];
 }
 const { perfil, equipo } = Astro.props;
+
+/* Decía "Cada perfil indica su formación y su registro en la Superintendencia de
+   Salud, para que puedas verificarlo". Es una promesa que la página no cumple:
+   `registroSuperintendencia` sigue en null y el bloque que lo muestra no se
+   renderiza. Ofrecer una verificación que no se puede hacer es peor que no
+   ofrecerla. Cuando llegue el número del Dr. Flores, esta frase vuelve a la
+   versión anterior. */
+const BAJADA_DIRECTORIO = 'Cada perfil indica su formación y dónde ha ejercido.';
 const sitio = Astro.site?.toString() ?? 'https://conectamedica.com/';
 const Contenido = perfil ? (await render(perfil)).Content : null;
 ---
@@ -88,7 +96,7 @@ const Contenido = perfil ? (await render(perfil)).Content : null;
       actual={RUTAS.equipo}
       eyebrow="Equipo"
       h1="Quiénes atienden"
-      bajada="Cada perfil indica su formación y su registro en la Superintendencia de Salud, para que puedas verificarlo."
+      bajada={BAJADA_DIRECTORIO}
       migas={migas({ label: 'Equipo' })}
     >
       <section class="seccion">
@@ -98,7 +106,7 @@ const Contenido = perfil ? (await render(perfil)).Content : null;
               nombre={p.data.nombreCompleto}
               rol={p.data.especialidad}
               subtitulo={p.data.subespecialidad}
-              foto={p.data.foto}
+              foto={p.data.avatar ?? p.data.foto}
               href={RUTAS.perfil(p.data.slug)}
             />
           ))}
