@@ -1,9 +1,14 @@
-/* Genera favicon, íconos e imagen OG a partir del logo real.
+/* Genera la imagen OG a partir del logo real.
 
-   No se redibuja la marca: cada salida es un recorte del archivo original, con
-   los mismos valores que usa ConectaLogo (design-system/components/brand/).
-   Cuando Carlos entregue el vector, este script se reemplaza por tres SVG
-   limpios. Ver docs/preguntas-carlos.md, punto B-5. */
+   Generaba también el favicon y los íconos, recortándolos del JPG original. Ya
+   no: el vector que este archivo estaba esperando —"cuando Carlos entregue el
+   vector, este script se reemplaza por SVG limpios", decía acá— existe desde el
+   2026-09-02 en public/marca/, y los íconos salen de ahí con scripts/iconos.mjs.
+   Dejar las dos rutas vivas significaba que el último script en correr ganaba,
+   y el que gana en silencio sería el que produce el PNG borroso.
+
+   La imagen OG sigue saliendo del recorte porque necesita el lockup completo
+   —"Clínica CONECTA" con su tipografía—, y de eso todavía no hay vector. */
 import sharp from 'sharp';
 import { mkdirSync } from 'node:fs';
 
@@ -39,54 +44,6 @@ async function recortar(variante, margen = 0) {
 }
 
 mkdirSync('public', { recursive: true });
-
-/* Iconos, desde el isotipo (la gota), no del logo completo.
-
-   El aire alrededor se agrega DESPUÉS del recorte, con `extend`, y no ampliando
-   el recorte: ampliarlo arrastra las letras de "Clinica", que están a solo unos
-   píxeles bajo la gota. */
-async function isotipoCuadrado(tam) {
-  const interior = Math.round(tam * 0.62);
-  const gota = await (await recortar('isotype'))
-    .resize(interior, interior, { fit: 'inside' })
-    .png()
-    .toBuffer();
-  const { width = interior, height = interior } = await sharp(gota).metadata();
-  return sharp({
-    create: { width: tam, height: tam, channels: 3, background: '#FFFFFF' },
-  })
-    .composite([
-      {
-        input: gota,
-        top: Math.round((tam - height) / 2),
-        left: Math.round((tam - width) / 2),
-      },
-    ])
-    .png()
-    .toBuffer();
-}
-
-for (const tam of [180, 192, 512]) {
-  const buf = await isotipoCuadrado(tam);
-  await sharp(buf).toFile(
-    tam === 180 ? 'public/apple-touch-icon.png' : `public/icono-${tam}.png`,
-  );
-  console.log('icono', tam);
-}
-
-// favicon.svg: el isotipo incrustado, para pestañas nítidas en cualquier tamaño
-const iso = await isotipoCuadrado(128);
-const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
-  <rect width="128" height="128" fill="#FFFFFF"/>
-  <image href="data:image/png;base64,${iso.toString('base64')}" width="128" height="128"/>
-</svg>`;
-await sharp(Buffer.from(svg)).toFile('public/favicon.png');
-const { writeFileSync } = await import('node:fs');
-writeFileSync('public/favicon.svg', svg);
-await sharp(await sharp(Buffer.from(svg)).resize(32, 32).png().toBuffer()).toFile(
-  'public/favicon-32.png',
-);
-console.log('favicon');
 
 // --- Imagen OG 1200×630: lockup sobre blanco, con el hilo Conecta ---
 const lockup = await (await recortar('lockup')).resize({ width: 620 }).png().toBuffer();

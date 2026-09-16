@@ -54,7 +54,8 @@ src/
 
 design-system/           material de referencia importado de Claude Design
 docs/                    plan, preguntas al cliente, SEO, imágenes, manual, DNS
-scripts/marca.mjs        favicon, íconos y OG desde el logo real
+scripts/iconos.mjs       favicon, ícono de app y manifiesto, desde el vector
+scripts/marca.mjs        imagen OG desde el logo real
 scripts/presupuesto.mjs  presupuesto de rendimiento y de honestidad
 ```
 
