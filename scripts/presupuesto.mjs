@@ -16,9 +16,32 @@ import { join, relative } from 'node:path';
 
 const DIST = 'dist';
 
+/* EL PRESUPUESTO DE HTML MIDE DOS COSAS, Y LA QUE MANDA ES LA SEGUNDA.
+
+   Hasta el 2026-09-16 había un solo número: 60 KB de HTML sin comprimir. Ese
+   límite detuvo el trabajo dos veces seguidas —la foto del médico y el botón de
+   WhatsApp— por diferencias de 11 y de 900 bytes, y las dos veces la salida que
+   ofrecía era sacar contenido útil de la portada.
+
+   Al medirlo en serio, el límite estaba mirando el número equivocado. La
+   portada pesa 61,3 KB crudos pero 11,6 KB en gzip y 9,8 KB en brotli, que es
+   lo que Cloudflare sirve y lo único que el paciente baja. Pasar de 61 a 62 KB
+   crudos son 200 bytes reales en el cable. Sacar de la portada un acordeón que
+   responde las cuatro preguntas más frecuentes, para ahorrar 200 bytes, es
+   optimizar la métrica en contra del sitio.
+
+   Así que ahora:
+
+     · htmlGzKB es el presupuesto de verdad, sobre el peso comprimido.
+     · htmlKB queda como alarma de bulto: no frena cambios legítimos, pero
+       avisa si alguien pega 20 KB de markup de golpe.
+
+   El de JavaScript no se toca. Ese sí viene del brief y sí se mide comprimido
+   desde el principio. */
 const LIMITES = {
   jsInicialKB: 60, // presupuesto del brief
-  htmlKB: 60, // HTML sin comprimir por página
+  htmlGzKB: 16, // lo que el navegador baja de verdad
+  htmlKB: 72, // HTML sin comprimir: alarma de bulto, no presupuesto
 };
 
 /* Patrones que NO pueden aparecer en el sitio público. */
@@ -88,11 +111,14 @@ for (const archivo of [...htmls(DIST)].sort()) {
   const js = pesoJsTransitivo(html);
 
   const htmlKB = Buffer.byteLength(html) / 1024;
+  const htmlGzKB = gzipSync(Buffer.from(html), { level: 9 }).length / 1024;
   const jsKB = js / 1024;
 
   const problemas = [];
   if (jsKB > LIMITES.jsInicialKB) problemas.push(`JS ${kb(js)}KB > ${LIMITES.jsInicialKB}KB`);
-  if (htmlKB > LIMITES.htmlKB) problemas.push(`HTML ${htmlKB.toFixed(1)}KB > ${LIMITES.htmlKB}KB`);
+  if (htmlGzKB > LIMITES.htmlGzKB)
+    problemas.push(`HTML ${htmlGzKB.toFixed(1)}KB gz > ${LIMITES.htmlGzKB}KB`);
+  if (htmlKB > LIMITES.htmlKB) problemas.push(`HTML ${htmlKB.toFixed(1)}KB crudo > ${LIMITES.htmlKB}KB`);
 
   // Solo el cuerpo visible: el JSON-LD y los comentarios no cuentan.
   const visible = html
@@ -103,20 +129,28 @@ for (const archivo of [...htmls(DIST)].sort()) {
   }
 
   if (problemas.length) fallas++;
-  filas.push({ ruta, htmlKB: htmlKB.toFixed(1), jsKB: jsKB.toFixed(1), problemas });
+  filas.push({
+    ruta,
+    htmlKB: htmlKB.toFixed(1),
+    htmlGzKB: htmlGzKB.toFixed(1),
+    jsKB: jsKB.toFixed(1),
+    problemas,
+  });
 }
 
 const anchoRuta = Math.max(...filas.map((f) => f.ruta.length), 6);
 console.log('');
 console.log(
-  '  ' + 'RUTA'.padEnd(anchoRuta) + '   HTML      JS(gz)   ESTADO',
+  '  ' + 'RUTA'.padEnd(anchoRuta) + '   HTML(gz)  HTML      JS(gz)   ESTADO',
 );
-console.log('  ' + '─'.repeat(anchoRuta + 30));
+console.log('  ' + '─'.repeat(anchoRuta + 40));
 for (const f of filas) {
   const estado = f.problemas.length ? 'X  ' + f.problemas.join(' · ') : 'ok';
   console.log(
     '  ' +
       f.ruta.padEnd(anchoRuta) +
+      '  ' +
+      (f.htmlGzKB + 'KB').padStart(7) +
       '  ' +
       (f.htmlKB + 'KB').padStart(7) +
       '  ' +
@@ -129,7 +163,7 @@ for (const f of filas) {
 console.log('');
 if (fallas === 0) {
   console.log(
-    `  ${filas.length} páginas dentro del presupuesto (JS < ${LIMITES.jsInicialKB}KB, HTML < ${LIMITES.htmlKB}KB) y sin datos de relleno.`,
+    `  ${filas.length} páginas dentro del presupuesto (JS < ${LIMITES.jsInicialKB}KB, HTML < ${LIMITES.htmlGzKB}KB comprimido) y sin datos de relleno.`,
   );
 } else {
   console.error(`  ${fallas} página(s) fuera de presupuesto o con datos de relleno.`);

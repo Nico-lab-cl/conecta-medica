@@ -2,28 +2,26 @@
 /* Barra de acciones fija al pie, solo en móvil. Viene del artboard de 390 px de
    `Conectamedica v3 - Portada.dc.html`.
 
-   Cuatro destinos, con "agendar" destacado. El cuarto es WhatsApp cuando hay
-   número cargado; mientras no lo haya, es contacto. No se pinta un botón de
-   WhatsApp que lleve a un número inventado —la misma regla de
-   BotonWhatsApp.astro—, pero tampoco se deja el hueco: el destino existe.
+   Cuatro destinos, con "agendar" destacado. El cuarto era WhatsApp cuando había
+   número cargado y Contacto mientras no lo hubiera; ahora es siempre Contacto.
+
+   El motivo está en GloboWhatsApp.astro: el globo flotante pasó a mostrarse
+   también en móvil, apoyado justo encima de esta barra. Con el ítem de WhatsApp
+   acá quedaban dos botones verdes idénticos a 13 px uno del otro, en la misma
+   esquina —medido a 375 px—, y eso no se lee como dos atajos sino como un
+   error. El globo se queda con WhatsApp; la barra recupera un cuarto destino
+   que no repite a ninguno de los otros tres.
 
    Es `fixed`, no `sticky`: sticky depende de dónde caiga el elemento en el
    flujo y de qué antepasado tenga overflow. Un `.espaciador` del mismo alto
    evita que la barra tape el final del pie. */
 import Icono from '../core/Icono.astro';
 import { RUTAS } from '../../lib/rutas';
-import { ajustes } from '../../lib/contenido';
-import { enlaceWhatsApp } from '../../lib/whatsapp';
-
-const { whatsapp } = await ajustes();
-const wa = enlaceWhatsApp(whatsapp, 'inicio');
 
 const items = [
   { label: 'Prestaciones', href: RUTAS.prestaciones, icono: 'stethoscope', externo: false },
   { label: 'Telemedicina', href: RUTAS.telemedicina, icono: 'video', externo: false },
-  wa
-    ? { label: 'WhatsApp', href: wa, icono: 'whatsapp', externo: true }
-    : { label: 'Contacto', href: RUTAS.contacto, icono: 'message-circle', externo: false },
+  { label: 'Contacto', href: RUTAS.contacto, icono: 'message-circle', externo: false },
 ];
 ---
 

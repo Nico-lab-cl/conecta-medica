@@ -14,15 +14,16 @@
       botones inline del sitio. Se reconoce igual: la forma del glifo y la
       posición hacen el trabajo que haría el tono exacto.
 
-   2. EN MÓVIL NO EXISTE. Bajo 1280 px hay una barra de acciones fija al pie, y
-      su cuarto ítem YA es WhatsApp en cuanto hay número cargado —lo arma
-      `BarraMovilV3.astro` con el mismo `enlaceWhatsApp`—. La primera versión de
-      este globo se subía por encima de la barra para no taparla, y quedaban dos
-      botones de WhatsApp a 13 px uno del otro, en la misma esquina: medido en
-      el navegador a 375 px. Eso no se lee como dos atajos, se lee como un
-      error. En móvil manda la barra, que es la superficie de acciones del
-      sitio; el globo aparece desde 1280 px, que es justo donde la barra
-      desaparece.
+   2. EN MÓVIL SE APARTA DE LA BARRA, NO SE ESCONDE. Bajo 1280 px hay una barra
+      de acciones fija al pie, de 60 px más el área segura. El globo se sube por
+      encima de ella: en `bottom: 24px` taparía "Solicitar hora", que es la
+      acción principal del sitio en móvil.
+
+      Esto obligó a tocar la barra. Su cuarto ítem se convertía en WhatsApp en
+      cuanto había número, y con el globo encima quedaban dos botones verdes
+      idénticos a 13 px uno del otro —medido a 375 px—: eso no se lee como dos
+      atajos, se lee como un error. Ahora ese ítem es siempre Contacto, así que
+      hay UN WhatsApp en el sitio y cuatro destinos distintos en la barra.
 
    3. NO RENDERIZA NADA SIN NÚMERO REAL. `enlaceWhatsApp` devuelve null mientras
       `site.json` tenga `whatsapp: null`, y acá eso significa no pintar el
@@ -57,8 +58,7 @@ const href = enlaceWhatsApp(whatsapp, origenDesdeRuta(ruta));
 
 <style>
   .globo {
-    /* Oculto por defecto: sólo aparece cuando la barra móvil ya no está. */
-    display: none;
+    display: flex;
     position: fixed;
     z-index: 45;
     right: max(16px, env(safe-area-inset-right, 0px));
@@ -80,9 +80,9 @@ const href = enlaceWhatsApp(whatsapp, origenDesdeRuta(ruta));
 
   /* 1280 px es exactamente el punto donde BarraMovilV3 deja de mostrarse. Si
      ese corte cambia allá, tiene que cambiar acá: son la misma decisión. */
-  @media (min-width: 1280px) {
+  @media (max-width: 1279px) {
     .globo {
-      display: flex;
+      bottom: calc(60px + env(safe-area-inset-bottom, 0px) + 14px);
     }
   }
 
