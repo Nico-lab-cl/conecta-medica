@@ -883,17 +883,49 @@ const SECUENCIA = [
     margin-top: var(--space-8);
   }
 
+  /* La tarjeta del eje venía dibujada para ir sobre blanco: fondo nube, borde
+     transparente y sin sombra. Acá la sección TAMBIÉN es nube, así que la
+     tarjeta más importante de la portada era del mismo color que su fondo y no
+     se leía como tarjeta. No se toca el componente —en las páginas de la unidad
+     sí va sobre blanco y ahí está bien—: se le da acá la forma que corresponde
+     sobre fondo teñido, la misma de las tres de órbita. */
+  .celda-eje :global(.prestacion) {
+    background: var(--surface-card);
+    border-color: var(--color-line);
+    box-shadow: var(--shadow-2);
+  }
+
+  /* Las de órbita ya eran blancas, pero con shadow-1 (0 1px 2px al 6%) sobre
+     nube el canto no se separaba del fondo. shadow-2 es el segundo y último
+     nivel del sistema, el que usa el propio mockup v3 en sus tarjetas. */
+  .celda-orbita :global(.prestacion) {
+    box-shadow: var(--shadow-2);
+  }
+
   /* ==========================================================================
      TELEMEDICINA, MATERIAL, CONÓCENOS, PREGUNTAS
      ========================================================================== */
+
+  /* RITMO DE FONDOS. Antes las secciones iban blanco · nube · blanco · blanco ·
+     nube · blanco: telemedicina y material quedaban pegadas, 1276 px seguidos
+     de blanco separados por una línea de 1 px en #E2E7EE, que no se ve. De ahí
+     la sensación de que la mitad de abajo es una sola mancha blanca.
+
+     Ahora alternan sin excepción: nube · blanco · nube · blanco · nube · azul.
+     No es sólo ritmo: las piezas del sistema están dibujadas como "panel teñido
+     sobre blanco" (fondo nube, sin borde) o como "tarjeta blanca sobre teñido"
+     (fondo blanco, borde y sombra). Cuando el panel teñido cae en una sección
+     teñida desaparece —es exactamente lo que pasaba con la tarjeta del eje, con
+     el aviso de material y con el bloque de precio—. La alternancia deja a cada
+     pieza sobre el fondo para el que fue dibujada. */
   .telemedicina,
-  .material,
-  .preguntas {
+  .conocenos {
     background: var(--surface-page);
     border-bottom: var(--border-width) solid var(--color-line);
     padding-block: var(--section-y);
   }
-  .conocenos {
+  .material,
+  .preguntas {
     background: var(--surface-alt);
     border-bottom: var(--border-width) solid var(--color-line);
     padding-block: var(--section-y);
@@ -977,7 +1009,7 @@ const SECUENCIA = [
     background: var(--surface-card);
     border: var(--border-width) solid var(--color-line);
     border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-1);
+    box-shadow: var(--shadow-2);
     text-decoration: none;
     transition: border-color var(--dur-fast) var(--ease-out);
   }
@@ -1009,7 +1041,11 @@ const SECUENCIA = [
     align-items: flex-start;
     margin-top: var(--space-6);
     padding: var(--space-8);
-    background: var(--surface-alt);
+    /* La sección pasó a nube, así que este aviso deja de ser un panel teñido
+       —que ahí sería invisible— y pasa a ser tarjeta blanca. */
+    background: var(--surface-card);
+    border: var(--border-width) solid var(--color-line);
+    box-shadow: var(--shadow-2);
     border-radius: var(--radius-lg);
   }
   .material-vacio h3 {
@@ -1023,8 +1059,14 @@ const SECUENCIA = [
     max-width: var(--measure-prose);
   }
 
+  /* Conócenos pasó a blanco, así que la ficha del médico —tarjeta blanca con
+     borde hairline— se apoyaba en un borde de 1,1:1 de contraste. Con shadow-2
+     el canto existe sin tocar el color. */
   .ficha-medico {
     margin-top: var(--space-6);
+  }
+  .ficha-medico :global(.prof) {
+    box-shadow: var(--shadow-2);
   }
   .secuencia {
     margin-top: var(--space-6);
