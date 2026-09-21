@@ -9,6 +9,7 @@
     "preview": "astro preview",
     "check": "astro check",
     "iconos": "node scripts/iconos.mjs",
+    "og": "node scripts/og.mjs",
     "presupuesto": "node scripts/presupuesto.mjs",
     "deploy": "wrangler deploy"
   },

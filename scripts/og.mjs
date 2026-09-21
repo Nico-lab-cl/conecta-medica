@@ -5,11 +5,11 @@
    genérica en ese momento cuesta más que cualquier detalle de la página.
 
    Cada tarjeta compone: la fotografía de esa página, un degradado oscuro hacia
-   abajo para que el texto se lea, el lockup de la marca sobre una placa blanca,
-   y el título. Sin créditos de generación: se arma en local con las imágenes que
-   ya existen. */
+   abajo para que el texto se lea, la marca sobre una placa blanca, y el
+   título. Sin créditos de generación: se arma en local con las imágenes que ya
+   existen. */
 import sharp from 'sharp';
-import { mkdirSync } from 'node:fs';
+import { existsSync, mkdirSync } from 'node:fs';
 
 const IMG = 'src/assets/imagenes';
 const SALIDA = 'public/og';
@@ -35,22 +35,82 @@ const TARJETAS = [
 
 mkdirSync(SALIDA, { recursive: true });
 
-/* El lockup ahora es vectorial (scripts/logo-vector.mjs), así que la placa sale
-   nítida en vez de recortada del JPG. */
-const lockup = await sharp('public/marca/lockup.svg', { density: 400 })
-  .resize({ width: 250 })
+/* Las fotos de origen eran PNG y hoy son JPG. Este script quedó apuntando a la
+   extensión vieja y por eso dejó de correr en silencio: se busca el archivo en
+   vez de asumirlo. */
+const foto = (nombre) => {
+  for (const ext of ['.jpg', '.jpeg', '.png', '.webp']) {
+    if (existsSync(`${IMG}/${nombre}${ext}`)) return `${IMG}/${nombre}${ext}`;
+  }
+  throw new Error(`falta la foto ${nombre} en ${IMG}`);
+};
+
+/* LA PLACA DE MARCA
+
+   Acá estaba el lockup trazado del JPG original: la gota azul con "Clinica
+   CONECTA". Es el logo viejo, y era lo primero que veía cualquiera que
+   recibiera un enlace del sitio por WhatsApp. El resto de la marca había
+   cambiado hacía semanas; la tarjeta compartida seguía mostrando la anterior.
+
+   Ahora la placa se arma como la cabecera: el isotipo redibujado —el rehilete—
+   más el nombre en texto. Las proporciones son las de CabeceraV3 (isotipo de
+   44 px, nombre de 24 px, aire de 11 px) escaladas 1,78 veces, para que la
+   marca pese lo mismo dentro de una tarjeta de 1200 px.
+
+   El nombre va en Segoe UI y no en Inter, que es la sans del sitio, porque
+   estas tarjetas se rasterizan acá con las tipografías del sistema e Inter no
+   está instalada. Es la humanista más cercana de las que sí están, y a este
+   tamaño la diferencia no se lee. Source Serif 4 sí está instalada, así que el
+   título de la tarjeta ahora es exactamente el del sitio y no Georgia. */
+const ISOTIPO_ALTO = 78;
+const NOMBRE_TAM = 43;
+const AIRE_MARCA = 19;
+const PLACA_PAD_X = 32;
+const PLACA_PAD_Y = 24;
+const SANS = 'Segoe UI, Nunito Sans, Helvetica, Arial, sans-serif';
+const SERIF = 'Source Serif 4, Georgia, Times New Roman, serif';
+
+const isotipo = await sharp('public/marca/isotipo-limpio.svg', { density: 600 })
+  .resize({ height: ISOTIPO_ALTO })
   .png()
   .toBuffer();
-const lockupMeta = await sharp(lockup).metadata();
-const placa = await sharp({
-  create: {
-    width: (lockupMeta.width ?? 250) + 52,
-    height: (lockupMeta.height ?? 100) + 36,
-    channels: 4,
-    background: '#FFFFFF',
-  },
-})
-  .composite([{ input: lockup, top: 18, left: 26 }])
+const isotipoMeta = await sharp(isotipo).metadata();
+
+/* El nombre se rasteriza en un lienzo holgado y se recorta a la tinta: es la
+   única forma de saber cuánto mide antes de dimensionar la placa. */
+const nombre = await sharp(
+  Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="700" height="140">
+    <text x="4" y="104" font-family="${SANS}" font-size="${NOMBRE_TAM}" fill="#16437F"><tspan font-weight="400">Clínica</tspan><tspan font-weight="600" dx="13">Conecta</tspan></text>
+  </svg>`),
+)
+  .png()
+  .trim()
+  .toBuffer();
+const nombreMeta = await sharp(nombre).metadata();
+
+const isoW = isotipoMeta.width ?? 80;
+const isoH = isotipoMeta.height ?? ISOTIPO_ALTO;
+const nomW = nombreMeta.width ?? 220;
+const nomH = nombreMeta.height ?? 44;
+const placaW = PLACA_PAD_X * 2 + isoW + AIRE_MARCA + nomW;
+const placaH = PLACA_PAD_Y * 2 + Math.max(isoH, nomH);
+
+const placa = await sharp(
+  Buffer.from(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${placaW}" height="${placaH}"><rect width="${placaW}" height="${placaH}" rx="12" fill="#FFFFFF"/></svg>`,
+  ),
+)
+  .composite([
+    { input: isotipo, top: Math.round((placaH - isoH) / 2), left: PLACA_PAD_X },
+    {
+      input: nombre,
+      /* Centrado por la caja de tinta, que arriba llega hasta la tilde de
+         "Clínica" y abajo hasta la línea base: eso lo deja ópticamente un pelo
+         alto, y dos píxeles lo compensan. */
+      top: Math.round((placaH - nomH) / 2) + 2,
+      left: PLACA_PAD_X + isoW + AIRE_MARCA,
+    },
+  ])
   .png()
   .toBuffer();
 
@@ -58,7 +118,7 @@ const escapar = (s) =>
   s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
 for (const t of TARJETAS) {
-  const fondo = await sharp(`${IMG}/${t.foto}.png`)
+  const fondo = await sharp(foto(t.foto))
     .resize(W, H, { fit: 'cover', position: 'attention' })
     .modulate({ brightness: 1.02 })
     .toBuffer();
@@ -79,8 +139,8 @@ for (const t of TARJETAS) {
           `<circle cx="${64 + p * 1072}" cy="454" r="6" fill="#0A2B5E" stroke="#FFFFFF" stroke-opacity="0.85" stroke-width="2"/>`,
       )
       .join('')}
-    <text x="64" y="522" font-family="Georgia, 'Times New Roman', serif" font-size="52" font-weight="600" fill="#FFFFFF">${escapar(t.titulo)}</text>
-    <text x="64" y="566" font-family="Helvetica, Arial, sans-serif" font-size="25" fill="#D6E3F7">${escapar(t.pie)}</text>
+    <text x="64" y="522" font-family="${SERIF}" font-size="52" font-weight="600" fill="#FFFFFF">${escapar(t.titulo)}</text>
+    <text x="64" y="566" font-family="${SANS}" font-size="25" fill="#D6E3F7">${escapar(t.pie)}</text>
   </svg>`);
 
   await sharp(fondo)
