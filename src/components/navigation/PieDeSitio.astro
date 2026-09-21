@@ -18,7 +18,6 @@
    columnas y la línea legal, nada más—. El aviso de urgencias no desaparece del
    sitio: sigue en agendar, contacto, telemedicina y preguntas frecuentes, que
    son las páginas donde alguien puede estar decidiendo si esperar una hora. */
-import Logo from '../brand/Logo.astro';
 import { RUTAS } from '../../lib/rutas';
 import { ajustes, pais, horarioLegible, precioCLP } from '../../lib/contenido';
 
@@ -31,9 +30,23 @@ const anio = new Date().getFullYear();
 <footer class="pie">
   <div class="contenedor rejilla">
     <div>
-      {/* Ya no hace falta la placa blanca detrás: existe una versión monocroma
-          blanca del lockup, trazada del mismo archivo. Ver scripts/logo-vector.mjs */}
-      <Logo variante="lockup" alto={38} tono="blanco" />
+      {/* La misma marca que la cabecera y que el resto del sitio: el isotipo
+          redibujado más el nombre en texto vivo. Acá seguía el lockup trazado
+          del JPG original —la marca vieja—, con lo que el pie era la única
+          parte de la página con otro logo. En blanco, porque el pie es azul
+          profundo. */}
+      <a class="marca" href={RUTAS.inicio} aria-label={`${a.nombre}, inicio`}>
+        <img
+          class="isotipo"
+          src="/marca/isotipo-limpio-blanco.svg"
+          alt=""
+          width="39"
+          height="38"
+        />
+        <span class="lockup" aria-hidden="true">
+          <span class="lockup-1">Clínica</span><span class="lockup-2">Conecta</span>
+        </span>
+      </a>
       <address class="datos">
         <span class="fuerte">{a.razonSocial}</span>
         <span>{d.edificio}</span>
@@ -83,6 +96,41 @@ const anio = new Date().getFullYear();
     background: var(--surface-footer);
     color: #fff;
   }
+  /* La marca, con las mismas proporciones de la cabecera pero en blanco. */
+  .marca {
+    display: inline-flex;
+    align-items: center;
+    gap: 11px;
+    text-decoration: none;
+  }
+  .isotipo {
+    height: 38px;
+    width: auto;
+    display: block;
+  }
+  .lockup {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+    white-space: nowrap;
+    font-family: 'Avenir Next', Avenir, 'Nunito Sans', var(--font-sans);
+    font-size: 21px;
+    line-height: 1;
+    letter-spacing: -0.01em;
+    color: #fff;
+  }
+  .lockup-1 {
+    font-weight: var(--weight-regular);
+  }
+  .lockup-2 {
+    font-weight: var(--weight-semibold);
+  }
+  .marca:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 4px;
+    border-radius: 4px;
+  }
+
   /* El espacio superior lo daba el hilo de cierre; sin él lo toma la rejilla. */
   .rejilla {
     display: grid;
