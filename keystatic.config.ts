@@ -5,24 +5,35 @@ import { config, fields, collection, singleton } from '@keystatic/core';
    Está escrito en español y con textos de ayuda en cada campo, porque quien lo
    va a usar es un médico, no un desarrollador.
 
-   Almacenamiento: hoy `local` (edita los archivos del repo directamente al
-   correr `npm run dev`). Para producción se cambia a:
+   ALMACENAMIENTO. Hasta el 2026-09-21 era `local`: el CMS sólo funcionaba en
+   el computador de un desarrollador corriendo `npm run dev`, así que el
+   cliente no podía entrar desde su navegador.
 
-     storage: { kind: 'github', repo: { owner: 'ORG', name: 'REPO' } }
+   En producción es `cloud` (Keystatic Cloud), y no `github`, por una razón
+   práctica: en modo `github` cada persona que edita necesita su propia cuenta
+   de GitHub con permiso de escritura en el repo, y eso es mucho pedirle a un
+   médico que sólo quiere corregir una frase. Con Keystatic Cloud entra con
+   correo y contraseña, y Keystatic hace el commit en GitHub por él.
 
-   Eso es lo único que hay que cambiar cuando exista el repositorio.
-   Ver docs/preguntas-carlos.md, punto A-3. */
+   El contenido sigue viviendo en el repo, no en Keystatic: Cloud sólo pone el
+   inicio de sesión y hace de intermediario con GitHub. Cada guardado es un
+   commit en `main`, Cloudflare lo publica solo, y si algún día se deja Cloud,
+   volver a `github` es cambiar este bloque. Nada se pierde.
+
+   En desarrollo queda en `local`: se edita directo en los archivos, sin
+   iniciar sesión. Paso a paso y cuentas en docs/cms-produccion.md. */
 
 const ayudaActivo =
   'Desactiva en vez de borrar. El contenido desaparece del sitio pero queda guardado y se puede volver a publicar.';
 
 export default config({
-  storage: { kind: 'local' },
+  storage: import.meta.env.PROD ? { kind: 'cloud' } : { kind: 'local' },
+  cloud: { project: 'conectamedica/conecta-medica' },
 
   ui: {
     brand: { name: 'Clínica Conecta' },
     navigation: {
-      Contenido: ['services', 'units', 'faqs'],
+      Contenido: ['portada', 'services', 'units', 'faqs'],
       'Personas y recursos': ['professionals', 'resources', 'categories'],
       Configuración: ['ajustes', 'chile'],
       Legales: ['legal'],
@@ -30,6 +41,165 @@ export default config({
   },
 
   singletons: {
+    /* PORTADA. Hasta el 2026-09-21 todo este texto estaba escrito dentro de
+       src/pages/index.astro y sólo se podía cambiar tocando código.
+
+       Los textos aceptan MARCADORES entre llaves, que se rellenan solos con los
+       datos reales al publicar: {precio}, {notaPrecio}, {comuna}, {ciudad},
+       {referencia}, {preguntas}, {sabado}, {nombre}, {razonSocial}. Así, si el
+       precio cambia en "Datos de la clínica", la portada no queda mintiendo.
+       Un marcador mal escrito no se imprime en crudo: desaparece. */
+    portada: singleton({
+      label: 'Portada del sitio',
+      path: 'src/content/settings/portada',
+      format: { data: 'json' },
+      schema: {
+        hero: fields.array(
+          fields.object({
+            eyebrow: fields.text({ label: 'Línea superior' }),
+            titulo: fields.text({ label: 'Titular', multiline: true }),
+            tituloSinSabado: fields.text({
+              label: 'Titular alternativo',
+              multiline: true,
+              description:
+                'Sólo lo usa el cuadro que anuncia el sábado. Se muestra si en "Dirección y horarios" no hay atención de sábado cargada. Déjalo vacío en los demás cuadros.',
+            }),
+            texto: fields.text({ label: 'Texto', multiline: true }),
+            botonLabel: fields.text({
+              label: 'Texto del segundo botón',
+              description: 'El primer botón siempre es "Agendar hora" y no se cambia desde acá.',
+            }),
+            botonDestino: fields.select({
+              label: 'A dónde lleva el segundo botón',
+              options: [
+                { label: 'Agendar hora', value: 'agendar' },
+                { label: 'Telemedicina', value: 'telemedicina' },
+                { label: 'Precios', value: 'precios' },
+                { label: 'Preguntas frecuentes', value: 'preguntas' },
+                { label: 'Qué llevar a la consulta', value: 'que-llevar' },
+                { label: 'Contacto', value: 'contacto' },
+                { label: 'Conócenos', value: 'conocenos' },
+                { label: 'Conecta Hematología', value: 'unidad' },
+                { label: 'Prestaciones', value: 'prestaciones' },
+                { label: 'Información para pacientes', value: 'pacientes' },
+              ],
+              defaultValue: 'agendar',
+            }),
+            imagen: fields.image({
+              label: 'Fotografía de fondo',
+              directory: 'src/content/settings',
+              publicPath: './',
+              description:
+                'Opcional. Si la dejas vacía se mantiene la fotografía que este cuadro tiene hoy. Va a pantalla completa detrás del texto, así que conviene una imagen horizontal y de al menos 1600 px de ancho. Regla del proyecto: si hay personas, van anónimas.',
+            }),
+            imagenAlt: fields.text({
+              label: 'Descripción de la fotografía',
+              multiline: true,
+              description: 'Obligatoria si subiste una foto. Describe lo que se ve.',
+            }),
+          }),
+          {
+            label: 'Cuadros de portada',
+            description:
+              'Los cuadros que se van alternando arriba de todo. El primero es el que ve Google como título principal de la página.',
+            itemLabel: (p) => p.fields.titulo.value || p.fields.eyebrow.value,
+          },
+        ),
+        accesosTitulo: fields.text({ label: 'Título de la grilla de accesos' }),
+        accesosApunte: fields.text({ label: 'Apunte bajo el título', multiline: true }),
+        accesos: fields.array(
+          fields.object({
+            icono: fields.text({
+              label: 'Ícono',
+              description:
+                'Nombre del ícono: calendar, video, file-text, info, map-pin, message-circle, stethoscope, check, arrow-right.',
+            }),
+            titulo: fields.text({ label: 'Título' }),
+            texto: fields.text({ label: 'Texto', multiline: true }),
+            destino: fields.select({
+              label: 'A dónde lleva',
+              options: [
+                { label: 'Agendar hora', value: 'agendar' },
+                { label: 'Telemedicina', value: 'telemedicina' },
+                { label: 'Precios', value: 'precios' },
+                { label: 'Preguntas frecuentes', value: 'preguntas' },
+                { label: 'Qué llevar a la consulta', value: 'que-llevar' },
+                { label: 'Contacto', value: 'contacto' },
+                { label: 'Conócenos', value: 'conocenos' },
+                { label: 'Conecta Hematología', value: 'unidad' },
+                { label: 'Prestaciones', value: 'prestaciones' },
+                { label: 'Información para pacientes', value: 'pacientes' },
+              ],
+              defaultValue: 'agendar',
+            }),
+          }),
+          {
+            label: '¿Qué necesitas hacer?',
+            description: 'La grilla de accesos. Seis es lo que el diseño contempla.',
+            itemLabel: (p) => p.fields.titulo.value,
+          },
+        ),
+        unidad: fields.object(
+          {
+            eyebrow: fields.text({ label: 'Línea superior' }),
+            titulo: fields.text({ label: 'Título', multiline: true }),
+            parrafos: fields.array(fields.text({ label: 'Párrafo', multiline: true }), {
+              label: 'Párrafos',
+              itemLabel: (p) => (p.value ?? '').slice(0, 60),
+            }),
+          },
+          { label: 'Sección Conecta Hematología' },
+        ),
+        telemedicina: fields.object(
+          {
+            eyebrow: fields.text({ label: 'Línea superior' }),
+            titulo: fields.text({ label: 'Título', multiline: true }),
+            texto: fields.text({ label: 'Texto', multiline: true }),
+            puntos: fields.array(fields.text({ label: 'Punto' }), {
+              label: 'Qué se resuelve a distancia',
+              description:
+                'Tiene que decir lo mismo que la página de Telemedicina. Si acá se promete algo que allá se descarta, el sitio se contradice.',
+              itemLabel: (p) => p.value ?? '',
+            }),
+          },
+          { label: 'Sección Telemedicina' },
+        ),
+        material: fields.object(
+          {
+            eyebrow: fields.text({ label: 'Línea superior' }),
+            titulo: fields.text({ label: 'Título', multiline: true }),
+          },
+          { label: 'Sección Información para pacientes' },
+        ),
+        conocenos: fields.object(
+          {
+            eyebrow: fields.text({ label: 'Línea superior' }),
+            titulo: fields.text({ label: 'Título', multiline: true }),
+            texto: fields.text({ label: 'Texto', multiline: true }),
+            secuencia: fields.array(fields.text({ label: 'Paso' }), {
+              label: 'Los pasos de la atención',
+              itemLabel: (p) => p.value ?? '',
+            }),
+          },
+          { label: 'Sección Conócenos' },
+        ),
+        preguntas: fields.object(
+          {
+            eyebrow: fields.text({ label: 'Línea superior' }),
+            titulo: fields.text({ label: 'Título', multiline: true }),
+          },
+          { label: 'Sección Preguntas frecuentes' },
+        ),
+        cierre: fields.object(
+          {
+            titulo: fields.text({ label: 'Título', multiline: true }),
+            bajada: fields.text({ label: 'Texto', multiline: true }),
+          },
+          { label: 'Bloque de cierre' },
+        ),
+      },
+    }),
+
     ajustes: singleton({
       label: 'Datos de la clínica',
       path: 'src/content/settings/site',
@@ -207,6 +377,22 @@ export default config({
       format: { contentField: 'cuerpo' },
       schema: {
         nombre: fields.slug({ name: { label: 'Nombre de la prestación' } }),
+        /* Si no se sube nada, la prestación sigue usando la fotografía que ya
+           tiene en src/lib/imagenes.ts. Subir acá reemplaza esa foto sin tocar
+           código. Ver la nota de `services` en src/content.config.ts. */
+        foto: fields.image({
+          label: 'Fotografía de la prestación',
+          directory: 'src/content/services',
+          publicPath: './',
+          description:
+            'Opcional. Si la dejas vacía se mantiene la fotografía que la prestación tiene hoy. Regla del proyecto: si aparecen personas, van siempre anónimas —de espaldas, solo las manos o fuera de foco—, nunca una cara identificable.',
+        }),
+        fotoAlt: fields.text({
+          label: 'Descripción de la fotografía',
+          multiline: true,
+          description:
+            'Obligatoria si subiste una foto. Es lo que escucha quien usa lector de pantalla y lo que Google lee. Describe lo que se ve, no lo que significa: "Unas manos ajustan el foco de un microscopio", no "Atención de calidad".',
+        }),
         titulo: fields.text({
           label: 'Título de la página (H1)',
           description:
@@ -284,10 +470,25 @@ export default config({
       schema: {
         nombreCompleto: fields.slug({ name: { label: 'Nombre completo' } }),
         slug: fields.text({ label: 'Slug (para la URL)' }),
-        foto: fields.text({
-          label: 'Foto (ruta)',
+        /* Antes era un campo de texto donde había que escribir la ruta a mano:
+           si el archivo no existía, simplemente no salía foto y nadie se
+           enteraba. Ahora se sube desde el CMS. El archivo queda junto al .mdx
+           y el valor guardado es "./nombre.webp", que es exactamente lo que el
+           `image()` del esquema de Astro espera, así que el retrato entra al
+           pipeline de optimización en vez de servirse crudo. */
+        foto: fields.image({
+          label: 'Retrato',
+          directory: 'src/content/professionals',
+          publicPath: './',
           description:
-            'Déjala vacía si no hay retrato real. El sitio muestra un monograma. Nunca usamos foto de banco de imágenes.',
+            'Déjala vacía si no hay retrato real: el sitio muestra un monograma con las iniciales. Nunca usamos foto de banco de imágenes. Sube el original, sin recortar ni comprimir: el sitio genera solo los tamaños que necesita.',
+        }),
+        avatar: fields.image({
+          label: 'Recorte cuadrado de la cara',
+          directory: 'src/content/professionals',
+          publicPath: './',
+          description:
+            'Opcional. El mismo retrato recortado cuadrado, de los hombros hacia arriba, para el círculo pequeño de las tarjetas. Si no lo subes se usa el retrato completo, donde la cara puede salir muy chica.',
         }),
         especialidad: fields.text({ label: 'Especialidad' }),
         subespecialidad: fields.text({ label: 'Subespecialidad' }),

@@ -9,14 +9,22 @@ guardados con fecha y autor, así que **nada se pierde y todo se puede deshacer*
 
 ## 1. Cómo entrar
 
-Vaya a **conectamedica.com/admin** e inicie sesión con su cuenta de GitHub.
+Vaya a **conectamedica.com/admin** e inicie sesión con su correo y su
+contraseña. No necesita ninguna otra cuenta.
 
-Si es la primera vez, Nicolás le va a enviar una invitación por correo: acéptela
-antes de intentar entrar.
+La primera vez le va a llegar un correo de **Keystatic** (el administrador del
+sitio) con una invitación. Ábralo, acepte la invitación y elija su contraseña.
+Recién después de eso puede entrar por conectamedica.com/admin.
+
+**Después de guardar, el cambio tarda uno o dos minutos en aparecer en el
+sitio.** Es normal: en ese tiempo el sitio se vuelve a armar con su cambio. Si
+recarga la página y todavía ve lo anterior, espere un momento y vuelva a
+recargar.
 
 Va a ver un menú a la izquierda con cuatro grupos:
 
-- **Contenido** — prestaciones, la unidad y las preguntas frecuentes
+- **Contenido** — la portada, las prestaciones, la unidad y las preguntas
+  frecuentes
 - **Personas y recursos** — profesionales, videos y artículos
 - **Configuración** — datos de la clínica, dirección y horarios
 - **Legales** — política de privacidad, términos y aviso médico
@@ -35,7 +43,90 @@ Borrar es definitivo. Desactivar, no.
 
 ---
 
-## 3. Cambiar el precio de la consulta
+## 3. Cambiar el texto de la portada
+
+La portada —lo primero que ve alguien que llega al sitio— se edita completa
+desde **Contenido → Portada del sitio**. Ahí está:
+
+- Los tres **cuadros de portada** que se van alternando arriba de todo
+- La grilla **"¿Qué necesitas hacer?"** con sus seis accesos
+- El título y el texto de cada sección: Conecta Hematología, Telemedicina,
+  Información para pacientes, Conócenos y Preguntas frecuentes
+- El **bloque de cierre** de abajo
+
+### Los textos entre llaves no son un error
+
+Va a ver cosas como `Consulta particular {precio}, precio conocido antes de
+atenderte`. Eso de `{precio}` es un hueco que el sitio rellena solo con el
+valor real al publicar. Sirve para que, cuando usted cambie el precio en *Datos
+de la clínica*, la portada no se quede anunciando el anterior.
+
+Los huecos que puede usar:
+
+| Escriba | Sale publicado |
+|---|---|
+| `{precio}` | el valor de la consulta, con formato: $50.000 |
+| `{notaPrecio}` | la nota sobre previsión |
+| `{comuna}` | Ñuñoa |
+| `{ciudad}` | Santiago |
+| `{referencia}` | la referencia de la dirección |
+| `{sabado}` | "Sábado de 10:00 a 13:00" |
+| `{preguntas}` | cuántas preguntas hay publicadas |
+| `{nombre}` | Clínica Conecta |
+| `{razonSocial}` | Clínica Conecta SpA |
+
+Puede borrarlos y escribir el dato a mano, pero entonces tendrá que acordarse de
+cambiarlo en dos lugares cada vez. Es mejor dejarlos.
+
+Si escribe un hueco que no existe —`{preico}`, por ejemplo— no sale publicado
+en crudo: simplemente desaparece. Igual conviene revisar la frase después.
+
+### Cuidado con el largo
+
+Los títulos están medidos para el diseño. Si un título de dos líneas pasa a
+tener cinco, la sección se desarma, sobre todo en teléfono. Cambie el texto y
+después **mire la página en el celular** antes de dar por bueno el cambio.
+
+---
+
+## 4. Subir fotografías
+
+Donde hay un campo de imagen puede arrastrar el archivo o buscarlo en su
+computador. Suba **el original, sin recortar ni achicar**: el sitio genera solo
+los tamaños que necesita y en los formatos modernos que pesan menos.
+
+Qué se puede cambiar hoy:
+
+- **Su retrato** — *Personas y recursos → Profesionales*. Hay dos campos: el
+  retrato completo y un recorte cuadrado de la cara, que es el que se usa en los
+  círculos pequeños. Si no sube el recorte se usa el retrato completo, donde la
+  cara puede salir muy chica.
+- **La foto de cada prestación** — *Contenido → Prestaciones*.
+- **Las fotos de los cuadros de portada** — *Contenido → Portada del sitio*.
+
+Si deja un campo de imagen vacío, se mantiene la fotografía que el sitio tiene
+hoy. No se rompe nada.
+
+### La descripción de la foto no es opcional
+
+Cada imagen tiene al lado un campo de descripción. Eso es lo que escucha una
+persona ciega que usa lector de pantalla, y es lo que lee Google. Describa **lo
+que se ve**, no lo que significa:
+
+- Bien: *"Unas manos ajustan el foco de un microscopio sobre un mesón blanco."*
+- Mal: *"Atención de calidad."*
+
+### La regla de las personas
+
+Si en la foto aparece gente, tiene que ir **anónima**: de espaldas, solo las
+manos, o fuera de foco. Ninguna cara identificable y ningún pie de foto que
+presente a alguien como paciente de la clínica. Esto se decidió al principio del
+proyecto y vale también para las fotos que suba usted. Su propio retrato es la
+excepción, claro.
+
+---
+
+## 5. Cambiar el precio de la consulta
 
 1. **Configuración → Datos de la clínica**
 2. Busque *Valor de la consulta*
@@ -47,7 +138,7 @@ buscarlo uno por uno.
 
 ---
 
-## 4. Cambiar los horarios
+## 6. Cambiar los horarios
 
 1. **Configuración → Dirección y horarios**
 2. En *Horarios de atención* puede editar, agregar o eliminar bloques
@@ -59,7 +150,7 @@ También los lee Google para mostrar si está abierto o cerrado.
 
 ---
 
-## 5. Publicar el número de WhatsApp
+## 7. Publicar el número de WhatsApp
 
 Mientras el campo esté vacío, **los botones de WhatsApp no aparecen en el sitio**.
 Es a propósito: preferimos no tener botón antes que tener uno con un número que
@@ -75,7 +166,7 @@ según la página desde la que el paciente escriba.
 
 ---
 
-## 6. Aprobar una respuesta clínica
+## 8. Aprobar una respuesta clínica
 
 Las respuestas médicas **no se publican hasta que usted las apruebe**. Es una
 protección deliberada: usted es quien firma lo que el sitio dice sobre salud.
@@ -97,7 +188,7 @@ la persona entre al sitio. El desarrollo largo va en la respuesta completa.
 
 ---
 
-## 7. Agregar un profesional
+## 9. Agregar un profesional
 
 1. **Personas y recursos → Profesionales → +**
 2. Complete nombre, especialidad y biografía corta
@@ -119,7 +210,7 @@ usamos fotos de banco de imágenes para personas que atienden pacientes.
 
 ---
 
-## 8. Publicar un video de YouTube
+## 10. Publicar un video de YouTube
 
 1. Suba el video a YouTube. Puede dejarlo como *No listado* si no quiere que
    aparezca en las búsquedas de YouTube
@@ -135,7 +226,7 @@ rápida y evita que YouTube instale cookies a quien solo estaba leyendo.
 
 ---
 
-## 9. Desactivar una prestación
+## 11. Desactivar una prestación
 
 1. **Contenido → Prestaciones**
 2. Abra la prestación
@@ -147,7 +238,7 @@ existir. Cuando la vuelva a marcar, todo reaparece.
 
 ---
 
-## 10. Qué NO tocar
+## 12. Qué NO tocar
 
 - **Slug (para la URL).** Es la dirección de la página en internet. Si la cambia,
   los enlaces que ya existen se rompen y Google pierde la página. Avísele a
@@ -163,7 +254,7 @@ existir. Cuando la vuelva a marcar, todo reaparece.
 
 ---
 
-## 11. Lo que el sitio nunca va a hacer solo
+## 13. Lo que el sitio nunca va a hacer solo
 
 - Inventar un dato que usted no haya escrito. Si un campo está vacío, esa sección
   simplemente no aparece.
@@ -175,7 +266,7 @@ existir. Cuando la vuelva a marcar, todo reaparece.
 
 ---
 
-## 12. Si algo se rompe
+## 14. Si algo se rompe
 
 Escríbale a Nicolás. Indique:
 
@@ -188,7 +279,7 @@ definitiva: todos los cambios quedan versionados y se pueden revertir.
 
 ---
 
-## 13. Preguntas que todavía tenemos para usted
+## 15. Preguntas que todavía tenemos para usted
 
 La lista completa está en `docs/preguntas-carlos.md`. Las más urgentes:
 

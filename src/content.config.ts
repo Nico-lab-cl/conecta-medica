@@ -84,34 +84,46 @@ const units = defineCollection({
 
 const services = defineCollection({
   loader: glob({ pattern: '**/*.mdx', base: './src/content/services' }),
-  schema: z.object({
-    nombre: z.string(),
-    // El H1 no es el nombre de la especialidad, es su función dentro del
-    // estudio hematológico. Ver docs/00-plan.md §5, punto 2.
-    titulo: z.string(),
-    slug: z.string(),
-    unidad: reference('units'),
-    resumen: z.string(),
-    aporteHematologia: z
-      .string()
-      .min(
-        120,
-        'Obligatorio: explica cómo esta prestación aporta a la evaluación, tratamiento o seguimiento del paciente hematológico. Sin esto la prestación quedaría presentada como especialidad suelta, que es justamente lo que el proyecto no hace.',
-      ),
-    queIncluye: z.array(z.string()).default([]),
-    queEsperar: z.array(z.string()).default([]),
-    modalidades,
-    paises: z.array(reference('countries')).default([]),
-    profesionales: z.array(reference('professionals')).default([]),
-    preguntasRelacionadas: z.array(reference('faqs')).default([]),
-    // "axis" es hematología, el eje. "orbit" son las tres que giran alrededor.
-    // Es la misma distinción que trae ServiceCard en el design system.
-    nivel: z.enum(['axis', 'orbit']).default('orbit'),
-    activo: z.boolean().default(false),
-    orden: z.number().default(0),
-    icono: z.string().default('stethoscope'),
-    seo,
-  }),
+  /* `image()` acá para que el cliente pueda SUBIR la fotografía de cada
+     prestación desde el CMS. Hasta ahora las fotos vivían sólo en el registro
+     de `src/lib/imagenes.ts`, con imports estáticos: cambiar una exigía tocar
+     código. Lo que se sube manda; si no hay nada subido se sigue usando el
+     registro, así que ninguna foto actual se pierde. */
+  schema: ({ image }) =>
+    z.object({
+      foto: image().nullable().default(null),
+      fotoAlt: z
+        .string()
+        .nullable()
+        .default(null)
+        .describe('Obligatorio si se sube una foto: describe la imagen para quien no puede verla.'),
+      nombre: z.string(),
+      // El H1 no es el nombre de la especialidad, es su función dentro del
+      // estudio hematológico. Ver docs/00-plan.md §5, punto 2.
+      titulo: z.string(),
+      slug: z.string(),
+      unidad: reference('units'),
+      resumen: z.string(),
+      aporteHematologia: z
+        .string()
+        .min(
+          120,
+          'Obligatorio: explica cómo esta prestación aporta a la evaluación, tratamiento o seguimiento del paciente hematológico. Sin esto la prestación quedaría presentada como especialidad suelta, que es justamente lo que el proyecto no hace.',
+        ),
+      queIncluye: z.array(z.string()).default([]),
+      queEsperar: z.array(z.string()).default([]),
+      modalidades,
+      paises: z.array(reference('countries')).default([]),
+      profesionales: z.array(reference('professionals')).default([]),
+      preguntasRelacionadas: z.array(reference('faqs')).default([]),
+      // "axis" es hematología, el eje. "orbit" son las tres que giran alrededor.
+      // Es la misma distinción que trae ServiceCard en el design system.
+      nivel: z.enum(['axis', 'orbit']).default('orbit'),
+      activo: z.boolean().default(false),
+      orden: z.number().default(0),
+      icono: z.string().default('stethoscope'),
+      seo,
+    }),
 });
 
 /* ------------------------------ profesionales ---------------------------- */
@@ -240,8 +252,23 @@ const legal = defineCollection({
 
 /* ------------------------------- ajustes --------------------------------- */
 
+/* PARSER. El loader `file()` de Astro trata cada clave de primer nivel del
+   JSON como una entrada distinta, así que hasta acá el archivo venía envuelto
+   en {"site": {...}} para producir una sola entrada llamada "site".
+
+   El problema: Keystatic, que es quien va a escribir este archivo cuando el
+   cliente guarde desde el CMS, lo escribe PLANO —para él, el archivo es el
+   singleton—. Es decir, el primer guardado desde el CMS habría dejado el JSON
+   en un formato que este loader no sabe leer, y el sitio habría dejado de
+   compilar. No era hipotético: es lo que pasa al pasar el CMS a modo GitHub.
+
+   La solución es guardar plano, que es lo que el CMS escribe, y envolver acá al
+   leer. Así el archivo en disco tiene una sola forma y los dos lados la
+   entienden. */
 const settings = defineCollection({
-  loader: file('./src/content/settings/site.json'),
+  loader: file('./src/content/settings/site.json', {
+    parser: (texto) => ({ site: JSON.parse(texto) }),
+  }),
   schema: z.object({
     nombre: z.string(),
     razonSocial: z.string(),
@@ -282,6 +309,81 @@ const settings = defineCollection({
   }),
 });
 
+/* -------------------------------- portada -------------------------------- */
+
+/* El copy de la portada, que hasta el 2026-09-21 vivía escrito dentro de
+   src/pages/index.astro: los tres cuadros del rotador, los seis accesos de
+   "¿Qué necesitas hacer?", los títulos de cada sección, la lista de
+   telemedicina y los cuatro pasos de la secuencia. Era justo el texto que un
+   cliente quiere cambiar y el único que no podía tocar sin un desarrollador.
+
+   MARCADORES. Varios de estos textos se componían con datos vivos: el precio
+   de la consulta, la comuna, cuántas preguntas hay publicadas. Si se copiaran
+   como texto fijo al CMS, cambiar el precio en "Datos de la clínica" dejaría
+   la portada mintiendo —que es exactamente el problema que el pie de sitio ya
+   tuvo—. Por eso el texto admite marcadores entre llaves, {precio} o {comuna},
+   que se reemplazan al renderizar con el dato real. La lista completa y su
+   expansión están en src/lib/portada.ts. */
+const homepage = defineCollection({
+  // Plano en disco y envuelto al leer, por lo mismo que `settings`.
+  loader: file('./src/content/settings/portada.json', {
+    parser: (texto) => ({ portada: JSON.parse(texto) }),
+  }),
+  schema: ({ image }) =>
+    z.object({
+      hero: z
+        .array(
+          z.object({
+            eyebrow: z.string(),
+            titulo: z.string(),
+            /* Sólo el tercer cuadro lo usa. El título por defecto anuncia el
+               horario de sábado; si en "Dirección y horarios" no hay sábado, el
+               marcador no tendría con qué expandirse y quedaría una frase rota,
+               así que se cae a este otro en vez de publicar basura. */
+            tituloSinSabado: z.string().nullable().default(null),
+            texto: z.string(),
+            botonLabel: z.string(),
+            botonDestino: z.string(),
+            imagen: image().nullable().default(null),
+            imagenAlt: z.string().nullable().default(null),
+          }),
+        )
+        .default([]),
+      accesosTitulo: z.string(),
+      accesosApunte: z.string(),
+      accesos: z
+        .array(
+          z.object({
+            icono: z.string(),
+            titulo: z.string(),
+            texto: z.string(),
+            destino: z.string(),
+          }),
+        )
+        .default([]),
+      unidad: z.object({
+        eyebrow: z.string(),
+        titulo: z.string(),
+        parrafos: z.array(z.string()).default([]),
+      }),
+      telemedicina: z.object({
+        eyebrow: z.string(),
+        titulo: z.string(),
+        texto: z.string(),
+        puntos: z.array(z.string()).default([]),
+      }),
+      material: z.object({ eyebrow: z.string(), titulo: z.string() }),
+      conocenos: z.object({
+        eyebrow: z.string(),
+        titulo: z.string(),
+        texto: z.string(),
+        secuencia: z.array(z.string()).default([]),
+      }),
+      preguntas: z.object({ eyebrow: z.string(), titulo: z.string() }),
+      cierre: z.object({ titulo: z.string(), bajada: z.string() }),
+    }),
+});
+
 export const collections = {
   countries,
   units,
@@ -292,4 +394,5 @@ export const collections = {
   faqs,
   legal,
   settings,
+  homepage,
 };

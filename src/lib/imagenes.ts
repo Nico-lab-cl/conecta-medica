@@ -76,6 +76,28 @@ export function fotoDePrestacion(slug: string): Foto | undefined {
   return (FOTO_PRESTACION as Record<string, Foto>)[slug];
 }
 
+/* Foto de una prestación, mirando primero lo que el cliente subió por el CMS.
+
+   El registro de arriba sigue siendo la fuente por defecto: son las fotografías
+   con las que el sitio se entregó y no hay que volver a cargarlas. Pero desde
+   que `services` acepta `image()`, una prestación puede traer su propia foto
+   subida, y esa manda. Así cambiar una fotografía deja de ser una tarea de
+   desarrollo.
+
+   El alt no se hereda: una foto nueva con el texto alternativo de la anterior
+   describiría algo que ya no está en pantalla, que es peor que no tener alt.
+   Por eso, si hay foto subida sin descripción, se devuelve cadena vacía —que
+   es lo correcto para una imagen decorativa— y el campo queda marcado como
+   obligatorio en el CMS. */
+export function fotoDeServicio(data: {
+  slug: string;
+  foto?: ImageMetadata | null;
+  fotoAlt?: string | null;
+}): Foto | undefined {
+  if (data.foto) return { src: data.foto, alt: data.fotoAlt ?? '' };
+  return fotoDePrestacion(data.slug);
+}
+
 /** Fotografía de cabecera de cada página. */
 export const FOTO_PAGINA = {
   inicio: f(

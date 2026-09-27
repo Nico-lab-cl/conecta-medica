@@ -70,6 +70,7 @@ import {
   precioCLP,
 } from '../lib/contenido';
 import { FOTO_PAGINA, FOTO_PRESTACION } from '../lib/imagenes';
+import { portada, marcadores, expandir, rutaDeDestino } from '../lib/portada';
 
 const a = await ajustes();
 const cl = (await pais('cl')).data;
@@ -99,97 +100,43 @@ const enAcordeon = [
 const sabado = cl.horarios.find((h) => h.dia === 'Sábado');
 const horarios = cl.horarios.map(horarioLegible).join(' · ');
 
-/* --------------------------------- hero ---------------------------------- */
+/* ------------------------------ texto editable ---------------------------- */
 
-const SLIDES = [
-  {
-    eyebrow: 'Telemedicina en todo Chile',
-    titulo: 'Atención hematológica sin viajar a Santiago',
-    texto:
-      'Interpretamos tus exámenes, ajustamos un tratamiento en curso y damos segunda opinión por videollamada. Si tu caso necesita examen físico, te lo decimos.',
-    segunda: { label: 'Cómo funciona', href: RUTAS.telemedicina },
-    foto: FOTO_PAGINA.espacio,
-  },
-  {
-    eyebrow: 'Si tu hemograma salió alterado',
-    titulo: 'Revisamos lo que ya te hiciste antes de indicar algo nuevo',
-    texto:
-      'Trae tus exámenes previos, aunque sean antiguos: sirven para ver la evolución. Sales sabiendo qué tienes, qué falta estudiar y cuál es el paso siguiente.',
-    segunda: { label: 'Qué llevar a la consulta', href: `${RUTAS.preguntas}#que-llevar-a-la-consulta` },
-    foto: FOTO_PRESTACION.hematologia,
-  },
-  {
-    eyebrow: 'También el fin de semana',
-    titulo: sabado
-      ? `Sábado de ${sabado.desde} a ${sabado.hasta}, sin derivación previa`
-      : 'Sin derivación previa de otro médico',
-    texto: `Consulta particular ${precioCLP(a.precioConsulta)}, precio conocido antes de atenderte. ${a.precioNota}`,
-    segunda: { label: 'Ver precios', href: RUTAS.precios },
-    foto: FOTO_PAGINA.agendar,
-  },
-];
+/* Todo el copy de esta página vive ahora en src/content/settings/portada.json
+   y se edita desde el CMS, en "Portada del sitio". Acá sólo se expanden los
+   marcadores —{precio}, {comuna}, {preguntas}— con los datos vivos, para que
+   cambiar el precio en "Datos de la clínica" no deje la portada mintiendo.
+   Ver src/lib/portada.ts. */
+const P = await portada();
+const M = await marcadores(preguntas.length);
+const txt = (texto: string) => expandir(texto, M);
 
-/* ------------------------- ¿qué necesitas hacer? -------------------------- */
+/* Fotografías por defecto del rotador, por si el cliente no ha subido ninguna.
+   Son las que el sitio trae de fábrica; subir una en el CMS la reemplaza. */
+const FOTO_SLIDE = [FOTO_PAGINA.espacio, FOTO_PRESTACION.hematologia, FOTO_PAGINA.agendar];
 
-const ACCESOS = [
-  {
-    icono: 'calendar',
-    titulo: 'Solicitar una hora',
-    texto: `Presencial en ${cl.direccion.comuna} o por telemedicina.`,
-    href: RUTAS.agendar,
-  },
-  {
-    icono: 'video',
-    titulo: 'Atenderme por telemedicina',
-    texto: 'Desde cualquier región de Chile.',
-    href: RUTAS.telemedicina,
-  },
-  {
-    icono: 'file-text',
-    titulo: 'Saber qué llevar',
-    texto: 'Exámenes previos, medicamentos e informes.',
-    href: `${RUTAS.preguntas}#que-llevar-a-la-consulta`,
-  },
-  {
-    icono: 'info',
-    titulo: 'Conocer el precio',
-    texto: `${precioCLP(a.precioConsulta)}, solo atención particular.`,
-    href: RUTAS.precios,
-  },
-  {
-    icono: 'map-pin',
-    titulo: 'Cómo llegar',
-    texto: cl.direccion.referencia
-      ? `${cl.direccion.referencia}, ${cl.direccion.comuna}.`
-      : `${cl.direccion.comuna}, ${cl.direccion.ciudad}.`,
-    href: RUTAS.contacto,
-  },
-  {
-    icono: 'message-circle',
-    titulo: 'Resolver una duda',
-    texto: `${preguntas.length} preguntas respondidas.`,
-    href: RUTAS.preguntas,
-  },
-];
+const SLIDES = P.hero.map((s, i) => ({
+  eyebrow: txt(s.eyebrow),
+  /* El tercer cuadro anuncia el horario de sábado. Si en "Dirección y horarios"
+     no hay sábado, el marcador se expandiría a nada y quedaría una frase rota,
+     así que se usa el título alternativo. */
+  titulo: txt(!sabado && s.tituloSinSabado ? s.tituloSinSabado : s.titulo),
+  texto: txt(s.texto),
+  segunda: { label: s.botonLabel, href: rutaDeDestino(s.botonDestino) },
+  foto: s.imagen
+    ? { src: s.imagen, alt: s.imagenAlt ?? '' }
+    : (FOTO_SLIDE[i] ?? FOTO_PAGINA.inicio),
+}));
 
-/* ------------------------------ telemedicina ----------------------------- */
+const ACCESOS = P.accesos.map((x) => ({
+  icono: x.icono,
+  titulo: txt(x.titulo),
+  texto: txt(x.texto),
+  href: rutaDeDestino(x.destino),
+}));
 
-/* Los mismos cuatro que la página de telemedicina declara resolubles a
-   distancia, resumidos. Ni uno más: lo que necesita examen físico está dicho
-   allá y no se contradice acá. */
-const TELE = [
-  'Interpretar un hemograma o una ferritina alterada',
-  'Revisar y ajustar un tratamiento en curso',
-  'Una segunda opinión sobre un estudio ya hecho',
-  'Orientarte sobre qué estudiar y en qué orden',
-];
-
-const SECUENCIA = [
-  'Pides hora',
-  'Preparas tus exámenes',
-  'Primera consulta',
-  'Control con resultados',
-];
+const TELE = P.telemedicina.puntos.map(txt);
+const SECUENCIA = P.conocenos.secuencia.map(txt);
 ---
 
 <Base
@@ -244,10 +191,8 @@ const SECUENCIA = [
 
       <div class="tareas-cuerpo">
         <div class="titulo-fila">
-          <h2>¿Qué necesitas hacer?</h2>
-          <p class="apunte">
-            Sin derivación previa · Te confirmamos dentro del próximo día hábil
-          </p>
+          <h2>{txt(P.accesosTitulo)}</h2>
+          <p class="apunte">{txt(P.accesosApunte)}</p>
         </div>
         <ul class="rejilla-accesos">
           {
@@ -273,19 +218,11 @@ const SECUENCIA = [
     <div class="contenedor">
       <p class="marca-eyebrow">
         <img src="/marca/isotipo-limpio.svg" alt="" width="31" height="30" />
-        <span class="eyebrow">Conecta Hematología</span>
+        <span class="eyebrow">{txt(P.unidad.eyebrow)}</span>
       </p>
       <div class="unidad-intro">
-        <h2>La hematología es el eje. Lo demás entra cuando tu caso lo necesita.</h2>
-        <p>
-          Gastroenterología, nutrición e imágenes no son especialidades sueltas ofrecidas en el
-          mismo lugar: entran cuando el estudio hematológico las necesita, y las coordina el mismo
-          médico que lleva tu caso.
-        </p>
-        <p>
-          Todo lo que se agenda acá es hematología. Si tu motivo de consulta es otro, preferimos
-          decírtelo antes de que tomes la hora.
-        </p>
+        <h2>{txt(P.unidad.titulo)}</h2>
+        {P.unidad.parrafos.map((x) => <p>{txt(x)}</p>)}
       </div>
 
       <div class="rejilla-prestaciones">
@@ -322,15 +259,9 @@ const SECUENCIA = [
   <section class="telemedicina">
     <div class="contenedor dos-columnas">
       <div>
-        <p class="eyebrow">Telemedicina</p>
-        <h2>
-          Si vives en región, la mayoría del trabajo hematológico se puede hacer a distancia
-        </h2>
-        <p class="parrafo">
-          Interpretar exámenes, ajustar un tratamiento en curso, dar segunda opinión y decidir qué
-          falta estudiar no requieren que estés en la sala. Lo que sí requiere examen físico te lo
-          decimos de frente.
-        </p>
+        <p class="eyebrow">{txt(P.telemedicina.eyebrow)}</p>
+        <h2>{txt(P.telemedicina.titulo)}</h2>
+        <p class="parrafo">{txt(P.telemedicina.texto)}</p>
         <ul class="lista-check">
           {
             TELE.map((t) => (
@@ -373,8 +304,8 @@ const SECUENCIA = [
     <div class="contenedor">
       <div class="titulo-fila">
         <div>
-          <p class="eyebrow">Información para pacientes</p>
-          <h2>Entender lo que te pasa, antes y después de la consulta</h2>
+          <p class="eyebrow">{txt(P.material.eyebrow)}</p>
+          <h2>{txt(P.material.titulo)}</h2>
         </div>
         <EnlaceTexto href={RUTAS.pacientes} flecha>Ver todo el material</EnlaceTexto>
       </div>
@@ -422,14 +353,10 @@ const SECUENCIA = [
       <div>
         <p class="marca-eyebrow">
           <img src="/marca/isotipo-limpio.svg" alt="" width="31" height="30" />
-          <span class="eyebrow">Conócenos</span>
+          <span class="eyebrow">{txt(P.conocenos.eyebrow)}</span>
         </p>
-        <h2>Una unidad pequeña, con un médico responsable de tu caso de principio a fin</h2>
-        <p class="parrafo">
-          {a.razonSocial} es una unidad de hematología en {cl.direccion.comuna}. No es un centro
-          médico general: atiende hematología y las prestaciones que ese estudio necesita. Quien te
-          recibe en la primera consulta es quien sigue tu caso.
-        </p>
+        <h2>{txt(P.conocenos.titulo)}</h2>
+        <p class="parrafo">{txt(P.conocenos.texto)}</p>
 
         {
           medico && (
@@ -476,8 +403,8 @@ const SECUENCIA = [
       <section class="preguntas">
         <div class="contenedor dos-columnas dos-columnas-angosta">
           <div>
-            <p class="eyebrow">Preguntas frecuentes</p>
-            <h2>Las dudas que llegan antes de agendar</h2>
+            <p class="eyebrow">{txt(P.preguntas.eyebrow)}</p>
+            <h2>{txt(P.preguntas.titulo)}</h2>
             <p class="ver-todas">
               <EnlaceTexto href={RUTAS.preguntas} flecha>
                 Ver las {preguntas.length} preguntas
@@ -522,11 +449,8 @@ const SECUENCIA = [
           width="41"
           height="40"
         />
-        <h2>Cuéntanos qué te pasa y te confirmamos una hora</h2>
-        <p class="bajada">
-          Respondemos dentro del próximo día hábil. No necesitas derivación ni interconsulta para
-          pedir hora.
-        </p>
+        <h2>{txt(P.cierre.titulo)}</h2>
+        <p class="bajada">{txt(P.cierre.bajada)}</p>
       </div>
       <div class="cierre-acciones">
         <BotonAgendar tam="lg" anchoCompleto />

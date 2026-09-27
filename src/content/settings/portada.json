@@ -1,0 +1,114 @@
+{
+  "hero": [
+    {
+      "eyebrow": "Telemedicina en todo Chile",
+      "titulo": "Atención hematológica sin viajar a Santiago",
+      "texto": "Interpretamos tus exámenes, ajustamos un tratamiento en curso y damos segunda opinión por videollamada. Si tu caso necesita examen físico, te lo decimos.",
+      "botonLabel": "Cómo funciona",
+      "botonDestino": "telemedicina",
+      "imagen": null,
+      "imagenAlt": null
+    },
+    {
+      "eyebrow": "Si tu hemograma salió alterado",
+      "titulo": "Revisamos lo que ya te hiciste antes de indicar algo nuevo",
+      "texto": "Trae tus exámenes previos, aunque sean antiguos: sirven para ver la evolución. Sales sabiendo qué tienes, qué falta estudiar y cuál es el paso siguiente.",
+      "botonLabel": "Qué llevar a la consulta",
+      "botonDestino": "que-llevar",
+      "imagen": null,
+      "imagenAlt": null
+    },
+    {
+      "eyebrow": "También el fin de semana",
+      "titulo": "{sabado}, sin derivación previa",
+      "tituloSinSabado": "Sin derivación previa de otro médico",
+      "texto": "Consulta particular {precio}, precio conocido antes de atenderte. {notaPrecio}",
+      "botonLabel": "Ver precios",
+      "botonDestino": "precios",
+      "imagen": null,
+      "imagenAlt": null
+    }
+  ],
+  "accesosTitulo": "¿Qué necesitas hacer?",
+  "accesosApunte": "Sin derivación previa · Te confirmamos dentro del próximo día hábil",
+  "accesos": [
+    {
+      "icono": "calendar",
+      "titulo": "Solicitar una hora",
+      "texto": "Presencial en {comuna} o por telemedicina.",
+      "destino": "agendar"
+    },
+    {
+      "icono": "video",
+      "titulo": "Atenderme por telemedicina",
+      "texto": "Desde cualquier región de Chile.",
+      "destino": "telemedicina"
+    },
+    {
+      "icono": "file-text",
+      "titulo": "Saber qué llevar",
+      "texto": "Exámenes previos, medicamentos e informes.",
+      "destino": "que-llevar"
+    },
+    {
+      "icono": "info",
+      "titulo": "Conocer el precio",
+      "texto": "{precio}, solo atención particular.",
+      "destino": "precios"
+    },
+    {
+      "icono": "map-pin",
+      "titulo": "Cómo llegar",
+      "texto": "{referencia}, {comuna}.",
+      "destino": "contacto"
+    },
+    {
+      "icono": "message-circle",
+      "titulo": "Resolver una duda",
+      "texto": "{preguntas} preguntas respondidas.",
+      "destino": "preguntas"
+    }
+  ],
+  "unidad": {
+    "eyebrow": "Conecta Hematología",
+    "titulo": "La hematología es el eje. Lo demás entra cuando tu caso lo necesita.",
+    "parrafos": [
+      "Gastroenterología, nutrición e imágenes no son especialidades sueltas ofrecidas en el mismo lugar: entran cuando el estudio hematológico las necesita, y las coordina el mismo médico que lleva tu caso.",
+      "Todo lo que se agenda acá es hematología. Si tu motivo de consulta es otro, preferimos decírtelo antes de que tomes la hora."
+    ]
+  },
+  "telemedicina": {
+    "eyebrow": "Telemedicina",
+    "titulo": "Si vives en región, la mayoría del trabajo hematológico se puede hacer a distancia",
+    "texto": "Interpretar exámenes, ajustar un tratamiento en curso, dar segunda opinión y decidir qué falta estudiar no requieren que estés en la sala. Lo que sí requiere examen físico te lo decimos de frente.",
+    "puntos": [
+      "Interpretar un hemograma o una ferritina alterada",
+      "Revisar y ajustar un tratamiento en curso",
+      "Una segunda opinión sobre un estudio ya hecho",
+      "Orientarte sobre qué estudiar y en qué orden"
+    ]
+  },
+  "material": {
+    "eyebrow": "Información para pacientes",
+    "titulo": "Entender lo que te pasa, antes y después de la consulta"
+  },
+  "conocenos": {
+    "eyebrow": "Conócenos",
+    "titulo": "Una unidad pequeña, con un médico responsable de tu caso de principio a fin",
+    "texto": "{razonSocial} es una unidad de hematología en {comuna}. No es un centro médico general: atiende hematología y las prestaciones que ese estudio necesita. Quien te recibe en la primera consulta es quien sigue tu caso.",
+    "secuencia": [
+      "Pides hora",
+      "Preparas tus exámenes",
+      "Primera consulta",
+      "Control con resultados"
+    ]
+  },
+  "preguntas": {
+    "eyebrow": "Preguntas frecuentes",
+    "titulo": "Las dudas que llegan antes de agendar"
+  },
+  "cierre": {
+    "titulo": "Cuéntanos qué te pasa y te confirmamos una hora",
+    "bajada": "Respondemos dentro del próximo día hábil. No necesitas derivación ni interconsulta para pedir hora."
+  }
+}
