@@ -5,18 +5,14 @@
       "titulo": "Atención hematológica sin viajar a Santiago",
       "texto": "Interpretamos tus exámenes, ajustamos un tratamiento en curso y damos segunda opinión por videollamada. Si tu caso necesita examen físico, te lo decimos.",
       "botonLabel": "Cómo funciona",
-      "botonDestino": "telemedicina",
-      "imagen": null,
-      "imagenAlt": null
+      "botonDestino": "telemedicina"
     },
     {
       "eyebrow": "Si tu hemograma salió alterado",
       "titulo": "Revisamos lo que ya te hiciste antes de indicar algo nuevo",
       "texto": "Trae tus exámenes previos, aunque sean antiguos: sirven para ver la evolución. Sales sabiendo qué tienes, qué falta estudiar y cuál es el paso siguiente.",
       "botonLabel": "Qué llevar a la consulta",
-      "botonDestino": "que-llevar",
-      "imagen": null,
-      "imagenAlt": null
+      "botonDestino": "que-llevar"
     },
     {
       "eyebrow": "También el fin de semana",
@@ -24,9 +20,7 @@
       "tituloSinSabado": "Sin derivación previa de otro médico",
       "texto": "Consulta particular {precio}, precio conocido antes de atenderte. {notaPrecio}",
       "botonLabel": "Ver precios",
-      "botonDestino": "precios",
-      "imagen": null,
-      "imagenAlt": null
+      "botonDestino": "precios"
     }
   ],
   "accesosTitulo": "¿Qué necesitas hacer?",
@@ -108,7 +102,7 @@
     "titulo": "Las dudas que llegan antes de agendar"
   },
   "cierre": {
-    "titulo": "Cuéntanos qué te pasa y te confirmamos una hora",
+    "titulo": "Cuéntanos qué te pasa y te confirmamos una hora test",
     "bajada": "Respondemos dentro del próximo día hábil. No necesitas derivación ni interconsulta para pedir hora."
   }
 }
