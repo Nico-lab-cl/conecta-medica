@@ -1,0 +1,108 @@
+---
+/* Los últimos avisos que mandó TotalMed, tal cual llegaron. Sirve para dos
+   cosas: confirmar que el webhook está conectado, y ver el formato real de los
+   envíos cuando un paciente no se reconoce. */
+import Admin from '../../layouts/Admin.astro';
+import { entorno } from '../../lib/crm/entorno';
+import { haySesion } from '../../lib/crm/sesion';
+import { fechaRegistro } from '../../lib/crm/fechas';
+
+export const prerender = false;
+
+const env = entorno(Astro.locals);
+if (!(await haySesion(Astro.cookies, env))) return Astro.redirect('/admin/');
+
+const eventos = env.DB
+  ? (
+      await env.DB.prepare(
+        `SELECT id, recibido_en, tipo, firma_valida, cabeceras, cuerpo, paciente_id, error
+           FROM eventos_webhook ORDER BY id DESC LIMIT 50`,
+      ).all<{
+        id: number;
+        recibido_en: string;
+        tipo: string | null;
+        firma_valida: number;
+        cabeceras: string;
+        cuerpo: string;
+        paciente_id: number | null;
+        error: string | null;
+      }>()
+    ).results
+  : [];
+
+const bonito = (s: string) => {
+  try {
+    return JSON.stringify(JSON.parse(s), null, 2);
+  } catch {
+    return s;
+  }
+};
+const destino = new URL('/api/webhooks/totalmed', Astro.url.origin).toString();
+---
+
+<Admin titulo="Webhook">
+  <h1>Webhook de TotalMed</h1>
+  <p class="tenue">
+    Destino a registrar en TotalMed: <code>{destino}</code>
+  </p>
+  {
+    !env.TOTALMED_WEBHOOK_SECRET && (
+      <p class="aviso error">Falta TOTALMED_WEBHOOK_SECRET: todos los envíos se van a rechazar.</p>
+    )
+  }
+
+  <div class="lista">
+    {
+      eventos.length ? (
+        eventos.map((e) => (
+          <details class="tarjeta">
+            <summary>
+              <b>#{e.id}</b> {e.tipo ?? 'sin tipo'} · {fechaRegistro(e.recibido_en)} ·{' '}
+              {e.firma_valida ? 'firmado' : 'sin firma válida'}
+              {e.paciente_id && (
+                <>
+                  {' '}
+                  · <a href={`/admin/pacientes/${e.paciente_id}/`}>paciente {e.paciente_id}</a>
+                </>
+              )}
+              {e.error && <span class="error"> · {e.error}</span>}
+            </summary>
+            <h2>Cuerpo</h2>
+            <pre>{bonito(e.cuerpo)}</pre>
+            <h2>Cabeceras</h2>
+            <pre>{bonito(e.cabeceras)}</pre>
+          </details>
+        ))
+      ) : (
+        <p class="tenue">Todavía no llega ningún envío.</p>
+      )
+    }
+  </div>
+</Admin>
+
+<style>
+  .lista {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  summary {
+    cursor: pointer;
+  }
+  .error {
+    color: var(--color-alert);
+  }
+  pre {
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    background: var(--surface-alt);
+    padding: 12px;
+    border-radius: 8px;
+    max-height: 400px;
+  }
+  .aviso {
+    margin-top: 12px;
+  }
+</style>

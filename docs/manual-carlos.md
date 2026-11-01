@@ -9,12 +9,15 @@ guardados con fecha y autor, así que **nada se pierde y todo se puede deshacer*
 
 ## 1. Cómo entrar
 
-Vaya a **conectamedica.com/admin** e inicie sesión con su correo y su
+Vaya a **conectamedica.com/keystatic** e inicie sesión con su correo y su
 contraseña. No necesita ninguna otra cuenta.
 
 La primera vez le va a llegar un correo de **Keystatic** (el administrador del
 sitio) con una invitación. Ábralo, acepte la invitación y elija su contraseña.
-Recién después de eso puede entrar por conectamedica.com/admin.
+Recién después de eso puede entrar por conectamedica.com/keystatic.
+
+(En **conectamedica.com/admin** está la lista de pacientes que reservan por la
+agenda en línea. Esa entrada usa una clave distinta, que le damos aparte.)
 
 **Después de guardar, el cambio tarda uno o dos minutos en aparecer en el
 sitio.** Es normal: en ese tiempo el sitio se vuelve a armar con su cambio. Si

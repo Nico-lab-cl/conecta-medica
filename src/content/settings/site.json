@@ -15,10 +15,10 @@
     "telefono": "131"
   },
   "agendamiento": {
-    "modo": "formulario",
-    "src": null,
+    "modo": "enlace",
+    "src": "https://totalmed.lat/reserva/334e8ec5-e3d8-43b7-b7e2-61e80362b706",
     "altura": 900,
-    "proveedor": null,
+    "proveedor": "TotalMed",
     "politicaPrivacidadProveedor": null
   },
   "estadoApertura": {

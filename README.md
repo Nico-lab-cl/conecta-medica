@@ -7,7 +7,7 @@ Astro 5 estático · TypeScript estricto · Tailwind v4 · Keystatic · Cloudfla
 
 ```bash
 npm install
-npm run dev          # http://localhost:4321  ·  CMS en /admin
+npm run dev          # http://localhost:4321  ·  CMS en /keystatic · CRM en /admin
 npm run build
 npm run presupuesto  # verifica peso y ausencia de datos de relleno
 ```
@@ -45,7 +45,7 @@ Conecta es CSS puro, y el formulario funciona sin JavaScript.
 ```
 src/
   content.config.ts      9 colecciones Zod — acá viven las reglas editoriales
-  content/               el contenido real, editable desde /admin
+  content/               el contenido real, editable desde /keystatic
   lib/contenido.ts       toda consulta al contenido pasa por acá
   lib/whatsapp.ts        sin número configurado → no se renderiza el botón
   lib/schema.ts          JSON-LD; omite lo que no tiene dato

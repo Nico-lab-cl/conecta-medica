@@ -27,8 +27,30 @@ const cl = (await pais('cl')).data;
 const ruta = migas({ label: 'Agendar hora' });
 const claveTurnstile = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY as string | undefined;
 const conIframe = a.agendamiento.modo === 'iframe' && Boolean(a.agendamiento.src);
+
+/* Modo "enlace": la agenda vive entera en el proveedor y esta página sólo
+   reenvía. Es estática, así que el reenvío va por meta refresh y por script, y
+   queda un enlace visible por si el navegador no sigue ninguno de los dos.
+   Va con noindex: lo que se indexa es la agenda, no un paso intermedio. */
+const destinoDirecto = a.agendamiento.modo === 'enlace' ? a.agendamiento.src : null;
 ---
 
+{destinoDirecto ? (
+  <html lang="es-CL">
+    <head>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <meta name="robots" content="noindex" />
+      <meta http-equiv="refresh" content={`0;url=${destinoDirecto}`} />
+      <title>Agendar hora — Clínica Conecta</title>
+      <script is:inline define:vars={{ destinoDirecto }}>location.replace(destinoDirecto);</script>
+    </head>
+    <body style="font-family:system-ui,sans-serif;padding:2rem;text-align:center">
+      <p>Te estamos llevando a la agenda…</p>
+      <p><a href={destinoDirecto}>Si no avanza, entra acá</a></p>
+    </body>
+  </html>
+) : (
 <Pagina
   titulo="Agendar hora — Clínica Conecta"
   descripcion="Solicita tu hora de hematología, presencial en Ñuñoa o por telemedicina. Consulta particular $50.000, sin derivación previa."
@@ -122,6 +144,7 @@ const conIframe = a.agendamiento.modo === 'iframe' && Boolean(a.agendamiento.src
     <div class="contenedor"><AvisoUrgencias /></div>
   </section>
 </Pagina>
+)}
 
 <style>
   .columnas {

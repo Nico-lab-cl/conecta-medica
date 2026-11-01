@@ -1,0 +1,133 @@
+---
+/* Ficha de un paciente en el CRM: datos de contacto, etapa, notas del equipo y
+   las citas que llegaron desde TotalMed. */
+import Admin from '../../../layouts/Admin.astro';
+import { entorno } from '../../../lib/crm/entorno';
+import { haySesion } from '../../../lib/crm/sesion';
+import { ESTADOS } from '../../../lib/crm/estados';
+import { fechaCita, fechaRegistro } from '../../../lib/crm/fechas';
+
+export const prerender = false;
+
+const env = entorno(Astro.locals);
+if (!(await haySesion(Astro.cookies, env))) return Astro.redirect('/admin/');
+if (!env.DB) return Astro.redirect('/admin/');
+
+const id = Number(Astro.params.id);
+const p = await env.DB.prepare('SELECT * FROM pacientes WHERE id = ?').bind(id).first<{
+  id: number;
+  nombre: string;
+  email: string | null;
+  telefono: string | null;
+  rut: string | null;
+  estado: string;
+  notas: string;
+  origen: string;
+  totalmed_id: string | null;
+  creado_en: string;
+}>();
+if (!p) return new Response('Paciente no encontrado', { status: 404 });
+
+const citas = (
+  await env.DB.prepare('SELECT * FROM citas WHERE paciente_id = ? ORDER BY inicio DESC')
+    .bind(id)
+    .all<{ id: number; servicio: string | null; inicio: string | null; estado: string | null; profesional: string | null }>()
+).results;
+
+const whatsapp = p.telefono ? `https://wa.me/${p.telefono.replace(/\D/g, '')}` : null;
+---
+
+<Admin titulo={p.nombre || 'Paciente'}>
+  <p><a href="/admin/">← Pacientes</a></p>
+  <h1>{p.nombre || 'Sin nombre'}</h1>
+  <p class="tenue">
+    Ingresó {fechaRegistro(p.creado_en, 'full')} · {p.origen === 'totalmed' ? 'desde TotalMed' : 'agregado a mano'}
+  </p>
+
+  {Astro.url.searchParams.has('guardado') && <p class="aviso">Cambios guardados.</p>}
+
+  <div class="columnas">
+    <form class="tarjeta formulario" method="post" action="/api/admin/pacientes">
+      <input type="hidden" name="id" value={p.id} />
+      <label>Nombre<input name="nombre" value={p.nombre} required /></label>
+      <label>Correo<input name="email" type="email" value={p.email ?? ''} /></label>
+      <label>Teléfono<input name="telefono" type="tel" value={p.telefono ?? ''} /></label>
+      <label>RUT<input name="rut" value={p.rut ?? ''} /></label>
+      <label>
+        Estado
+        <select name="estado">
+          {ESTADOS.map((e) => <option value={e.valor} selected={e.valor === p.estado}>{e.etiqueta}</option>)}
+        </select>
+      </label>
+      <label class="ancho">
+        Notas del equipo
+        <textarea name="notas" rows="8">{p.notas}</textarea>
+      </label>
+      <div class="acciones ancho">
+        <button class="btn" type="submit">Guardar</button>
+        {p.email && <a href={`mailto:${p.email}`}>Escribir correo</a>}
+        {whatsapp && <a href={whatsapp} target="_blank" rel="noopener">Abrir WhatsApp</a>}
+      </div>
+    </form>
+
+    <section class="tarjeta">
+      <h2>Citas</h2>
+      {
+        citas.length ? (
+          <ul class="citas">
+            {citas.map((c) => (
+              <li>
+                <b>{fechaCita(c.inicio, 'full')}</b>
+                <div>{c.servicio ?? 'Servicio sin nombre'}</div>
+                <div class="tenue">
+                  {[c.estado, c.profesional].filter(Boolean).join(' · ')}
+                </div>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p class="tenue">Sin citas registradas.</p>
+        )
+      }
+    </section>
+  </div>
+</Admin>
+
+<style>
+  .columnas {
+    display: grid;
+    gap: 20px;
+    margin-top: 20px;
+  }
+  @media (min-width: 900px) {
+    .columnas {
+      grid-template-columns: 1.4fr 1fr;
+      align-items: start;
+    }
+  }
+  .formulario {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+  }
+  .ancho {
+    grid-column: 1 / -1;
+  }
+  .acciones {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+  }
+  .citas {
+    list-style: none;
+    padding: 0;
+    margin: 12px 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .aviso {
+    margin-top: 12px;
+  }
+</style>

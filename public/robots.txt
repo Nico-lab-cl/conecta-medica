@@ -1,7 +1,7 @@
 User-agent: *
 Allow: /
 
-# El CMS y su API no se indexan.
+# El CMS, el CRM y la API no se indexan.
 Disallow: /admin
 Disallow: /keystatic
 Disallow: /api/

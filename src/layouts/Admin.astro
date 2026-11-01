@@ -1,0 +1,204 @@
+---
+/* Armazón de /admin, el CRM interno. No usa la cabecera ni el pie del sitio:
+   es una herramienta de trabajo, no una página para pacientes. Sí usa los
+   mismos tokens, para que se sienta parte de la misma casa. */
+import '../styles/global.css';
+
+interface Props {
+  titulo: string;
+  conSesion?: boolean;
+}
+const { titulo, conSesion = true } = Astro.props;
+const ruta = Astro.url.pathname;
+---
+
+<!doctype html>
+<html lang="es-CL">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <title>{titulo} — Conecta CRM</title>
+  </head>
+  <body class="admin">
+    <header class="barra">
+      <a class="marca" href="/admin/">Conecta <span>CRM</span></a>
+      {
+        conSesion && (
+          <nav>
+            <a href="/admin/" aria-current={ruta === '/admin/' || ruta === '/admin' ? 'page' : undefined}>
+              Pacientes
+            </a>
+            <a href="/admin/eventos/" aria-current={ruta.startsWith('/admin/eventos') ? 'page' : undefined}>
+              Webhook
+            </a>
+            <a href="/keystatic">Editar el sitio</a>
+            <form method="post" action="/api/admin/sesion">
+              <input type="hidden" name="accion" value="salir" />
+              <button type="submit">Salir</button>
+            </form>
+          </nav>
+        )
+      }
+    </header>
+    <main class="cuerpo">
+      <slot />
+    </main>
+  </body>
+</html>
+
+<style is:global>
+  body.admin {
+    background: var(--surface-alt);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: var(--text-body-sm);
+    min-height: 100vh;
+  }
+  .admin .barra {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 24px;
+    background: var(--color-blue-deep);
+    color: var(--color-white);
+  }
+  .admin .marca {
+    color: inherit;
+    text-decoration: none;
+    font-family: var(--font-serif);
+    font-size: 1.25rem;
+  }
+  .admin .marca span {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    opacity: 0.7;
+  }
+  .admin .barra nav {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 18px;
+  }
+  .admin .barra nav a,
+  .admin .barra nav button {
+    color: inherit;
+    opacity: 0.8;
+    text-decoration: none;
+    background: none;
+    border: 0;
+    font: inherit;
+    cursor: pointer;
+    padding: 4px 0;
+  }
+  .admin .barra nav a[aria-current='page'] {
+    opacity: 1;
+    border-bottom: 2px solid currentColor;
+  }
+  .admin .cuerpo {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 28px 16px 64px;
+  }
+  .admin h1 {
+    font-family: var(--font-serif);
+    font-size: var(--text-h2);
+    color: var(--text-heading);
+  }
+  .admin h2 {
+    font-family: var(--font-serif);
+    font-size: var(--text-h4);
+    color: var(--text-heading);
+  }
+  .admin .tarjeta {
+    background: var(--surface-card);
+    border: 1px solid var(--color-line);
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .admin .aviso {
+    padding: 12px 16px;
+    border-radius: 8px;
+    background: var(--color-blue-cloud);
+    color: var(--color-blue-deep);
+  }
+  .admin .aviso.error {
+    background: #fdecec;
+    color: var(--color-alert);
+  }
+  .admin label {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-weight: 500;
+  }
+  .admin input,
+  .admin select,
+  .admin textarea {
+    font: inherit;
+    padding: 8px 10px;
+    border: 1px solid var(--color-line-strong);
+    border-radius: 8px;
+    background: var(--color-white);
+    color: var(--text-primary);
+  }
+  .admin .btn {
+    font: inherit;
+    font-weight: 600;
+    padding: 9px 16px;
+    border-radius: 8px;
+    border: 0;
+    background: var(--action-primary-bg);
+    color: var(--action-primary-fg);
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .admin .btn:hover {
+    background: var(--action-primary-bg-hover);
+  }
+  .admin .chip {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: var(--color-blue-cloud);
+    color: var(--color-blue-deep);
+    white-space: nowrap;
+  }
+  .admin .chip[data-estado='nuevo'] { background: #fff4d6; color: #7a5300; }
+  .admin .chip[data-estado='atendido'] { background: #e3f5e8; color: #1f6b35; }
+  .admin .chip[data-estado='inactivo'] { background: #eceef1; color: var(--color-gray); }
+  .admin .tabla {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .admin .tabla th {
+    text-align: left;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-gray);
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--color-line);
+  }
+  .admin .tabla td {
+    padding: 12px;
+    border-bottom: 1px solid var(--color-line);
+    vertical-align: top;
+  }
+  .admin .tabla tr:last-child td {
+    border-bottom: 0;
+  }
+  .admin .tenue {
+    color: var(--color-gray);
+  }
+  .admin .desplazable {
+    overflow-x: auto;
+  }
+</style>

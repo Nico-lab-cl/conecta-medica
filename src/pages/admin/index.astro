@@ -1,0 +1,266 @@
+---
+/* /admin: CRM de pacientes.
+
+   Sin sesión muestra la entrada; con sesión, la lista. Los pacientes llegan
+   solos desde la agenda de TotalMed (api/webhooks/totalmed.ts) y también se
+   pueden agregar a mano, por ejemplo los que agendan por WhatsApp. */
+import Admin from '../../layouts/Admin.astro';
+import { entorno } from '../../lib/crm/entorno';
+import { configurado, haySesion } from '../../lib/crm/sesion';
+import { ESTADOS, etiquetaEstado } from '../../lib/crm/estados';
+import { fechaCita, fechaRegistro } from '../../lib/crm/fechas';
+
+export const prerender = false;
+
+const env = entorno(Astro.locals);
+const conSesion = await haySesion(Astro.cookies, env);
+const error = Astro.url.searchParams.get('error');
+
+type Fila = {
+  id: number;
+  nombre: string;
+  email: string | null;
+  telefono: string | null;
+  rut: string | null;
+  estado: string;
+  origen: string;
+  creado_en: string;
+  proxima: string | null;
+  servicio: string | null;
+};
+
+const q = (Astro.url.searchParams.get('q') ?? '').trim();
+const filtro = Astro.url.searchParams.get('estado') ?? '';
+let filas: Fila[] = [];
+let conteo: Record<string, number> = {};
+
+if (conSesion && env.DB) {
+  const condiciones: string[] = [];
+  const valores: unknown[] = [];
+  if (q) {
+    condiciones.push('(p.nombre LIKE ?1 OR p.email LIKE ?1 OR p.telefono LIKE ?1 OR p.rut LIKE ?1)');
+    valores.push(`%${q}%`);
+  }
+  if (ESTADOS.some((e) => e.valor === filtro)) {
+    condiciones.push(`p.estado = ?${valores.length + 1}`);
+    valores.push(filtro);
+  }
+  const donde = condiciones.length ? `WHERE ${condiciones.join(' AND ')}` : '';
+  filas = (
+    await env.DB.prepare(
+      `SELECT p.id, p.nombre, p.email, p.telefono, p.rut, p.estado, p.origen, p.creado_en,
+              (SELECT inicio FROM citas c WHERE c.paciente_id = p.id ORDER BY inicio DESC LIMIT 1) AS proxima,
+              (SELECT servicio FROM citas c WHERE c.paciente_id = p.id ORDER BY inicio DESC LIMIT 1) AS servicio
+         FROM pacientes p ${donde}
+        ORDER BY p.actualizado_en DESC
+        LIMIT 500`,
+    )
+      .bind(...valores)
+      .all<Fila>()
+  ).results;
+
+  const c = await env.DB.prepare('SELECT estado, COUNT(*) AS n FROM pacientes GROUP BY estado').all<{
+    estado: string;
+    n: number;
+  }>();
+  conteo = Object.fromEntries(c.results.map((r) => [r.estado, r.n]));
+}
+const total = Object.values(conteo).reduce((a, b) => a + b, 0);
+---
+
+{
+  !conSesion ? (
+    <Admin titulo="Entrar" conSesion={false}>
+      <div class="entrada tarjeta">
+        <h1>Entrar al CRM</h1>
+        {!configurado(env) && (
+          <p class="aviso error">
+            Falta configurar ADMIN_PASSWORD y ADMIN_SECRET en Cloudflare. Mientras tanto nadie puede entrar.
+          </p>
+        )}
+        {error === 'clave' && <p class="aviso error">Clave incorrecta.</p>}
+        <form method="post" action="/api/admin/sesion">
+          <label>
+            Clave
+            <input type="password" name="clave" required autocomplete="current-password" autofocus />
+          </label>
+          <button class="btn" type="submit">Entrar</button>
+        </form>
+        <p class="tenue">
+          ¿Buscas editar los textos del sitio? Eso está en <a href="/keystatic">/keystatic</a>.
+        </p>
+      </div>
+    </Admin>
+  ) : (
+    <Admin titulo="Pacientes">
+      <div class="encabezado">
+        <div>
+          <h1>Pacientes</h1>
+          <p class="tenue">{total} en total · entran solos al reservar en TotalMed</p>
+        </div>
+        <details class="nuevo">
+          <summary class="btn">Agregar paciente</summary>
+          <form class="tarjeta formulario" method="post" action="/api/admin/pacientes">
+            <label>Nombre<input name="nombre" required /></label>
+            <label>Correo<input name="email" type="email" /></label>
+            <label>Teléfono<input name="telefono" type="tel" /></label>
+            <label>RUT<input name="rut" /></label>
+            <label>
+              Estado
+              <select name="estado">
+                {ESTADOS.map((e) => <option value={e.valor}>{e.etiqueta}</option>)}
+              </select>
+            </label>
+            <label class="ancho">Notas<textarea name="notas" rows="3" /></label>
+            <button class="btn" type="submit">Guardar</button>
+          </form>
+        </details>
+      </div>
+
+      {!env.DB && (
+        <p class="aviso error">
+          La base de datos del CRM no está conectada. Ver los pasos en docs/crm.md.
+        </p>
+      )}
+
+      <nav class="etapas" aria-label="Filtrar por estado">
+        <a href={`/admin/${q ? `?q=${encodeURIComponent(q)}` : ''}`} aria-current={!filtro ? 'true' : undefined}>
+          Todos <b>{total}</b>
+        </a>
+        {ESTADOS.map((e) => (
+          <a
+            href={`/admin/?estado=${e.valor}${q ? `&q=${encodeURIComponent(q)}` : ''}`}
+            aria-current={filtro === e.valor ? 'true' : undefined}
+          >
+            {e.etiqueta} <b>{conteo[e.valor] ?? 0}</b>
+          </a>
+        ))}
+      </nav>
+
+      <form class="buscar" method="get" action="/admin/">
+        {filtro && <input type="hidden" name="estado" value={filtro} />}
+        <input type="search" name="q" value={q} placeholder="Buscar por nombre, correo, teléfono o RUT" />
+        <button class="btn" type="submit">Buscar</button>
+      </form>
+
+      <div class="tarjeta desplazable">
+        {filas.length ? (
+          <table class="tabla">
+            <thead>
+              <tr>
+                <th>Paciente</th>
+                <th>Contacto</th>
+                <th>Estado</th>
+                <th>Última cita</th>
+                <th>Ingresó</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filas.map((p) => (
+                <tr>
+                  <td>
+                    <a href={`/admin/pacientes/${p.id}/`}>
+                      <b>{p.nombre || 'Sin nombre'}</b>
+                    </a>
+                    {p.rut && <div class="tenue">{p.rut}</div>}
+                  </td>
+                  <td>
+                    {p.email && <div>{p.email}</div>}
+                    {p.telefono && <div class="tenue">{p.telefono}</div>}
+                  </td>
+                  <td>
+                    <span class="chip" data-estado={p.estado}>
+                      {etiquetaEstado(p.estado)}
+                    </span>
+                  </td>
+                  <td>
+                    {fechaCita(p.proxima)}
+                    {p.servicio && <div class="tenue">{p.servicio}</div>}
+                  </td>
+                  <td class="tenue">
+                    {fechaRegistro(p.creado_en)}
+                    <div>{p.origen === 'totalmed' ? 'TotalMed' : 'A mano'}</div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <p class="tenue">
+            {q || filtro ? 'Nadie coincide con la búsqueda.' : 'Todavía no hay pacientes. Aparecerán acá cuando alguien reserve en TotalMed.'}
+          </p>
+        )}
+      </div>
+    </Admin>
+  )
+}
+
+<style>
+  .entrada {
+    max-width: 380px;
+    margin: 8vh auto 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .entrada form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .encabezado {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .nuevo summary {
+    list-style: none;
+  }
+  .nuevo summary::-webkit-details-marker {
+    display: none;
+  }
+  .formulario {
+    margin-top: 12px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    max-width: 640px;
+  }
+  .formulario .ancho {
+    grid-column: 1 / -1;
+  }
+  .etapas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .etapas a {
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--color-line-strong);
+    background: var(--color-white);
+    color: var(--text-primary);
+    text-decoration: none;
+  }
+  .etapas a[aria-current] {
+    background: var(--color-blue);
+    border-color: var(--color-blue);
+    color: var(--color-white);
+  }
+  .buscar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .buscar input {
+    flex: 1;
+    min-width: 0;
+  }
+  .aviso {
+    margin-bottom: 16px;
+  }
+</style>

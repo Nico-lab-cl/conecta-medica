@@ -243,15 +243,16 @@ export default config({
               options: [
                 { label: 'Formulario propio (etapa 1)', value: 'formulario' },
                 { label: 'Agenda en línea embebida (etapa 2)', value: 'iframe' },
+                { label: 'Llevar directo a la agenda en línea', value: 'enlace' },
               ],
               defaultValue: 'formulario',
             }),
             src: fields.text({
               label: 'Enlace de la agenda en línea',
-              description: 'Solo se usa si arriba elegiste "Agenda en línea embebida".',
+              description: 'Solo se usa si arriba elegiste una agenda en línea, embebida o directa.',
             }),
             altura: fields.number({ label: 'Alto de la agenda en píxeles', defaultValue: 900 }),
-            proveedor: fields.text({ label: 'Nombre del proveedor (ej. Medinet)' }),
+            proveedor: fields.text({ label: 'Nombre del proveedor (ej. TotalMed)' }),
             politicaPrivacidadProveedor: fields.text({
               label: 'Enlace a la política de privacidad del proveedor',
               description:

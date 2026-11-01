@@ -11,7 +11,7 @@ export const SITE = 'https://conectamedica.com';
 
 export default defineConfig({
   site: SITE,
-  // Estático por defecto. Solo /admin y /api/keystatic salen del prerender.
+  // Estático por defecto. Solo /admin (CRM), /keystatic y /api/* salen del prerender.
   output: 'static',
   adapter: cloudflare({ imageService: 'compile' }),
   /* 'ignore' y no 'always'. Con 'always', el Worker redirigía
@@ -24,17 +24,17 @@ export default defineConfig({
      Meta.astro y el sitemap sale idéntico. */
   trailingSlash: 'ignore',
 
-  // La integración de Keystatic inyecta /keystatic y /api/keystatic. El brief
-  // pide /admin, así que se redirige. Ninguna de las tres se indexa.
-  redirects: {
-    '/admin': '/keystatic',
-  },
+  // La integración de Keystatic inyecta /keystatic y /api/keystatic. Hasta el
+  // 2026-11-01 /admin redirigía ahí; ahora /admin es el CRM de pacientes y el
+  // CMS se abre en /keystatic (el CRM lo enlaza). Ninguna de las dos se indexa.
   integrations: [
     react(),
     mdx(),
     markdoc(),
     sitemap({
-      filter: (page) => !page.includes('/admin') && !page.includes('/keystatic'),
+      // /agendar/ sólo reenvía a la agenda en línea mientras el modo sea "enlace".
+      filter: (page) =>
+        !page.includes('/admin') && !page.includes('/keystatic') && !page.includes('/agendar'),
       i18n: { defaultLocale: 'es', locales: { es: 'es-CL' } },
     }),
   ],

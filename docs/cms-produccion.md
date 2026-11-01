@@ -13,7 +13,8 @@ Cloud) en producción, `local` en desarrollo.
 - Las rutas `/keystatic` y `/api/keystatic` se compilan dentro del Worker de
   Cloudflare. Verificado en `npm run build`: aparecen en `dist/_worker.js/pages/`,
   y tanto el panel como su API salen en modo `cloud`.
-- `/admin` redirige a `/keystatic` vía `_redirects`, y ninguna de las dos se
+- Hasta el 2026-11-01 `/admin` redirigía a `/keystatic`; ahora `/admin` es el
+  CRM de pacientes (docs/crm.md). Ni el CMS ni el CRM se
   indexa (filtro en el sitemap y `robots.txt`).
 - Campos de imagen reales en profesionales, prestaciones y cuadros de portada.
 - El copy completo de la portada es editable desde *Contenido → Portada del sitio*.
@@ -42,7 +43,7 @@ usuario adicional.
 ## Cómo llega un cambio al sitio
 
 ```
-El cliente guarda en conectamedica.com/admin
+El cliente guarda en conectamedica.com/keystatic
   → Keystatic Cloud hace un commit en main
   → Cloudflare (Workers Builds, conectado al repo) reconstruye y publica
   → el cambio está en línea en uno o dos minutos
@@ -68,7 +69,7 @@ al cliente.
 
 ## Probar el ciclo completo
 
-Entrar a `/admin` con una cuenta de prueba, cambiar una frase de la portada,
+Entrar a `/keystatic` con una cuenta de prueba, cambiar una frase de la portada,
 guardar, y comprobar que aparece el commit en el repo y el cambio en el sitio.
 Después sacar la cuenta de prueba para liberar el cupo del cliente.
 

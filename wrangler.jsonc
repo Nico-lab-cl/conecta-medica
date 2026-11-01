@@ -55,6 +55,18 @@
     "directory": "./dist"
   },
 
+  /* Base del CRM de /admin, creada el 2026-11-01. Las tablas están en
+     migrations/; se aplican con
+     `npx wrangler d1 migrations apply conecta-crm --remote`. */
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "conecta-crm",
+      "database_id": "ee8a6384-2e7e-4ec5-8bd9-8f1c398c5c93",
+      "migrations_dir": "migrations"
+    }
+  ],
+
   "observability": {
     "enabled": true
   }

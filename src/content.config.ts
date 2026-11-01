@@ -285,18 +285,19 @@ const settings = defineCollection({
       cuerpo: z.string(),
       telefono: z.string(),
     }),
-    // Etapa 1: formulario propio. Etapa 2: se cambia `modo` a "iframe" y se
-    // pega el enlace de Medinet. Ningún otro archivo del sitio cambia.
+    // Etapa 1: formulario propio. Etapa 2: "iframe" monta la agenda del
+    // proveedor dentro de /agendar/, y "enlace" hace que /agendar/ lleve directo
+    // a ella (TotalMed, desde el 2026-11-01). Ningún otro archivo cambia.
     agendamiento: z
       .object({
-        modo: z.enum(['formulario', 'iframe']).default('formulario'),
+        modo: z.enum(['formulario', 'iframe', 'enlace']).default('formulario'),
         src: z.string().url().nullable().default(null),
         altura: z.number().default(900),
         proveedor: z.string().nullable().default(null),
         politicaPrivacidadProveedor: z.string().url().nullable().default(null),
       })
-      .refine((a) => a.modo !== 'iframe' || Boolean(a.src), {
-        message: 'Si el modo es "iframe" hay que indicar el enlace de la agenda.',
+      .refine((a) => a.modo === 'formulario' || Boolean(a.src), {
+        message: 'Si se agenda en línea hay que indicar el enlace de la agenda.',
         path: ['src'],
       }),
     estadoApertura: z.object({
