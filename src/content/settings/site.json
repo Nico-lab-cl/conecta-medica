@@ -13,8 +13,8 @@
     "Respetamos tu tiempo y el horario de tu consulta"
   ],
   "avisoUrgencias": {
-    "titulo": "Esta no es una unidad de urgencia",
-    "cuerpo": "Si tienes fiebre sobre 38 °C, sangrado que no se detiene o falta de aire, acude al servicio de urgencia más cercano o llama al 131. No esperes una hora con nosotros.",
+    "titulo": "¿Necesitas atención médica de urgencia?",
+    "cuerpo": "Si presentas fiebre sobre 38 °C, sangrado persistente o dificultad para respirar, acude directamente al servicio de urgencia más cercano. Allí recibirás la evaluación y atención inmediata que tu situación requiere. Ante una emergencia, llama al 131.",
     "telefono": "131"
   },
   "agendamiento": {
