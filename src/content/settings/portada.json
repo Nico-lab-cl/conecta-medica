@@ -84,12 +84,12 @@
   },
   "material": {
     "eyebrow": "Información para pacientes",
-    "titulo": "Entender lo que te pasa, antes y después de la consulta"
+    "titulo": "Conoce más sobre tu salud hematológica"
   },
   "conocenos": {
     "eyebrow": "Conócenos",
-    "titulo": "Una unidad pequeña, con un médico responsable de tu caso de principio a fin",
-    "texto": "{razonSocial} es una unidad de hematología en {comuna}. No es un centro médico general: atiende hematología y las prestaciones que ese estudio necesita. Quien te recibe en la primera consulta es quien sigue tu caso.",
+    "titulo": "Medicina especializada, atención cercana y compromiso con tu salud",
+    "texto": "{razonSocial} ofrece atención hematológica especializada en {comuna}, con un modelo centrado en la evaluación personalizada, la coordinación de servicios complementarios y la continuidad del cuidado médico. Te acompañamos en cada etapa de tu atención con rigor clínico, cercanía y confianza.",
     "secuencia": [
       "Pides hora",
       "Preparas tus exámenes",
