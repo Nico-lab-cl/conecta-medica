@@ -2,8 +2,8 @@
   "hero": [
     {
       "eyebrow": "Telemedicina en todo Chile",
-      "titulo": "Atención hematológica sin viajar a Santiago",
-      "texto": "Interpretamos tus exámenes, ajustamos un tratamiento en curso y damos segunda opinión por videollamada. Si tu caso necesita examen físico, te lo decimos.",
+      "titulo": "Atención hematológica especializada, estés donde estés",
+      "texto": "Accede a una evaluación hematológica personalizada desde cualquier región de Chile. Revisamos tus antecedentes, interpretamos tus exámenes y te orientamos en el diagnóstico, tratamiento y seguimiento de enfermedades hematológicas, con recomendaciones adaptadas a tus necesidades clínicas.",
       "botonLabel": "Cómo funciona",
       "botonDestino": "telemedicina"
     },
