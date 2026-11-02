@@ -3,12 +3,15 @@
   "razonSocial": "Clínica Conecta SpA",
   "tagline": "Tu salud hematológica, conectada con quienes la entienden",
   "correoAgenda": "asistente@conectamedica.com",
-  "correoContacto": null,
-  "telefono": null,
   "whatsapp": "+56 9 3592 6881",
-  "redes": [],
   "precioConsulta": 50000,
-  "precioNota": "Atención particular. No trabajamos con Fonasa ni con isapres en convenio.",
+  "precioNota": "Atención médica particular, con emisión de boleta para solicitar reembolso según las condiciones de tu isapre o seguro complementario.",
+  "compromisos": [
+    "Te explicamos el diagnóstico en palabras simples.",
+    "Sabes el precio antes de que te atendamos.",
+    "No indicamos exámenes que no aporten a tu caso.",
+    "Atendemos a la hora que te dimos."
+  ],
   "avisoUrgencias": {
     "titulo": "Esta no es una unidad de urgencia",
     "cuerpo": "Si tienes fiebre sobre 38 °C, sangrado que no se detiene o falta de aire, acude al servicio de urgencia más cercano o llama al 131. No esperes una hora con nosotros.",
@@ -18,18 +21,10 @@
     "modo": "enlace",
     "src": "https://totalmed.lat/reserva/334e8ec5-e3d8-43b7-b7e2-61e80362b706",
     "altura": 900,
-    "proveedor": "TotalMed",
-    "politicaPrivacidadProveedor": null
+    "proveedor": "TotalMed"
   },
   "estadoApertura": {
-    "estado": "pre-apertura",
-    "fecha": null,
-    "mensaje": null
+    "estado": "pre-apertura"
   },
-  "compromisos": [
-    "Te explicamos el diagnóstico en palabras simples.",
-    "Sabes el precio antes de que te atendamos.",
-    "No indicamos exámenes que no aporten a tu caso.",
-    "Atendemos a la hora que te dimos."
-  ]
+  "redes": []
 }
