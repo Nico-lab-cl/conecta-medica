@@ -7,10 +7,10 @@
   "precioConsulta": 50000,
   "precioNota": "Atención médica particular, con emisión de boleta para solicitar reembolso según las condiciones de tu isapre o seguro complementario.",
   "compromisos": [
-    "Te explicamos el diagnóstico en palabras simples.",
-    "Sabes el precio antes de que te atendamos.",
-    "No indicamos exámenes que no aporten a tu caso.",
-    "Atendemos a la hora que te dimos."
+    "Te explicamos tu diagnóstico con claridad y cercanía",
+    "Te informamos las condiciones de tu atención con transparencia",
+    "Indicamos estudios según tus necesidades clínicas",
+    "Respetamos tu tiempo y el horario de tu consulta"
   ],
   "avisoUrgencias": {
     "titulo": "Esta no es una unidad de urgencia",
