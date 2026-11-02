@@ -17,7 +17,7 @@
     {
       "eyebrow": "Horarios de atención",
       "titulo": "Atención hematológica también los sábados",
-      "tituloSinSabado": "Atención hematológica con acceso directo",
+      "tituloSinSabado": "{sabado} · Atención hematológica especializada",
       "texto": "Consultas presenciales en Ñuñoa y atención por telemedicina, con horarios disponibles durante la semana y los sábados.",
       "botonLabel": "Ver precios",
       "botonDestino": "precios"
@@ -40,14 +40,14 @@
     },
     {
       "icono": "file-text",
-      "titulo": "Saber qué llevar",
-      "texto": "Exámenes previos, medicamentos e informes.",
+      "titulo": "Prepara tu consulta",
+      "texto": "Trae tus exámenes anteriores, informes médicos y una lista de los medicamentos que utilizas.",
       "destino": "que-llevar"
     },
     {
       "icono": "info",
-      "titulo": "Conocer el precio",
-      "texto": "{precio}, solo atención particular.",
+      "titulo": "Precios y modalidades de atención",
+      "texto": "Consulta hematológica desde {precio}. Conoce nuestras tarifas y condiciones de atención.",
       "destino": "precios"
     },
     {
