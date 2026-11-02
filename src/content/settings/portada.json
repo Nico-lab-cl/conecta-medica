@@ -91,10 +91,10 @@
     "titulo": "Medicina especializada, atención cercana y compromiso con tu salud",
     "texto": "{razonSocial} ofrece atención hematológica especializada en {comuna}, con un modelo centrado en la evaluación personalizada, la coordinación de servicios complementarios y la continuidad del cuidado médico. Te acompañamos en cada etapa de tu atención con rigor clínico, cercanía y confianza.",
     "secuencia": [
-      "Pides hora",
-      "Preparas tus exámenes",
-      "Primera consulta",
-      "Control con resultados"
+      "Agenda tu consulta",
+      "Prepara tus antecedentes médicos",
+      "Evaluación médica especializada",
+      "Seguimiento y continuidad del cuidado"
     ]
   },
   "preguntas": {
