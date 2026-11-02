@@ -18,7 +18,7 @@
       "eyebrow": "Horarios de atención",
       "titulo": "Atención hematológica también los sábados",
       "tituloSinSabado": "{sabado} · Atención hematológica especializada",
-      "texto": "Consultas presenciales en Ñuñoa y atención por telemedicina, con horarios disponibles durante la semana y los sábados.",
+      "texto": "Atención presencial en Ñuñoa y por telemedicina. Consulta particular {precio}. {notaPrecio}",
       "botonLabel": "Ver precios",
       "botonDestino": "precios"
     }
