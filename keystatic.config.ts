@@ -50,6 +50,22 @@ const foto = (directorio: string, label = 'Fotografía de cabecera') => ({
   fotoAlt: fields.text({ label: 'Descripción de la fotografía', multiline: true, description: ayudaAlt }),
 });
 
+/* El bloque `seo` de prestaciones, unidades y textos legales. Unidades y
+   Legales lo tenían en sus archivos pero no en el formulario, y Keystatic se
+   negaba a abrirlos: "Key on object value "seo" is not allowed". */
+const seoCampo = () =>
+  fields.object(
+    {
+      title: fields.text({ label: 'Título para Google', validation: { length: { max: 60 } } }),
+      description: fields.text({
+        label: 'Descripción para Google',
+        multiline: true,
+        validation: { length: { max: 155 } },
+      }),
+    },
+    { label: 'Google y redes sociales' },
+  );
+
 const seoPagina = () =>
   fields.object(
     {
@@ -607,6 +623,7 @@ export default config({
             'Listado de condiciones hematológicas. Mientras esté vacío, la sección no aparece en el sitio.',
           itemLabel: (p) => p.value ?? '',
         }),
+        seo: seoCampo(),
         cuerpo: fields.mdx({ label: 'Contenido' }),
       },
     }),
@@ -688,17 +705,7 @@ export default config({
         icono: fields.text({ label: 'Ícono', defaultValue: 'stethoscope' }),
         activo: fields.checkbox({ label: 'Publicada', description: ayudaActivo }),
         orden: fields.number({ label: 'Orden', defaultValue: 0 }),
-        seo: fields.object(
-          {
-            title: fields.text({ label: 'Título para Google', validation: { length: { max: 60 } } }),
-            description: fields.text({
-              label: 'Descripción para Google',
-              multiline: true,
-              validation: { length: { max: 155 } },
-            }),
-          },
-          { label: 'SEO' },
-        ),
+        seo: seoCampo(),
         cuerpo: fields.mdx({ label: 'Contenido adicional' }),
       },
     }),
@@ -819,7 +826,7 @@ export default config({
             'Las preguntas clínicas NO se publican mientras esta casilla esté desmarcada. Es una protección deliberada.',
         }),
         revisadoPor: fields.text({ label: 'Revisada por (slug del profesional)' }),
-        fechaRevision: fields.text({ label: 'Fecha de revisión (AAAA-MM-DD)' }),
+        fechaRevision: fields.date({ label: 'Fecha de revisión' }),
         destacada: fields.checkbox({ label: 'Mostrar en la portada' }),
         orden: fields.number({ label: 'Orden', defaultValue: 0 }),
         activo: fields.checkbox({ label: 'Activa', defaultValue: true, description: ayudaActivo }),
@@ -860,8 +867,8 @@ export default config({
         }),
         revisadoPor: fields.text({ label: 'Revisado por (slug del profesional)' }),
         revisado: fields.checkbox({ label: 'Revisado por el médico' }),
-        fechaPublicacion: fields.text({ label: 'Fecha de publicación (AAAA-MM-DD)' }),
-        fechaRevision: fields.text({ label: 'Fecha de última revisión (AAAA-MM-DD)' }),
+        fechaPublicacion: fields.date({ label: 'Fecha de publicación', validation: { isRequired: true } }),
+        fechaRevision: fields.date({ label: 'Fecha de última revisión' }),
         activo: fields.checkbox({ label: 'Publicado', description: ayudaActivo }),
         orden: fields.number({ label: 'Orden', defaultValue: 0 }),
         cuerpo: fields.mdx({ label: 'Contenido' }),
@@ -889,11 +896,12 @@ export default config({
       schema: {
         titulo: fields.slug({ name: { label: 'Título' } }),
         slug: fields.text({ label: 'Slug' }),
-        vigenteDesde: fields.text({ label: 'Vigente desde (AAAA-MM-DD)' }),
+        vigenteDesde: fields.date({ label: 'Vigente desde', validation: { isRequired: true } }),
         revisadoPorAbogado: fields.checkbox({
           label: 'Revisado por abogado',
           description: 'Mientras esté sin marcar, el sitio muestra el texto con una advertencia de borrador.',
         }),
+        seo: seoCampo(),
         cuerpo: fields.mdx({ label: 'Texto' }),
       },
     }),
