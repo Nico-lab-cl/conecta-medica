@@ -1,7 +1,6 @@
 ---
 import { FOTO_PAGINA } from '../../lib/imagenes';
 import { Picture } from 'astro:assets';
-import calleImg from '../../assets/imagenes/calle-nunoa.jpg';
 import Pagina from '../../layouts/Pagina.astro';
 import FormularioHora from '../../components/forms/FormularioHora.astro';
 import Icono from '../../components/core/Icono.astro';
@@ -10,12 +9,16 @@ import BotonWhatsApp from '../../components/actions/BotonWhatsApp.astro';
 import EnlaceTexto from '../../components/actions/EnlaceTexto.astro';
 import '../../styles/formulario.css';
 import { RUTAS, migas } from '../../lib/rutas';
+import { leerPagina, propsCabecera, fotoElegida } from '../../lib/paginas';
 import { ajustes, pais, horarioLegible } from '../../lib/contenido';
 
 const a = await ajustes();
 const cl = (await pais('cl')).data;
 const d = cl.direccion;
 const ruta = migas({ label: 'Contacto' });
+const P = await leerPagina('paginaContacto', 'contacto');
+const cab = await propsCabecera(P, { foto: FOTO_PAGINA.contacto, og: '/og/contacto.jpg' });
+const barrio = fotoElegida(P.barrio, FOTO_PAGINA.contacto);
 
 // La clave pública de Turnstile llega por variable de entorno. Mientras no
 // exista la cuenta de Cloudflare, el widget simplemente no se monta.
@@ -28,16 +31,10 @@ const mapa = `https://www.google.com/maps/search/?api=1&query=${consulta}`;
 ---
 
 <Pagina
-  titulo="Contacto y cómo llegar — Clínica Conecta, Ñuñoa"
-  descripcion="Solicita tu hora, escríbenos por WhatsApp o revisa cómo llegar al Edificio New Egaña desde Metro Plaza Egaña."
+  {...cab}
   ruta={RUTAS.contacto}
   actual={RUTAS.contacto}
-  eyebrow="Contacto"
-  h1="Pide tu hora"
-  bajada="Completa el formulario y te contactamos dentro del próximo día hábil. No pedimos síntomas ni antecedentes: eso se conversa en la consulta."
   migas={ruta}
-  foto={FOTO_PAGINA.contacto}
-  imagenOg="/og/contacto.jpg"
 >
   <section class="seccion">
     <div class="contenedor columnas">
@@ -48,7 +45,7 @@ const mapa = `https://www.google.com/maps/search/?api=1&query=${consulta}`;
 
       <aside class="lateral">
         <div class="bloque">
-          <h2>Otras formas de contacto</h2>
+          <h2>{P.otrasFormas}</h2>
           <ul class="datos">
             <li>
               <Icono nombre="message-circle" tam={20} color="var(--color-blue)" />
@@ -75,7 +72,7 @@ const mapa = `https://www.google.com/maps/search/?api=1&query=${consulta}`;
         </div>
 
         <div class="bloque">
-          <h2>Dónde estamos</h2>
+          <h2>{P.dondeEstamos}</h2>
           <address>
             {d.edificio}<br />
             {d.calle}, {d.oficina}<br />
@@ -90,15 +87,15 @@ const mapa = `https://www.google.com/maps/search/?api=1&query=${consulta}`;
               cookies de terceros y arruina el rendimiento de la página. */}
           <figure class="barrio">
             <Picture
-              src={calleImg}
-              alt="Avenida residencial de Ñuñoa con plátanos orientales y la cordillera al fondo."
+              src={barrio.src}
+              alt={barrio.alt}
               widths={[400, 700, 1100, 1600]}
               sizes="(min-width: 1000px) 380px, 100vw"
               formats={['avif', 'webp']}
               fallbackFormat="jpeg"
               loading="lazy"
             />
-            <figcaption>El barrio, a pasos de Metro Plaza Egaña.</figcaption>
+            {P.barrio.pie && <figcaption>{P.barrio.pie}</figcaption>}
           </figure>
 
           <a class="mapa" href={mapa} target="_blank" rel="noopener noreferrer">
@@ -111,15 +108,12 @@ const mapa = `https://www.google.com/maps/search/?api=1&query=${consulta}`;
             </span>
           </a>
 
-          <h3 class="sub">Cómo llegar</h3>
-          <p class="parrafo">
-            La estación <b>Plaza Egaña</b> de la Línea 4 queda a pocos metros del edificio. Es la
-            forma más simple de llegar.
-          </p>
+          <h3 class="sub">{P.comoLlegar.titulo}</h3>
+          <p class="parrafo">{P.comoLlegar.texto}</p>
         </div>
 
         <div class="bloque">
-          <h2>Horarios</h2>
+          <h2>{P.horarios}</h2>
           <ul class="horarios">
             {
               cl.horarios.map((h) => (

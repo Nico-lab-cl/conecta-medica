@@ -1,0 +1,72 @@
+{
+  "seo": {
+    "titulo": "Hematología por telemedicina en todo Chile",
+    "descripcion": "Consulta hematológica a distancia: qué se puede resolver en línea, qué necesita ser presencial, y cómo se agenda desde regiones."
+  },
+  "cabecera": {
+    "eyebrow": "Telemedicina",
+    "titulo": "Hematología a distancia, en todo Chile",
+    "bajada": "Decimos qué se resuelve por videollamada y qué no. Una consulta a distancia que debía ser presencial no le sirve a nadie.",
+    "foto": null,
+    "fotoAlt": null
+  },
+  "si": {
+    "titulo": "Sí se resuelve a distancia",
+    "items": [
+      "Interpretar un hemograma, un perfil de hierro o una ferritina alterada",
+      "Revisar y ajustar un tratamiento que ya estás siguiendo",
+      "Controles de seguimiento cuando el caso está estable",
+      "Una segunda opinión sobre un estudio que ya te hicieron",
+      "Orientarte sobre qué estudiar y en qué orden"
+    ]
+  },
+  "no": {
+    "titulo": "Necesita ser presencial",
+    "items": [
+      "Examinar un ganglio, el bazo o el abdomen",
+      "Una primera evaluación donde el examen físico sea determinante",
+      "Procedimientos de cualquier tipo"
+    ]
+  },
+  "notaPresencial": {
+    "titulo": "Si tu caso necesita ser presencial",
+    "texto": "Te lo decimos durante la videollamada, no después. La consulta no se cobra dos veces por eso."
+  },
+  "pasos": {
+    "eyebrow": "Cómo funciona",
+    "titulo": "Cuatro pasos",
+    "items": [
+      {
+        "titulo": "Pides tu hora",
+        "texto": "Por el formulario o por WhatsApp, indicando que la quieres por telemedicina."
+      },
+      {
+        "titulo": "Te confirmamos",
+        "texto": "Coordinamos día y hora, y te explicamos cómo conectarte."
+      },
+      {
+        "titulo": "Preparas tus exámenes",
+        "texto": "Ten a mano tus exámenes y la lista de medicamentos, en papel o en pantalla."
+      },
+      {
+        "titulo": "La consulta",
+        "texto": "El mismo tiempo y la misma revisión que la presencial. Si tu caso necesita ser visto en persona, te lo decimos ahí mismo."
+      }
+    ]
+  },
+  "regiones": {
+    "titulo": "Si vives en regiones",
+    "parrafos": [
+      "La hematología está concentrada en pocos centros, casi todos en Santiago. Para muchos pacientes eso significa viajar horas por una consulta que se resolvía revisando bien los exámenes que ya tenían.",
+      "La telemedicina existe exactamente para eso: para que la distancia no sea el motivo por el que un problema de la sangre queda sin estudiar."
+    ]
+  },
+  "notaPlataforma": {
+    "titulo": "Plataforma, recetas y licencias",
+    "texto": "Estamos terminando de definir la plataforma de videollamada y las condiciones para receta electrónica y licencias en modalidad a distancia. Preferimos no prometerlo hasta tenerlo confirmado. Cuando coordinemos tu hora te lo indicamos con precisión."
+  },
+  "cierre": {
+    "titulo": "Agenda tu consulta por telemedicina",
+    "texto": "Ves el valor de la prestación al elegir tu hora. Sin derivación previa."
+  }
+}

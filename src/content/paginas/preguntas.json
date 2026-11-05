@@ -1,0 +1,15 @@
+{
+  "seo": {
+    "titulo": "Preguntas frecuentes de hematología — Clínica Conecta",
+    "descripcion": "Anemia por falta de hierro, ferritina baja, plaquetas y leucocitos bajos, ganglios aumentados y anticoagulantes, respondidas por un hematólogo en Chile."
+  },
+  "cabecera": {
+    "eyebrow": "Preguntas frecuentes",
+    "titulo": "Lo que más nos preguntan",
+    "bajada": "Respuestas directas, en lenguaje simple, con una indicación clara de cuándo conviene consultar. Son información general y no reemplazan una evaluación médica.",
+    "foto": null,
+    "fotoAlt": null
+  },
+  "grupoClinico": "Sobre tus exámenes y tu tratamiento",
+  "grupoOperativo": "Cómo funciona la atención"
+}

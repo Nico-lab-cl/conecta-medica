@@ -1,0 +1,46 @@
+{
+  "seo": {
+    "titulo": "Pago, boleta y reembolso",
+    "descripcion": "Qué incluye la consulta, cómo funciona la boleta para pedir reembolso y por qué la atención es particular. El valor de cada prestación lo ves al agendar."
+  },
+  "cabecera": {
+    "eyebrow": "Pago y reembolso",
+    "titulo": "Cómo funciona el pago de tu atención",
+    "bajada": "El valor depende de la prestación que necesites, y lo ves al elegir tu hora, antes de confirmarla.",
+    "foto": null,
+    "fotoAlt": null
+  },
+  "incluye": {
+    "titulo": "Qué incluye",
+    "items": [
+      "El tiempo de la consulta con el médico",
+      "La revisión de los exámenes que traigas, incluidos los antiguos",
+      "La explicación del diagnóstico y del plan",
+      "La boleta correspondiente"
+    ]
+  },
+  "aparte": {
+    "titulo": "Qué se cotiza aparte",
+    "items": [
+      "Exámenes de laboratorio",
+      "Imágenes (ecografías, tomografías)",
+      "Procedimientos"
+    ],
+    "nota": "Si tu caso necesita alguno, se te dice el costo antes de que decidas."
+  },
+  "particular": {
+    "titulo": "Atención particular, sin convenios",
+    "parrafos": [
+      "No trabajamos con Fonasa ni con isapres en convenio. Lo decimos así de directo porque preferimos que lo sepas antes de agendar y no cuando llegues al mostrador.",
+      "Si tienes un seguro complementario de salud, la boleta te sirve para pedir reembolso. Cuánto te devuelvan depende de tu plan y de tu asegurador, y eso no es algo que nosotros podamos comprometer."
+    ]
+  },
+  "notaMediosPago": {
+    "titulo": "Medios de pago y política de anulación",
+    "texto": "Estamos terminando de definir los medios de pago aceptados y la política de anulación. Preferimos no publicarlos hasta tenerlos confirmados: si tienes dudas antes de agendar, escríbenos y te respondemos."
+  },
+  "cierre": {
+    "titulo": "El valor lo ves al agendar",
+    "texto": "Al elegir tu hora ves el valor de la prestación. No necesitas derivación previa."
+  }
+}

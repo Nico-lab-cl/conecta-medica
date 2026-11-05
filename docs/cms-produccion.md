@@ -101,10 +101,10 @@ ya es una entrada completa.
 
 Para no prometer de más:
 
-- El copy de las páginas internas: telemedicina, precios, contacto, agendar,
-  conócenos y preguntas frecuentes siguen con su texto en las plantillas.
-- Las fotografías de cabecera del resto de las páginas (`FOTO_PAGINA` en
-  `src/lib/imagenes.ts`). Sólo los tres cuadros de la portada son subibles.
+- Desde el 2026-11-04 el copy y la foto de cabecera de las páginas internas sí
+  están en el CMS (sección *Páginas*, archivos en `src/content/paginas/`, puente
+  en `src/lib/paginas.ts`). Quedan fuera el menú, el pie de sitio, los textos
+  legales de cada aviso (urgencias, descargo clínico) y la página 404.
 - `units.hero.imagen` y `resources.portada` existen en el esquema pero **no se
   usan en ninguna plantilla**. Son campos muertos desde antes; no se les puso
   campo de imagen para no ofrecer al cliente un control que no hace nada.

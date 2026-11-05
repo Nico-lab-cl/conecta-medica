@@ -17,6 +17,7 @@ import NotaInfo from '../../components/notices/NotaInfo.astro';
 import BotonAgendar from '../../components/actions/BotonAgendar.astro';
 import EnlaceTexto from '../../components/actions/EnlaceTexto.astro';
 import { RUTAS, migas } from '../../lib/rutas';
+import { leerPagina, propsCabecera } from '../../lib/paginas';
 import { profesionalesActivos, ajustes } from '../../lib/contenido';
 import { medicoJsonLd } from '../../lib/schema';
 
@@ -30,27 +31,15 @@ const Biografia = fundador ? (await render(fundador)).Content : null;
 const ruta = migas({ label: 'Conócenos' });
 const sitio = Astro.site?.toString() ?? 'https://conectamedica.com/';
 
-const VALORES = [
-  { t: 'Excelencia clínica', d: 'Decisiones basadas en evidencia, no en costumbre.', i: 'activity' },
-  { t: 'Atención humanizada', d: 'Tiempo suficiente y explicaciones que se entienden.', i: 'message-circle' },
-  { t: 'Transparencia en los precios', d: 'Conoces el valor de tu atención al agendar, antes de llegar.', i: 'file-text' },
-  { t: 'Confidencialidad', d: 'Pedimos los datos mínimos y no los usamos para nada más.', i: 'check' },
-  { t: 'Cercanía', d: 'Sin trato distante y sin jerga innecesaria.', i: 'map-pin' },
-  { t: 'Coordinación', d: 'Si tu caso necesita otra mirada, la coordinamos nosotros.', i: 'stethoscope' },
-];
+const P = await leerPagina('paginaConocenos', 'conocenos');
+const cab = await propsCabecera(P, { foto: FOTO_PAGINA.conocenos, og: '/og/conocenos.jpg' });
 ---
 
 <Pagina
-  titulo="Conócenos — Clínica Conecta, hematología en Ñuñoa"
-  descripcion="Quién atiende, por qué existe Conecta y qué puedes esperar de la atención. Atención hematológica coordinada en Ñuñoa y por telemedicina."
+  {...cab}
   ruta={RUTAS.conocenos}
   actual={RUTAS.conocenos}
-  eyebrow="Conócenos"
-  h1="Una consulta que coordina, no que se suma a la lista"
-  bajada="Conecta nace de una observación simple: el problema del paciente hematológico rara vez es la falta de especialistas. Es que ninguno se habla con el otro."
   migas={ruta}
-  foto={FOTO_PAGINA.conocenos}
-  imagenOg="/og/conocenos.jpg"
   jsonLd={fundador
     ? [medicoJsonLd(fundador.data, new URL(RUTAS.conocenos, sitio).toString(), sitio)]
     : []}
@@ -77,7 +66,7 @@ const VALORES = [
           </div>
 
           <div class="perfil-texto">
-            <p class="eyebrow">Quién atiende</p>
+            <p class="eyebrow">{P.quienAtiende}</p>
             <h2>{fundador.data.nombreCompleto}</h2>
             <p class="rol">{fundador.data.especialidad}</p>
             <div class="bio">{Biografia ? <Biografia /> : <p>{fundador.data.bio}</p>}</div>
@@ -128,45 +117,31 @@ const VALORES = [
 
   <section class="seccion seccion-alt">
     <div class="contenedor prosa">
-      <p class="eyebrow">Por qué existe Conecta</p>
-      <h2>El problema no es la falta de especialistas</h2>
-      <p class="parrafo">
-        Un paciente con un hemograma alterado suele recorrer un camino largo y fragmentado. Lo ve un
-        médico general, lo derivan, espera, ve a un especialista, le piden exámenes que ya se hizo,
-        lo derivan otra vez. Cada consulta empieza de nuevo.
-      </p>
-      <p class="parrafo">
-        A eso se suma la geografía: la hematología está concentrada en pocos centros, casi todos en
-        Santiago. Para quien vive en regiones, cada control significa un viaje.
-      </p>
+      <p class="eyebrow">{P.porque.eyebrow}</p>
+      <h2>{P.porque.titulo}</h2>
+      {P.porque.parrafos.map((t) => <p class="parrafo">{t}</p>)}
 
       <div class="escritorio">
       </div>
 
-      <Cita fuente="La tesis del proyecto">
-        Conecta existe para coordinar la atención, no para agregar otra consulta suelta.
-      </Cita>
+      {P.porque.cita && <Cita fuente={P.porque.citaFuente}>{P.porque.cita}</Cita>}
 
-      <p class="parrafo">
-        Por eso la unidad se organiza con la hematología como eje y las otras prestaciones entrando
-        cuando el caso lo pide, coordinadas por el mismo médico. Y por eso la telemedicina no es un
-        agregado: es parte del diseño.
-      </p>
+      {P.porque.parrafosDespues.map((t) => <p class="parrafo">{t}</p>)}
     </div>
   </section>
 
   <section class="seccion">
     <div class="contenedor">
-      <p class="eyebrow">Cómo trabajamos</p>
-      <h2>Seis cosas que definen la atención</h2>
+      <p class="eyebrow">{P.valores.eyebrow}</p>
+      <h2>{P.valores.titulo}</h2>
       <ul class="valores">
         {
-          VALORES.map((v) => (
+          P.valores.items.map((v) => (
             <li>
-              <Icono nombre={v.i} tam={24} color="var(--color-blue)" />
+              <Icono nombre={v.icono} tam={24} color="var(--color-blue)" />
               <div>
-                <p class="valor-t">{v.t}</p>
-                <p class="valor-d">{v.d}</p>
+                <p class="valor-t">{v.titulo}</p>
+                <p class="valor-d">{v.texto}</p>
               </div>
             </li>
           ))
@@ -177,7 +152,7 @@ const VALORES = [
 
   <section class="seccion seccion-alt">
     <div class="contenedor cierre">
-      <p class="eyebrow">Nuestros compromisos</p>
+      <p class="eyebrow">{P.compromisosEyebrow}</p>
       <ul class="compromisos">
         {a.compromisos.map((c) => <li><Icono nombre="check" tam={20} color="var(--color-blue)" />{c}</li>)}
       </ul>

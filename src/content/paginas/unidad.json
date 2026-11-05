@@ -1,0 +1,13 @@
+{
+  "eyebrow": "Unidad",
+  "foto": null,
+  "fotoAlt": null,
+  "prestaciones": {
+    "eyebrow": "Las cuatro prestaciones",
+    "titulo": "Una sola unidad, cuatro miradas que se hablan"
+  },
+  "notaCondiciones": {
+    "titulo": "Listado de condiciones en preparación",
+    "texto": "Estamos terminando de definir el detalle de condiciones que atiende la unidad. Si tienes un examen alterado y no sabes si corresponde, escríbenos y te orientamos sin costo."
+  }
+}

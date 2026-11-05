@@ -20,6 +20,7 @@ import Icono from '../../components/core/Icono.astro';
 import AvisoUrgencias from '../../components/notices/AvisoUrgencias.astro';
 import '../../styles/formulario.css';
 import { RUTAS, migas } from '../../lib/rutas';
+import { leerPagina, propsCabecera } from '../../lib/paginas';
 import { ajustes, pais, horarioLegible } from '../../lib/contenido';
 
 const a = await ajustes();
@@ -27,6 +28,8 @@ const cl = (await pais('cl')).data;
 const ruta = migas({ label: 'Agendar hora' });
 const claveTurnstile = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY as string | undefined;
 const conIframe = a.agendamiento.modo === 'iframe' && Boolean(a.agendamiento.src);
+const P = await leerPagina('paginaAgendar', 'agendar');
+const cab = await propsCabecera(P, { foto: FOTO_PAGINA.agendar, og: '/og/agendar.jpg' });
 
 /* Modo "enlace": la agenda vive entera en el proveedor y esta página sólo
    reenvía. Es estática, así que el reenvío va por meta refresh y por script, y
@@ -52,20 +55,11 @@ const destinoDirecto = a.agendamiento.modo === 'enlace' ? a.agendamiento.src : n
   </html>
 ) : (
 <Pagina
-  titulo="Agendar hora — Clínica Conecta"
-  descripcion="Solicita tu hora de hematología, presencial en Ñuñoa o por telemedicina. Atención particular, sin derivación previa."
+  {...cab}
+  bajada={conIframe ? P.cabecera.bajadaConAgenda : P.cabecera.bajada}
   ruta={RUTAS.agendar}
   actual={RUTAS.agendar}
-  eyebrow="Agendar"
-  h1="Agenda tu hora"
-  bajada={
-    conIframe
-      ? 'Elige día y hora en la agenda. Vas a necesitar tu RUT y un correo electrónico.'
-      : 'Déjanos tus datos y te contactamos dentro del próximo día hábil para confirmar día y hora.'
-  }
   migas={ruta}
-  foto={FOTO_PAGINA.agendar}
-  imagenOg="/og/agendar.jpg"
 >
 
   <section class="seccion">
@@ -88,11 +82,8 @@ const destinoDirecto = a.agendamiento.modo === 'enlace' ? a.agendamiento.src : n
 
         {/* Salida siempre visible para quien se atasque. */}
         <div class="salida">
-          <h2>¿Se te complicó?</h2>
-          <p>
-            Escríbenos y coordinamos tu hora a mano. Sirve especialmente si no tienes RUT chileno o
-            si prefieres hablar con alguien.
-          </p>
+          <h2>{P.salida.titulo}</h2>
+          <p>{P.salida.texto}</p>
           <div class="salida-acciones">
             <BotonWhatsApp origen="agendar" />
             <EnlaceTexto href={`mailto:${a.correoAgenda}`}>{a.correoAgenda}</EnlaceTexto>
@@ -102,24 +93,14 @@ const destinoDirecto = a.agendamiento.modo === 'enlace' ? a.agendamiento.src : n
 
       <aside class="lateral">
         <div class="bloque">
-          <h2>Lo que necesitas saber</h2>
+          <h2>{P.saber.titulo}</h2>
           <ul class="datos">
-            <li>
-              <Icono nombre="info" tam={20} color="var(--color-blue)" />
-              <span>Atención particular. El valor depende de la prestación y lo ves al elegir tu hora.</span>
-            </li>
-            <li>
-              <Icono nombre="check" tam={20} color="var(--color-blue)" />
-              <span>No necesitas derivación de otro médico.</span>
-            </li>
-            <li>
-              <Icono nombre="file-text" tam={20} color="var(--color-blue)" />
-              <span>Trae tus exámenes previos, aunque sean antiguos.</span>
-            </li>
-            <li>
-              <Icono nombre="video" tam={20} color="var(--color-blue)" />
-              <span>Puedes elegir presencial en Ñuñoa o telemedicina.</span>
-            </li>
+            {P.saber.items.map((x) => (
+              <li>
+                <Icono nombre={x.icono} tam={20} color="var(--color-blue)" />
+                <span>{x.texto}</span>
+              </li>
+            ))}
           </ul>
         </div>
 

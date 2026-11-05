@@ -1,0 +1,22 @@
+{
+  "seo": {
+    "titulo": "Información para pacientes — Clínica Conecta",
+    "descripcion": "Material para entender tus exámenes, prepararte para la consulta y saber qué esperar del tratamiento hematológico."
+  },
+  "cabecera": {
+    "eyebrow": "Información para pacientes",
+    "titulo": "Entender lo que te está pasando",
+    "bajada": "Material escrito y revisado por el equipo médico, en lenguaje simple. Es información general: no reemplaza una evaluación.",
+    "foto": null,
+    "fotoAlt": null
+  },
+  "vacio": {
+    "titulo": "Estamos preparando este material",
+    "texto": "Estamos escribiendo las guías y grabando los videos, y cada contenido pasa por revisión médica antes de publicarse. Mientras tanto, las preguntas frecuentes ya responden lo que más nos consultan.",
+    "boton": "Ir a las preguntas frecuentes"
+  },
+  "mientras": {
+    "eyebrow": "Mientras tanto",
+    "titulo": "Lo que ya está respondido"
+  }
+}

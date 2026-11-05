@@ -12,25 +12,22 @@ import Icono from '../../components/core/Icono.astro';
 import DescargoClinico from '../../components/notices/DescargoClinico.astro';
 import BotonWhatsApp from '../../components/actions/BotonWhatsApp.astro';
 import { RUTAS, migas } from '../../lib/rutas';
+import { leerPagina, propsCabecera } from '../../lib/paginas';
 import { recursosPublicables, categoriasConRecursos, faqsPublicables } from '../../lib/contenido';
 
 const recursos = await recursosPublicables();
 const categorias = await categoriasConRecursos();
 const faqs = (await faqsPublicables()).filter((f) => f.data.categoria === 'clinica').slice(0, 4);
 const ruta = migas({ label: 'Información para pacientes' });
+const P = await leerPagina('paginaPacientes', 'pacientes');
+const cab = await propsCabecera(P, { foto: FOTO_PAGINA.pacientes, og: '/og/pacientes.jpg' });
 ---
 
 <Pagina
-  titulo="Información para pacientes — Clínica Conecta"
-  descripcion="Material para entender tus exámenes, prepararte para la consulta y saber qué esperar del tratamiento hematológico."
+  {...cab}
   ruta={RUTAS.pacientes}
   actual={RUTAS.pacientes}
-  eyebrow="Información para pacientes"
-  h1="Entender lo que te está pasando"
-  bajada="Material escrito y revisado por el equipo médico, en lenguaje simple. Es información general: no reemplaza una evaluación."
   migas={ruta}
-  foto={FOTO_PAGINA.pacientes}
-  imagenOg="/og/pacientes.jpg"
 >
 
   <section class="seccion">
@@ -61,14 +58,10 @@ const ruta = migas({ label: 'Información para pacientes' });
         ) : (
           <div class="vacio">
             <Icono nombre="file-text" tam={32} color="var(--color-blue)" />
-            <h2>Estamos preparando este material</h2>
-            <p>
-              Estamos escribiendo las guías y grabando los videos, y cada contenido pasa por
-              revisión médica antes de publicarse. Mientras tanto, las preguntas frecuentes ya
-              responden lo que más nos consultan.
-            </p>
+            <h2>{P.vacio.titulo}</h2>
+            <p>{P.vacio.texto}</p>
             <Boton href={RUTAS.preguntas} variante="primary" icono="arrow-right">
-              Ir a las preguntas frecuentes
+              {P.vacio.boton}
             </Boton>
           </div>
         )
@@ -80,8 +73,8 @@ const ruta = migas({ label: 'Información para pacientes' });
     faqs.length > 0 && (
       <section class="seccion seccion-alt">
         <div class="contenedor">
-          <p class="eyebrow">Mientras tanto</p>
-          <h2>Lo que ya está respondido</h2>
+          <p class="eyebrow">{P.mientras.eyebrow}</p>
+          <h2>{P.mientras.titulo}</h2>
           <ul class="preguntas">
             {faqs.map((f) => (
               <li>

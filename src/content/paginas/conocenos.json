@@ -1,0 +1,64 @@
+{
+  "seo": {
+    "titulo": "Conócenos — Clínica Conecta, hematología en Ñuñoa",
+    "descripcion": "Quién atiende, por qué existe Conecta y qué puedes esperar de la atención. Atención hematológica coordinada en Ñuñoa y por telemedicina."
+  },
+  "cabecera": {
+    "eyebrow": "Conócenos",
+    "titulo": "Una consulta que coordina, no que se suma a la lista",
+    "bajada": "Conecta nace de una observación simple: el problema del paciente hematológico rara vez es la falta de especialistas. Es que ninguno se habla con el otro.",
+    "foto": null,
+    "fotoAlt": null
+  },
+  "quienAtiende": "Quién atiende",
+  "porque": {
+    "eyebrow": "Por qué existe Conecta",
+    "titulo": "El problema no es la falta de especialistas",
+    "parrafos": [
+      "Un paciente con un hemograma alterado suele recorrer un camino largo y fragmentado. Lo ve un médico general, lo derivan, espera, ve a un especialista, le piden exámenes que ya se hizo, lo derivan otra vez. Cada consulta empieza de nuevo.",
+      "A eso se suma la geografía: la hematología está concentrada en pocos centros, casi todos en Santiago. Para quien vive en regiones, cada control significa un viaje."
+    ],
+    "cita": "Conecta existe para coordinar la atención, no para agregar otra consulta suelta.",
+    "citaFuente": "La tesis del proyecto",
+    "parrafosDespues": [
+      "Por eso la unidad se organiza con la hematología como eje y las otras prestaciones entrando cuando el caso lo pide, coordinadas por el mismo médico. Y por eso la telemedicina no es un agregado: es parte del diseño."
+    ]
+  },
+  "valores": {
+    "eyebrow": "Cómo trabajamos",
+    "titulo": "Seis cosas que definen la atención",
+    "items": [
+      {
+        "titulo": "Excelencia clínica",
+        "texto": "Decisiones basadas en evidencia, no en costumbre.",
+        "icono": "activity"
+      },
+      {
+        "titulo": "Atención humanizada",
+        "texto": "Tiempo suficiente y explicaciones que se entienden.",
+        "icono": "message-circle"
+      },
+      {
+        "titulo": "Transparencia en los precios",
+        "texto": "Conoces el valor de tu atención al agendar, antes de llegar.",
+        "icono": "file-text"
+      },
+      {
+        "titulo": "Confidencialidad",
+        "texto": "Pedimos los datos mínimos y no los usamos para nada más.",
+        "icono": "check"
+      },
+      {
+        "titulo": "Cercanía",
+        "texto": "Sin trato distante y sin jerga innecesaria.",
+        "icono": "map-pin"
+      },
+      {
+        "titulo": "Coordinación",
+        "texto": "Si tu caso necesita otra mirada, la coordinamos nosotros.",
+        "icono": "stethoscope"
+      }
+    ]
+  },
+  "compromisosEyebrow": "Nuestros compromisos"
+}

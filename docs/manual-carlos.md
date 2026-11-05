@@ -57,6 +57,27 @@ desde **Contenido → Portada del sitio**. Ahí está:
   Información para pacientes, Conócenos y Preguntas frecuentes
 - El **bloque de cierre** de abajo
 
+### Las demás páginas
+
+Cada página interna tiene su propio formulario en la sección **Páginas** del
+menú izquierdo: Telemedicina, Pago y reembolso, Conócenos, Contacto, Preguntas
+frecuentes, Información para pacientes, Conecta Hematología, Listado de
+prestaciones y Agendar.
+
+En cada uno están:
+
+- **Google y redes sociales**: el título que sale en la pestaña y en Google, y
+  la descripción gris bajo ese título.
+- **Cabecera**: la línea superior, el título grande, la bajada y la fotografía.
+- **Los textos de cada sección** de esa página: listas, pasos, párrafos, notas
+  y el texto final antes de los botones.
+
+Lo que no está ahí se edita en otra parte: los horarios y la dirección en
+*Configuración → Dirección y horarios*, los compromisos y la nota de previsión
+en *Configuración → Datos de la clínica*, y el título de Conecta Hematología en
+*Contenido → Unidades*. El formulario de cada página lo recuerda donde
+corresponde.
+
 ### Los textos entre llaves no son un error
 
 Va a ver cosas como `Atención presencial en {comuna} y por telemedicina`. Eso de
@@ -105,6 +126,17 @@ Qué se puede cambiar hoy:
   cara puede salir muy chica.
 - **La foto de cada prestación** — *Contenido → Prestaciones*.
 - **Las fotos de los cuadros de portada** — *Contenido → Portada del sitio*.
+- **Las fotos de las secciones de la portada** (Telemedicina, Conócenos y el
+  bloque de cierre) — también en *Contenido → Portada del sitio*, dentro de
+  cada sección.
+- **La foto de cabecera de cada página interna** — *Páginas → (la página)*,
+  en el bloque *Cabecera*. En Contacto hay además una segunda foto, la del
+  barrio junto a la dirección.
+
+Para las cabeceras conviene una foto **horizontal**, de al menos 1600 px de
+ancho, con lo importante al centro: en el celular la foto se muestra como una
+franja y se recortan los bordes. Cuando cambia la foto de una página, también
+cambia la imagen que aparece al compartir ese enlace por WhatsApp.
 
 Si deja un campo de imagen vacío, se mantiene la fotografía que el sitio tiene
 hoy. No se rompe nada.

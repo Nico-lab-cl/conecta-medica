@@ -1,4 +1,4 @@
-import { defineCollection, reference, z } from 'astro:content';
+import { defineCollection, reference, z, type SchemaContext } from 'astro:content';
 import { glob, file } from 'astro/loaders';
 
 /* ---------------------------------------------------------------------------
@@ -371,6 +371,8 @@ const homepage = defineCollection({
         titulo: z.string(),
         texto: z.string(),
         puntos: z.array(z.string()).default([]),
+        foto: image().nullable().default(null),
+        fotoAlt: z.string().nullable().default(null),
       }),
       material: z.object({ eyebrow: z.string(), titulo: z.string() }),
       conocenos: z.object({
@@ -378,13 +380,171 @@ const homepage = defineCollection({
         titulo: z.string(),
         texto: z.string(),
         secuencia: z.array(z.string()).default([]),
+        foto: image().nullable().default(null),
+        fotoAlt: z.string().nullable().default(null),
       }),
       preguntas: z.object({ eyebrow: z.string(), titulo: z.string() }),
-      cierre: z.object({ titulo: z.string(), bajada: z.string() }),
+      cierre: z.object({
+        titulo: z.string(),
+        bajada: z.string(),
+        foto: image().nullable().default(null),
+        fotoAlt: z.string().nullable().default(null),
+      }),
+    }),
+});
+
+/* --------------------------- páginas internas ---------------------------- */
+
+/* El texto y la fotografía de cabecera de cada página interna. Hasta el
+   2026-11-04 vivían escritos en cada plantilla, y el cliente no podía cambiar
+   ni una frase de Telemedicina ni la foto de Contacto sin un desarrollador.
+
+   Un archivo por página en src/content/paginas/, cada uno con su colección:
+   las páginas no comparten estructura —Telemedicina tiene pasos, Pago tiene
+   listas, Contacto casi sólo títulos— y una colección por página deja que cada
+   esquema diga exactamente qué campos existen. Se guardan planos y se envuelven
+   al leer, por lo mismo que `settings` (ver docs/cms-produccion.md).
+
+   La foto es opcional en todas: vacía = la fotografía que la página trae de
+   fábrica (FOTO_PAGINA en src/lib/imagenes.ts). Ver src/lib/paginas.ts. */
+
+type Imagen = SchemaContext['image'];
+
+const seoPagina = z.object({
+  titulo: z.string().max(70, 'El título para Google no puede pasar de 70 caracteres'),
+  descripcion: z.string().max(170, 'La descripción para Google no puede pasar de 170 caracteres'),
+});
+
+const cabecera = (image: Imagen) =>
+  z.object({
+    eyebrow: z.string(),
+    titulo: z.string(),
+    bajada: z.string(),
+    foto: image().nullable().default(null),
+    fotoAlt: z.string().nullable().default(null),
+  });
+
+const bloque = z.object({ titulo: z.string(), texto: z.string() });
+const lista = z.object({ titulo: z.string(), items: z.array(z.string()).default([]) });
+
+function pagina<T extends z.ZodRawShape>(id: string, cuerpo: (image: Imagen) => T) {
+  return defineCollection({
+    loader: file(`./src/content/paginas/${id}.json`, {
+      parser: (texto) => ({ [id]: JSON.parse(texto) }),
+    }),
+    schema: ({ image }) =>
+      z.object({ seo: seoPagina, cabecera: cabecera(image), ...cuerpo(image) }),
+  });
+}
+
+const paginaTelemedicina = pagina('telemedicina', () => ({
+  si: lista,
+  no: lista,
+  notaPresencial: bloque,
+  pasos: z.object({
+    eyebrow: z.string(),
+    titulo: z.string(),
+    items: z.array(bloque).default([]),
+  }),
+  regiones: z.object({ titulo: z.string(), parrafos: z.array(z.string()).default([]) }),
+  notaPlataforma: bloque,
+  cierre: bloque,
+}));
+
+const paginaPago = pagina('pago', () => ({
+  incluye: lista,
+  aparte: lista.extend({ nota: z.string() }),
+  particular: z.object({ titulo: z.string(), parrafos: z.array(z.string()).default([]) }),
+  notaMediosPago: bloque,
+  cierre: bloque,
+}));
+
+const paginaConocenos = pagina('conocenos', () => ({
+  quienAtiende: z.string(),
+  porque: z.object({
+    eyebrow: z.string(),
+    titulo: z.string(),
+    parrafos: z.array(z.string()).default([]),
+    cita: z.string(),
+    citaFuente: z.string(),
+    parrafosDespues: z.array(z.string()).default([]),
+  }),
+  valores: z.object({
+    eyebrow: z.string(),
+    titulo: z.string(),
+    items: z.array(bloque.extend({ icono: z.string() })).default([]),
+  }),
+  compromisosEyebrow: z.string(),
+}));
+
+const paginaContacto = pagina('contacto', (image) => ({
+  otrasFormas: z.string(),
+  dondeEstamos: z.string(),
+  barrio: z.object({
+    foto: image().nullable().default(null),
+    fotoAlt: z.string().nullable().default(null),
+    pie: z.string(),
+  }),
+  comoLlegar: bloque,
+  horarios: z.string(),
+}));
+
+const paginaAgendar = defineCollection({
+  loader: file('./src/content/paginas/agendar.json', {
+    parser: (texto) => ({ agendar: JSON.parse(texto) }),
+  }),
+  schema: ({ image }) =>
+    z.object({
+      seo: seoPagina,
+      // La bajada cambia según la página muestre la agenda embebida o el formulario.
+      cabecera: cabecera(image).extend({ bajadaConAgenda: z.string() }),
+      salida: bloque,
+      saber: z.object({
+        titulo: z.string(),
+        items: z.array(z.object({ icono: z.string(), texto: z.string() })).default([]),
+      }),
+    }),
+});
+
+const paginaPreguntas = pagina('preguntas', () => ({
+  grupoClinico: z.string(),
+  grupoOperativo: z.string(),
+}));
+
+const paginaPacientes = pagina('pacientes', () => ({
+  vacio: bloque.extend({ boton: z.string() }),
+  mientras: z.object({ eyebrow: z.string(), titulo: z.string() }),
+}));
+
+const paginaPrestaciones = pagina('prestaciones', () => ({}));
+
+/* Conecta Hematología es la excepción: su título y bajada ya viven en la
+   colección `units`, que es donde el cliente los edita. Acá va sólo lo que no
+   estaba en ninguna parte: la foto y los textos de las secciones. */
+const paginaUnidad = defineCollection({
+  loader: file('./src/content/paginas/unidad.json', {
+    parser: (texto) => ({ unidad: JSON.parse(texto) }),
+  }),
+  schema: ({ image }) =>
+    z.object({
+      eyebrow: z.string(),
+      foto: image().nullable().default(null),
+      fotoAlt: z.string().nullable().default(null),
+      prestaciones: z.object({ eyebrow: z.string(), titulo: z.string() }),
+      notaCondiciones: bloque,
     }),
 });
 
 export const collections = {
+  paginaTelemedicina,
+  paginaPago,
+  paginaConocenos,
+  paginaContacto,
+  paginaAgendar,
+  paginaPreguntas,
+  paginaPacientes,
+  paginaPrestaciones,
+  paginaUnidad,
   countries,
   units,
   services,

@@ -7,6 +7,7 @@ import BotonAgendar from '../../components/actions/BotonAgendar.astro';
 import BotonWhatsApp from '../../components/actions/BotonWhatsApp.astro';
 import NotaInfo from '../../components/notices/NotaInfo.astro';
 import { RUTAS, migas } from '../../lib/rutas';
+import { leerPagina, fotoElegida, imagenParaCompartir } from '../../lib/paginas';
 import { unidadesActivas, serviciosActivos } from '../../lib/contenido';
 import { render } from 'astro:content';
 
@@ -16,18 +17,20 @@ if (!unidad) throw new Error('La unidad Conecta Hematología no está activa');
 const { Content } = await render(unidad);
 const servicios = await serviciosActivos();
 const ruta = migas({ label: 'Conecta Hematología' });
+const P = await leerPagina('paginaUnidad', 'unidad');
+const og = await imagenParaCompartir(P, '/og/unidad.jpg');
 ---
 <Pagina
   titulo={unidad.data.seo?.title ?? unidad.data.nombre}
   descripcion={unidad.data.seo?.description ?? unidad.data.resumen}
   ruta={RUTAS.unidad}
   actual={RUTAS.unidad}
-  eyebrow="Unidad"
+  eyebrow={P.eyebrow}
   h1={unidad.data.hero.titulo}
   bajada={unidad.data.hero.bajada}
   migas={ruta}
-  foto={FOTO_PAGINA.unidad}
-  imagenOg="/og/unidad.jpg"
+  foto={fotoElegida(P, FOTO_PAGINA.unidad)}
+  imagenOg={og}
 >
 
   <section class="seccion">
@@ -36,8 +39,8 @@ const ruta = migas({ label: 'Conecta Hematología' });
 
   <section class="seccion seccion-alt">
     <div class="contenedor">
-      <p class="eyebrow">Las cuatro prestaciones</p>
-      <h2>Una sola unidad, cuatro miradas que se hablan</h2>
+      <p class="eyebrow">{P.prestaciones.eyebrow}</p>
+      <h2>{P.prestaciones.titulo}</h2>
       <div class="hilo-prestaciones" aria-hidden="true"><Hilo nodos={4} /></div>
       <div class="rejilla">
         {servicios.map((s) => (
@@ -64,10 +67,7 @@ const ruta = migas({ label: 'Conecta Hematología' });
           <ul class="condiciones">{unidad.data.condiciones.map((c) => <li>{c}</li>)}</ul>
         </>
       ) : (
-        <NotaInfo titulo="Listado de condiciones en preparación">
-          Estamos terminando de definir el detalle de condiciones que atiende la unidad. Si tienes
-          un examen alterado y no sabes si corresponde, escríbenos y te orientamos sin costo.
-        </NotaInfo>
+        <NotaInfo titulo={P.notaCondiciones.titulo}>{P.notaCondiciones.texto}</NotaInfo>
       )}
 
       <div class="cierre">

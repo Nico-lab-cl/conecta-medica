@@ -26,6 +26,87 @@ import { config, fields, collection, singleton } from '@keystatic/core';
 const ayudaActivo =
   'Desactiva en vez de borrar. El contenido desaparece del sitio pero queda guardado y se puede volver a publicar.';
 
+/* ------------------------- páginas internas -------------------------------
+   Piezas compartidas por los formularios de "Páginas". Cada página interna
+   tiene su archivo en src/content/paginas/ y su esquema en
+   src/content.config.ts; si se agrega un campo acá, va también allá. */
+
+const ayudaFoto =
+  'Opcional. Si la dejas vacía se mantiene la fotografía que la página tiene hoy. Sube el original, sin achicar ni comprimir: el sitio genera solo los tamaños para celular y computador. Conviene una foto horizontal, de al menos 1600 px de ancho, con lo importante al centro: en celular se recorta como franja. Regla del proyecto: si aparecen personas, van anónimas —de espaldas, solo las manos o fuera de foco—, nunca una cara identificable.';
+
+const ayudaAlt =
+  'Obligatorio si subes una foto. Describe lo que se ve, en una frase, para quien no puede ver la imagen. Ej: "Sala de espera con dos sillones y una ventana a la calle".';
+
+const iconos =
+  'Nombre del ícono: activity, calendar, check, clock, file-text, info, map-pin, message-circle, phone, stethoscope, video.';
+
+const foto = (directorio: string, label = 'Fotografía de cabecera') => ({
+  foto: fields.image({
+    label,
+    directory: `src/content/paginas/${directorio}`,
+    publicPath: `./${directorio}/`,
+    description: ayudaFoto,
+  }),
+  fotoAlt: fields.text({ label: 'Descripción de la fotografía', multiline: true, description: ayudaAlt }),
+});
+
+const seoPagina = () =>
+  fields.object(
+    {
+      titulo: fields.text({
+        label: 'Título para Google',
+        description: 'Lo que aparece en la pestaña del navegador y en el resultado de Google. Hasta 70 caracteres.',
+        validation: { length: { min: 1, max: 70 } },
+      }),
+      descripcion: fields.text({
+        label: 'Descripción para Google',
+        multiline: true,
+        description: 'El texto gris bajo el título en Google. Hasta 170 caracteres.',
+        validation: { length: { min: 1, max: 170 } },
+      }),
+    },
+    { label: 'Google y redes sociales' },
+  );
+
+const cabecera = (directorio: string, extra: Record<string, ReturnType<typeof fields.text>> = {}) =>
+  fields.object(
+    {
+      eyebrow: fields.text({ label: 'Línea superior', description: 'El texto corto en mayúsculas sobre el título.' }),
+      titulo: fields.text({ label: 'Título de la página', multiline: true }),
+      bajada: fields.text({ label: 'Bajada', multiline: true, description: 'El párrafo bajo el título.' }),
+      ...extra,
+      ...foto(directorio),
+    },
+    { label: 'Cabecera (título y foto)' },
+  );
+
+const bloque = (label: string) =>
+  fields.object(
+    { titulo: fields.text({ label: 'Título' }), texto: fields.text({ label: 'Texto', multiline: true }) },
+    { label },
+  );
+
+const lista = (label: string, itemLabel = 'Punto') =>
+  fields.object(
+    {
+      titulo: fields.text({ label: 'Título' }),
+      items: fields.array(fields.text({ label: itemLabel }), { label: 'Puntos', itemLabel: (p) => p.value ?? '' }),
+    },
+    { label },
+  );
+
+const parrafos = (label = 'Párrafos') =>
+  fields.array(fields.text({ label: 'Párrafo', multiline: true }), { label, itemLabel: (p) => p.value ?? '' });
+
+const paginaSingleton = (label: string, id: string, schema: Record<string, unknown>) =>
+  singleton({
+    label,
+    path: `src/content/paginas/${id}`,
+    format: { data: 'json' },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    schema: { seo: seoPagina(), cabecera: cabecera(id), ...(schema as any) },
+  });
+
 export default config({
   storage: import.meta.env.PROD ? { kind: 'cloud' } : { kind: 'local' },
   cloud: { project: 'conectamedica/conecta-medica' },
@@ -35,6 +116,17 @@ export default config({
     navigation: {
       Contenido: ['portada', 'services', 'units', 'faqs'],
       'Personas y recursos': ['professionals', 'resources', 'categories'],
+      Páginas: [
+        'paginaTelemedicina',
+        'paginaPago',
+        'paginaConocenos',
+        'paginaContacto',
+        'paginaPreguntas',
+        'paginaPacientes',
+        'paginaUnidad',
+        'paginaPrestaciones',
+        'paginaAgendar',
+      ],
       Configuración: ['ajustes', 'chile'],
       Legales: ['legal'],
     },
@@ -161,6 +253,7 @@ export default config({
                 'Tiene que decir lo mismo que la página de Telemedicina. Si acá se promete algo que allá se descarta, el sitio se contradice.',
               itemLabel: (p) => p.value ?? '',
             }),
+            ...foto('portada-telemedicina', 'Fotografía junto al texto'),
           },
           { label: 'Sección Telemedicina' },
         ),
@@ -180,6 +273,7 @@ export default config({
               label: 'Los pasos de la atención',
               itemLabel: (p) => p.value ?? '',
             }),
+            ...foto('portada-conocenos', 'Fotografía junto al texto'),
           },
           { label: 'Sección Conócenos' },
         ),
@@ -194,6 +288,7 @@ export default config({
           {
             titulo: fields.text({ label: 'Título', multiline: true }),
             bajada: fields.text({ label: 'Texto', multiline: true }),
+            ...foto('portada-cierre', 'Fotografía de fondo'),
           },
           { label: 'Bloque de cierre' },
         ),
@@ -332,6 +427,152 @@ export default config({
           label: 'Medios de pago',
           itemLabel: (p) => p.value ?? '',
         }),
+      },
+    }),
+
+    /* PÁGINAS INTERNAS. Texto y foto de cabecera de cada una (2026-11-04). */
+    paginaTelemedicina: paginaSingleton('Telemedicina', 'telemedicina', {
+      si: lista('Qué sí se resuelve a distancia'),
+      no: lista('Qué necesita ser presencial'),
+      notaPresencial: bloque('Nota bajo "presencial"'),
+      pasos: fields.object(
+        {
+          eyebrow: fields.text({ label: 'Línea superior' }),
+          titulo: fields.text({ label: 'Título' }),
+          items: fields.array(
+            fields.object({ titulo: fields.text({ label: 'Paso' }), texto: fields.text({ label: 'Detalle', multiline: true }) }),
+            { label: 'Pasos', itemLabel: (p) => p.fields.titulo.value },
+          ),
+        },
+        { label: 'Cómo funciona (pasos)' },
+      ),
+      regiones: fields.object({ titulo: fields.text({ label: 'Título' }), parrafos: parrafos() }, { label: 'Si vives en regiones' }),
+      notaPlataforma: bloque('Nota sobre plataforma, recetas y licencias'),
+      cierre: bloque('Cierre (antes de los botones)'),
+    }),
+    paginaPago: paginaSingleton('Pago y reembolso', 'pago', {
+      incluye: lista('Qué incluye la consulta'),
+      aparte: fields.object(
+        {
+          titulo: fields.text({ label: 'Título' }),
+          items: fields.array(fields.text({ label: 'Punto' }), { label: 'Puntos', itemLabel: (p) => p.value ?? '' }),
+          nota: fields.text({ label: 'Nota bajo la lista', multiline: true }),
+        },
+        { label: 'Qué se cotiza aparte' },
+      ),
+      particular: fields.object({ titulo: fields.text({ label: 'Título' }), parrafos: parrafos() }, { label: 'Atención particular' }),
+      notaMediosPago: bloque('Nota de medios de pago (se muestra mientras no haya medios de pago cargados)'),
+      cierre: bloque('Cierre (antes de los botones)'),
+    }),
+    paginaConocenos: paginaSingleton('Conócenos', 'conocenos', {
+      quienAtiende: fields.text({ label: 'Línea sobre el nombre del médico' }),
+      porque: fields.object(
+        {
+          eyebrow: fields.text({ label: 'Línea superior' }),
+          titulo: fields.text({ label: 'Título' }),
+          parrafos: parrafos('Párrafos antes de la cita'),
+          cita: fields.text({ label: 'Cita destacada', multiline: true }),
+          citaFuente: fields.text({ label: 'Firma de la cita' }),
+          parrafosDespues: parrafos('Párrafos después de la cita'),
+        },
+        { label: 'Por qué existe Conecta' },
+      ),
+      valores: fields.object(
+        {
+          eyebrow: fields.text({ label: 'Línea superior' }),
+          titulo: fields.text({ label: 'Título' }),
+          items: fields.array(
+            fields.object({
+              titulo: fields.text({ label: 'Valor' }),
+              texto: fields.text({ label: 'Explicación', multiline: true }),
+              icono: fields.text({ label: 'Ícono', description: iconos, defaultValue: 'check' }),
+            }),
+            { label: 'Valores', itemLabel: (p) => p.fields.titulo.value },
+          ),
+        },
+        { label: 'Cómo trabajamos (valores)' },
+      ),
+      compromisosEyebrow: fields.text({
+        label: 'Título de los compromisos',
+        description: 'Los compromisos mismos se editan en Configuración → Datos de la clínica.',
+      }),
+    }),
+    paginaContacto: paginaSingleton('Contacto', 'contacto', {
+      otrasFormas: fields.text({ label: 'Título "Otras formas de contacto"' }),
+      dondeEstamos: fields.text({ label: 'Título "Dónde estamos"' }),
+      barrio: fields.object(
+        {
+          ...foto('contacto-barrio', 'Foto del barrio (junto a la dirección)'),
+          pie: fields.text({ label: 'Pie de foto' }),
+        },
+        { label: 'Foto del barrio' },
+      ),
+      comoLlegar: bloque('Cómo llegar'),
+      horarios: fields.text({ label: 'Título "Horarios"', description: 'Los horarios mismos se editan en Configuración → Dirección y horarios.' }),
+    }),
+    paginaAgendar: singleton({
+      label: 'Agendar',
+      path: 'src/content/paginas/agendar',
+      format: { data: 'json' },
+      schema: {
+        seo: seoPagina(),
+        cabecera: cabecera('agendar', {
+          bajadaConAgenda: fields.text({
+            label: 'Bajada cuando la agenda va dentro de la página',
+            multiline: true,
+            description: 'La otra bajada se usa cuando la página muestra el formulario. Hoy "Agendar" lleva directo a TotalMed, así que esta página casi no se ve.',
+          }),
+        }),
+        salida: bloque('"¿Se te complicó?"'),
+        saber: fields.object(
+          {
+            titulo: fields.text({ label: 'Título' }),
+            items: fields.array(
+              fields.object({
+                icono: fields.text({ label: 'Ícono', description: iconos, defaultValue: 'check' }),
+                texto: fields.text({ label: 'Texto', multiline: true }),
+              }),
+              { label: 'Puntos', itemLabel: (p) => p.fields.texto.value },
+            ),
+          },
+          { label: 'Lo que necesitas saber' },
+        ),
+      },
+    }),
+    paginaPreguntas: paginaSingleton('Preguntas frecuentes', 'preguntas', {
+      grupoClinico: fields.text({ label: 'Título del grupo de preguntas clínicas' }),
+      grupoOperativo: fields.text({ label: 'Título del grupo de preguntas sobre la atención' }),
+    }),
+    paginaPacientes: paginaSingleton('Información para pacientes', 'pacientes', {
+      vacio: fields.object(
+        {
+          titulo: fields.text({ label: 'Título' }),
+          texto: fields.text({ label: 'Texto', multiline: true }),
+          boton: fields.text({ label: 'Texto del botón' }),
+        },
+        { label: 'Mensaje mientras no hay material publicado' },
+      ),
+      mientras: fields.object(
+        { eyebrow: fields.text({ label: 'Línea superior' }), titulo: fields.text({ label: 'Título' }) },
+        { label: 'Preguntas destacadas' },
+      ),
+    }),
+    paginaPrestaciones: paginaSingleton('Listado de prestaciones', 'prestaciones', {}),
+    paginaUnidad: singleton({
+      label: 'Conecta Hematología',
+      path: 'src/content/paginas/unidad',
+      format: { data: 'json' },
+      schema: {
+        eyebrow: fields.text({
+          label: 'Línea superior de la cabecera',
+          description: 'El título y la bajada de esta página se editan en Contenido → Unidades → Conecta Hematología.',
+        }),
+        ...foto('unidad'),
+        prestaciones: fields.object(
+          { eyebrow: fields.text({ label: 'Línea superior' }), titulo: fields.text({ label: 'Título' }) },
+          { label: 'Sección de las prestaciones' },
+        ),
+        notaCondiciones: bloque('Nota mientras no haya condiciones cargadas'),
       },
     }),
   },

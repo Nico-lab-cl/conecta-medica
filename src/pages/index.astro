@@ -67,6 +67,7 @@ import {
   horarioLegible,
 } from '../lib/contenido';
 import { FOTO_PAGINA, FOTO_PRESTACION } from '../lib/imagenes';
+import { fotoElegida } from '../lib/paginas';
 import { portada, marcadores, expandir, rutaDeDestino } from '../lib/portada';
 
 const cl = (await pais('cl')).data;
@@ -130,6 +131,11 @@ const ACCESOS = P.accesos.map((x) => ({
   texto: txt(x.texto),
   href: rutaDeDestino(x.destino),
 }));
+
+/* Fotos de las secciones: la que subió el cliente, o la de fábrica. */
+const FOTO_TELE = fotoElegida(P.telemedicina, FOTO_PAGINA.telemedicina);
+const FOTO_CONOCENOS = fotoElegida(P.conocenos, FOTO_PAGINA.conocenos);
+const FOTO_CIERRE = fotoElegida(P.cierre, FOTO_PAGINA.unidad);
 
 const TELE = P.telemedicina.puntos.map(txt);
 const SECUENCIA = P.conocenos.secuencia.map(txt);
@@ -276,8 +282,8 @@ const SECUENCIA = P.conocenos.secuencia.map(txt);
 
       <div class="figura">
         <Picture
-          src={FOTO_PAGINA.telemedicina.src}
-          alt={FOTO_PAGINA.telemedicina.alt}
+          src={FOTO_TELE.src}
+          alt={FOTO_TELE.alt}
           widths={[560, 1000]}
           sizes="(min-width: 1100px) 560px, 100vw"
           formats={['avif', 'webp']}
@@ -379,8 +385,8 @@ const SECUENCIA = P.conocenos.secuencia.map(txt);
       <div>
         <div class="figura">
           <Picture
-            src={FOTO_PAGINA.conocenos.src}
-            alt={FOTO_PAGINA.conocenos.alt}
+            src={FOTO_CONOCENOS.src}
+            alt={FOTO_CONOCENOS.alt}
             widths={[560, 1000]}
             sizes="(min-width: 1100px) 500px, 100vw"
             formats={['avif', 'webp']}
@@ -426,7 +432,7 @@ const SECUENCIA = P.conocenos.secuencia.map(txt);
   <section class="cierre seccion-oscura">
     <span class="cierre-foto" aria-hidden="true">
       <Picture
-        src={FOTO_PAGINA.unidad.src}
+        src={FOTO_CIERRE.src}
         alt=""
         widths={[960, 1600]}
         sizes="100vw"

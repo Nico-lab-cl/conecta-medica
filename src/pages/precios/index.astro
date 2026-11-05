@@ -6,36 +6,22 @@ import Icono from '../../components/core/Icono.astro';
 import BotonAgendar from '../../components/actions/BotonAgendar.astro';
 import BotonWhatsApp from '../../components/actions/BotonWhatsApp.astro';
 import { RUTAS, migas } from '../../lib/rutas';
+import { leerPagina, propsCabecera } from '../../lib/paginas';
 import { ajustes, pais } from '../../lib/contenido';
 
 const a = await ajustes();
 const cl = (await pais('cl')).data;
 const ruta = migas({ label: 'Pago y reembolso' });
 
-const incluye = [
-  'El tiempo de la consulta con el médico',
-  'La revisión de los exámenes que traigas, incluidos los antiguos',
-  'La explicación del diagnóstico y del plan',
-  'La boleta correspondiente',
-];
-const noIncluye = [
-  'Exámenes de laboratorio',
-  'Imágenes (ecografías, tomografías)',
-  'Procedimientos',
-];
+const P = await leerPagina('paginaPago', 'pago');
+const cab = await propsCabecera(P, { foto: FOTO_PAGINA.precios, og: '/og/precios.jpg' });
 ---
 
 <Pagina
-  titulo="Pago, boleta y reembolso"
-  descripcion="Qué incluye la consulta, cómo funciona la boleta para pedir reembolso y por qué la atención es particular. El valor de cada prestación lo ves al agendar."
+  {...cab}
   ruta={RUTAS.precios}
   actual={RUTAS.precios}
-  eyebrow="Pago y reembolso"
-  h1="Cómo funciona el pago de tu atención"
-  bajada="El valor depende de la prestación que necesites, y lo ves al elegir tu hora, antes de confirmarla."
   migas={ruta}
-  foto={FOTO_PAGINA.precios}
-  imagenOg="/og/precios.jpg"
 >
 
   <section class="seccion">
@@ -44,10 +30,10 @@ const noIncluye = [
 
       <div class="dos">
         <div>
-          <h2>Qué incluye</h2>
+          <h2>{P.incluye.titulo}</h2>
           <ul class="lista">
             {
-              incluye.map((i) => (
+              P.incluye.items.map((i) => (
                 <li>
                   <Icono nombre="check" tam={18} color="var(--color-blue)" />
                   {i}
@@ -57,10 +43,10 @@ const noIncluye = [
           </ul>
         </div>
         <div>
-          <h2>Qué se cotiza aparte</h2>
+          <h2>{P.aparte.titulo}</h2>
           <ul class="lista tenue">
             {
-              noIncluye.map((i) => (
+              P.aparte.items.map((i) => (
                 <li>
                   <Icono nombre="minus" tam={18} color="var(--color-gray)" />
                   {i}
@@ -68,9 +54,7 @@ const noIncluye = [
               ))
             }
           </ul>
-          <p class="nota">
-            Si tu caso necesita alguno, se te dice el costo antes de que decidas.
-          </p>
+          <p class="nota">{P.aparte.nota}</p>
         </div>
       </div>
     </div>
@@ -78,16 +62,8 @@ const noIncluye = [
 
   <section class="seccion seccion-alt">
     <div class="contenedor prosa">
-      <h2>Atención particular, sin convenios</h2>
-      <p class="parrafo">
-        No trabajamos con Fonasa ni con isapres en convenio. Lo decimos así de directo porque
-        preferimos que lo sepas antes de agendar y no cuando llegues al mostrador.
-      </p>
-      <p class="parrafo">
-        Si tienes un seguro complementario de salud, la boleta te sirve para pedir reembolso.
-        Cuánto te devuelvan depende de tu plan y de tu asegurador, y eso no es algo que nosotros
-        podamos comprometer.
-      </p>
+      <h2>{P.particular.titulo}</h2>
+      {P.particular.parrafos.map((t) => <p class="parrafo">{t}</p>)}
 
       {
         cl.medioPago.length > 0 ? (
@@ -104,11 +80,7 @@ const noIncluye = [
           </>
         ) : (
           <div class="pendiente">
-            <NotaInfo titulo="Medios de pago y política de anulación">
-              Estamos terminando de definir los medios de pago aceptados y la política de anulación.
-              Preferimos no publicarlos hasta tenerlos confirmados: si tienes dudas antes de
-              agendar, escríbenos y te respondemos.
-            </NotaInfo>
+            <NotaInfo titulo={P.notaMediosPago.titulo}>{P.notaMediosPago.texto}</NotaInfo>
           </div>
         )
       }
@@ -117,8 +89,8 @@ const noIncluye = [
 
   <section class="seccion">
     <div class="contenedor cierre">
-      <h2>El valor lo ves al agendar</h2>
-      <p>Al elegir tu hora ves el valor de la prestación. No necesitas derivación previa.</p>
+      <h2>{P.cierre.titulo}</h2>
+      <p>{P.cierre.texto}</p>
       <div class="acciones">
         <BotonAgendar tam="lg" />
         <BotonWhatsApp origen="precios" />

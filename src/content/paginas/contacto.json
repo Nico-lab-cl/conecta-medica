@@ -1,0 +1,25 @@
+{
+  "seo": {
+    "titulo": "Contacto y cómo llegar — Clínica Conecta, Ñuñoa",
+    "descripcion": "Solicita tu hora, escríbenos por WhatsApp o revisa cómo llegar al Edificio New Egaña desde Metro Plaza Egaña."
+  },
+  "cabecera": {
+    "eyebrow": "Contacto",
+    "titulo": "Pide tu hora",
+    "bajada": "Completa el formulario y te contactamos dentro del próximo día hábil. No pedimos síntomas ni antecedentes: eso se conversa en la consulta.",
+    "foto": null,
+    "fotoAlt": null
+  },
+  "otrasFormas": "Otras formas de contacto",
+  "dondeEstamos": "Dónde estamos",
+  "barrio": {
+    "foto": null,
+    "fotoAlt": null,
+    "pie": "El barrio, a pasos de Metro Plaza Egaña."
+  },
+  "comoLlegar": {
+    "titulo": "Cómo llegar",
+    "texto": "La estación Plaza Egaña de la Línea 4 queda a pocos metros del edificio. Es la forma más simple de llegar."
+  },
+  "horarios": "Horarios"
+}

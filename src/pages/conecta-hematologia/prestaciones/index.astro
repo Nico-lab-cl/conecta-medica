@@ -4,23 +4,20 @@ import Pagina from '../../../layouts/Pagina.astro';
 import TarjetaPrestacion from '../../../components/content/TarjetaPrestacion.astro';
 import Hilo from '../../../components/brand/Hilo.astro';
 import { RUTAS, migas } from '../../../lib/rutas';
+import { leerPagina, propsCabecera } from '../../../lib/paginas';
 import { serviciosActivos } from '../../../lib/contenido';
 
 const servicios = await serviciosActivos();
 const ruta = migas({ label: 'Conecta Hematología', href: RUTAS.unidad }, { label: 'Prestaciones' });
+const P = await leerPagina('paginaPrestaciones', 'prestaciones');
+const cab = await propsCabecera(P, { foto: FOTO_PAGINA.prestaciones, og: '/og/prestaciones.jpg' });
 ---
 
 <Pagina
-  titulo="Prestaciones de Conecta Hematología"
-  descripcion="Hematología como eje, con gastroenterología, nutrición e imágenes que entran cuando el estudio hematológico las necesita."
+  {...cab}
   ruta={RUTAS.prestaciones}
   actual={RUTAS.prestaciones}
-  eyebrow="Conecta Hematología"
-  h1="Prestaciones"
-  bajada="Cada ficha explica cómo esa prestación aporta a la evaluación, el tratamiento o el seguimiento del paciente hematológico. Ninguna se ofrece como especialidad suelta."
   migas={ruta}
-  foto={FOTO_PAGINA.prestaciones}
-  imagenOg="/og/prestaciones.jpg"
 >
 
   <section class="seccion">

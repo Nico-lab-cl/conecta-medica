@@ -9,50 +9,28 @@ import AvisoUrgencias from '../../components/notices/AvisoUrgencias.astro';
 import BotonAgendar from '../../components/actions/BotonAgendar.astro';
 import BotonWhatsApp from '../../components/actions/BotonWhatsApp.astro';
 import { RUTAS, migas } from '../../lib/rutas';
+import { leerPagina, propsCabecera } from '../../lib/paginas';
 
 const ruta = migas({ label: 'Telemedicina' });
 
-const SI = [
-  'Interpretar un hemograma, un perfil de hierro o una ferritina alterada',
-  'Revisar y ajustar un tratamiento que ya estás siguiendo',
-  'Controles de seguimiento cuando el caso está estable',
-  'Una segunda opinión sobre un estudio que ya te hicieron',
-  'Orientarte sobre qué estudiar y en qué orden',
-];
-const NO = [
-  'Examinar un ganglio, el bazo o el abdomen',
-  'Una primera evaluación donde el examen físico sea determinante',
-  'Procedimientos de cualquier tipo',
-];
-
-const PASOS = [
-  { t: 'Pides tu hora', d: 'Por el formulario o por WhatsApp, indicando que la quieres por telemedicina.' },
-  { t: 'Te confirmamos', d: 'Coordinamos día y hora, y te explicamos cómo conectarte.' },
-  { t: 'Preparas tus exámenes', d: 'Ten a mano tus exámenes y la lista de medicamentos, en papel o en pantalla.' },
-  { t: 'La consulta', d: 'El mismo tiempo y la misma revisión que la presencial. Si tu caso necesita ser visto en persona, te lo decimos ahí mismo.' },
-];
+const P = await leerPagina('paginaTelemedicina', 'telemedicina');
+const cab = await propsCabecera(P, { foto: FOTO_PAGINA.telemedicina, og: '/og/telemedicina.jpg' });
 ---
 
 <Pagina
-  titulo="Hematología por telemedicina en todo Chile"
-  descripcion="Consulta hematológica a distancia: qué se puede resolver en línea, qué necesita ser presencial, y cómo se agenda desde regiones."
+  {...cab}
   ruta={RUTAS.telemedicina}
   actual={RUTAS.telemedicina}
-  eyebrow="Telemedicina"
-  h1="Hematología a distancia, en todo Chile"
-  bajada="Decimos qué se resuelve por videollamada y qué no. Una consulta a distancia que debía ser presencial no le sirve a nadie."
   migas={ruta}
-  foto={FOTO_PAGINA.telemedicina}
-  imagenOg="/og/telemedicina.jpg"
 >
 
   <section class="seccion">
     <div class="contenedor dos">
       <div>
-        <h2>Sí se resuelve a distancia</h2>
+        <h2>{P.si.titulo}</h2>
         <ul class="lista">
           {
-            SI.map((i) => (
+            P.si.items.map((i) => (
               <li>
                 <Icono nombre="check" tam={20} color="var(--color-blue)" />
                 {i}
@@ -62,10 +40,10 @@ const PASOS = [
         </ul>
       </div>
       <div>
-        <h2>Necesita ser presencial</h2>
+        <h2>{P.no.titulo}</h2>
         <ul class="lista tenue">
           {
-            NO.map((i) => (
+            P.no.items.map((i) => (
               <li>
                 <Icono nombre="minus" tam={20} color="var(--color-gray)" />
                 {i}
@@ -74,10 +52,7 @@ const PASOS = [
           }
         </ul>
         <div class="aviso-cambio">
-          <NotaInfo titulo="Si tu caso necesita ser presencial">
-            Te lo decimos durante la videollamada, no después. La consulta no se cobra dos veces por
-            eso.
-          </NotaInfo>
+          <NotaInfo titulo={P.notaPresencial.titulo}>{P.notaPresencial.texto}</NotaInfo>
         </div>
       </div>
     </div>
@@ -85,15 +60,15 @@ const PASOS = [
 
   <section class="seccion seccion-alt">
     <div class="contenedor">
-      <p class="eyebrow">Cómo funciona</p>
-      <h2>Cuatro pasos</h2>
-      <div class="hilo" aria-hidden="true"><Hilo nodos={4} /></div>
+      <p class="eyebrow">{P.pasos.eyebrow}</p>
+      <h2>{P.pasos.titulo}</h2>
+      <div class="hilo" aria-hidden="true"><Hilo nodos={P.pasos.items.length} /></div>
       <ol class="pasos">
         {
-          PASOS.map((p, i) => (
+          P.pasos.items.map((p, i) => (
             <li>
-              <BloquePaso numero={i + 1} titulo={p.t}>
-                {p.d}
+              <BloquePaso numero={i + 1} titulo={p.titulo}>
+                {p.texto}
               </BloquePaso>
             </li>
           ))
@@ -104,23 +79,11 @@ const PASOS = [
 
   <section class="seccion">
     <div class="contenedor prosa">
-      <h2>Si vives en regiones</h2>
-      <p class="parrafo">
-        La hematología está concentrada en pocos centros, casi todos en Santiago. Para muchos
-        pacientes eso significa viajar horas por una consulta que se resolvía revisando bien los
-        exámenes que ya tenían.
-      </p>
-      <p class="parrafo">
-        La telemedicina existe exactamente para eso: para que la distancia no sea el motivo por el
-        que un problema de la sangre queda sin estudiar.
-      </p>
+      <h2>{P.regiones.titulo}</h2>
+      {P.regiones.parrafos.map((t) => <p class="parrafo">{t}</p>)}
 
       <div class="pendiente">
-        <NotaInfo titulo="Plataforma, recetas y licencias">
-          Estamos terminando de definir la plataforma de videollamada y las condiciones para receta
-          electrónica y licencias en modalidad a distancia. Preferimos no prometerlo hasta tenerlo
-          confirmado. Cuando coordinemos tu hora te lo indicamos con precisión.
-        </NotaInfo>
+        <NotaInfo titulo={P.notaPlataforma.titulo}>{P.notaPlataforma.texto}</NotaInfo>
       </div>
 
       <div class="urgencias"><AvisoUrgencias /></div>
@@ -129,8 +92,8 @@ const PASOS = [
 
   <section class="seccion seccion-alt">
     <div class="contenedor cierre">
-      <h2>Agenda tu consulta por telemedicina</h2>
-      <p>Ves el valor de la prestación al elegir tu hora. Sin derivación previa.</p>
+      <h2>{P.cierre.titulo}</h2>
+      <p>{P.cierre.texto}</p>
       <div class="acciones">
         <BotonAgendar tam="lg" />
         <BotonWhatsApp origen="telemedicina" />

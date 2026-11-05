@@ -1,0 +1,39 @@
+{
+  "seo": {
+    "titulo": "Agendar hora — Clínica Conecta",
+    "descripcion": "Solicita tu hora de hematología, presencial en Ñuñoa o por telemedicina. Atención particular, sin derivación previa."
+  },
+  "cabecera": {
+    "eyebrow": "Agendar",
+    "titulo": "Agenda tu hora",
+    "bajada": "Déjanos tus datos y te contactamos dentro del próximo día hábil para confirmar día y hora.",
+    "foto": null,
+    "fotoAlt": null,
+    "bajadaConAgenda": "Elige día y hora en la agenda. Vas a necesitar tu RUT y un correo electrónico."
+  },
+  "salida": {
+    "titulo": "¿Se te complicó?",
+    "texto": "Escríbenos y coordinamos tu hora a mano. Sirve especialmente si no tienes RUT chileno o si prefieres hablar con alguien."
+  },
+  "saber": {
+    "titulo": "Lo que necesitas saber",
+    "items": [
+      {
+        "icono": "info",
+        "texto": "Atención particular. El valor depende de la prestación y lo ves al elegir tu hora."
+      },
+      {
+        "icono": "check",
+        "texto": "No necesitas derivación de otro médico."
+      },
+      {
+        "icono": "file-text",
+        "texto": "Trae tus exámenes previos, aunque sean antiguos."
+      },
+      {
+        "icono": "video",
+        "texto": "Puedes elegir presencial en Ñuñoa o telemedicina."
+      }
+    ]
+  }
+}
