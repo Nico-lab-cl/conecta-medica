@@ -19,7 +19,7 @@
    sitio: sigue en agendar, contacto, telemedicina y preguntas frecuentes, que
    son las páginas donde alguien puede estar decidiendo si esperar una hora. */
 import { RUTAS } from '../../lib/rutas';
-import { ajustes, pais, horarioLegible, precioCLP } from '../../lib/contenido';
+import { ajustes, pais, horarioLegible } from '../../lib/contenido';
 
 const a = await ajustes();
 const cl = (await pais('cl')).data;
@@ -64,7 +64,7 @@ const anio = new Date().getFullYear();
         <li><a class="enlace-pie" href={RUTAS.unidad}>Conecta Hematología</a></li>
         <li><a class="enlace-pie" href={RUTAS.prestaciones}>Prestaciones</a></li>
         <li><a class="enlace-pie" href={RUTAS.telemedicina}>Telemedicina</a></li>
-        <li><a class="enlace-pie" href={RUTAS.precios}>Precios</a></li>
+        <li><a class="enlace-pie" href={RUTAS.precios}>Pago y reembolso</a></li>
         <li><a class="enlace-pie" href={RUTAS.preguntas}>Preguntas frecuentes</a></li>
         <li><a class="enlace-pie" href={RUTAS.conocenos}>Conócenos</a></li>
         <li><a class="enlace-pie" href={RUTAS.contacto}>Contacto</a></li>
@@ -77,7 +77,7 @@ const anio = new Date().getFullYear();
         {cl.horarios.map((h) => <li>{horarioLegible(h)}</li>)}
         <li class="tenue">Domingo y festivos · cerrado</li>
       </ul>
-      <p class="nota">Atención solo particular · {precioCLP(a.precioConsulta)}</p>
+      <p class="nota">Atención particular · boleta para reembolso</p>
     </div>
   </div>
 

@@ -25,7 +25,7 @@ const MENSAJES: Record<OrigenWhatsApp, string> = {
   telemedicina:
     'Hola, vengo de la web de Clínica Conecta - telemedicina, necesito más información.',
   precios:
-    'Hola, vengo de la web de Clínica Conecta y quiero consultar por el valor de la consulta.',
+    'Hola, vengo de la web de Clínica Conecta y tengo una duda sobre el pago y el reembolso.',
   contacto: 'Hola, vengo de la web de Clínica Conecta y necesito coordinar una hora.',
   agendar: 'Hola, vengo de la web de Clínica Conecta y necesito ayuda para agendar mi hora.',
   preguntas:

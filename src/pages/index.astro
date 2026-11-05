@@ -51,7 +51,6 @@ import EnlaceTexto from '../components/actions/EnlaceTexto.astro';
 import Icono from '../components/core/Icono.astro';
 import Hilo from '../components/brand/Hilo.astro';
 import Acordeon from '../components/content/Acordeon.astro';
-import BloquePrecio from '../components/content/BloquePrecio.astro';
 import TarjetaPrestacion from '../components/content/TarjetaPrestacion.astro';
 import TarjetaProfesional from '../components/content/TarjetaProfesional.astro';
 import NotaInfo from '../components/notices/NotaInfo.astro';
@@ -59,7 +58,6 @@ import DescargoClinico from '../components/notices/DescargoClinico.astro';
 import BuscadorV3 from '../components/v3/BuscadorV3.astro';
 import { RUTAS } from '../lib/rutas';
 import {
-  ajustes,
   pais,
   serviciosActivos,
   profesionalesActivos,
@@ -67,12 +65,10 @@ import {
   faqsDestacadas,
   recursosPublicables,
   horarioLegible,
-  precioCLP,
 } from '../lib/contenido';
 import { FOTO_PAGINA, FOTO_PRESTACION } from '../lib/imagenes';
 import { portada, marcadores, expandir, rutaDeDestino } from '../lib/portada';
 
-const a = await ajustes();
 const cl = (await pais('cl')).data;
 const servicios = await serviciosActivos();
 const profesionales = await profesionalesActivos();
@@ -104,7 +100,7 @@ const horarios = cl.horarios.map(horarioLegible).join(' · ');
 
 /* Todo el copy de esta página vive ahora en src/content/settings/portada.json
    y se edita desde el CMS, en "Portada del sitio". Acá sólo se expanden los
-   marcadores —{precio}, {comuna}, {preguntas}— con los datos vivos, para que
+   marcadores —{notaPrecio}, {comuna}, {preguntas}— con los datos vivos, para que
    cambiar el precio en "Datos de la clínica" no deje la portada mintiendo.
    Ver src/lib/portada.ts. */
 const P = await portada();
@@ -141,7 +137,7 @@ const SECUENCIA = P.conocenos.secuencia.map(txt);
 
 <Base
   titulo="Hematólogo en Ñuñoa y telemedicina — Clínica Conecta"
-  descripcion={`Atención hematológica en Ñuñoa y por telemedicina en todo Chile. Consulta particular ${precioCLP(a.precioConsulta)}. Sin derivación previa.`}
+  descripcion={`Atención hematológica en Ñuñoa y por telemedicina en todo Chile. Atención particular, sin derivación previa.`}
   ruta={RUTAS.inicio}
   actual={RUTAS.inicio}
 >
@@ -392,7 +388,6 @@ const SECUENCIA = P.conocenos.secuencia.map(txt);
             loading="lazy"
           />
         </div>
-        <div class="precio"><BloquePrecio /></div>
       </div>
     </div>
   </section>
@@ -1006,14 +1001,6 @@ const SECUENCIA = P.conocenos.secuencia.map(txt);
     line-height: 1.45;
     color: var(--color-ink);
   }
-  .precio {
-    margin-top: var(--space-5);
-    background: var(--surface-card);
-    border: var(--border-width) solid var(--color-line);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-  }
-
   .ver-todas {
     margin-top: var(--space-5);
   }

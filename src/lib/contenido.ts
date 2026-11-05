@@ -120,11 +120,6 @@ export async function legalPorSlug(slug: string) {
   return (await getCollection('legal')).find((l) => l.data.slug === slug);
 }
 
-/** Formato de precio chileno, sin decimales. */
-export function precioCLP(valor: number): string {
-  return '$' + valor.toLocaleString('es-CL');
-}
-
 /** "Martes 15:00–19:00" a partir del registro del país. */
 export function horarioLegible(h: { dia: string; desde: string; hasta: string }): string {
   return `${h.dia} ${h.desde}–${h.hasta}`;

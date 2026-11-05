@@ -1,5 +1,5 @@
 import { getEntry } from 'astro:content';
-import { ajustes, pais, precioCLP } from './contenido';
+import { ajustes, pais } from './contenido';
 import { RUTAS } from './rutas';
 
 /* Portada editable.
@@ -80,7 +80,6 @@ export async function marcadores(totalPreguntas: number): Promise<Marcadores> {
   const sabado = cl.horarios.find((h) => h.dia === 'Sábado');
 
   return {
-    precio: precioCLP(a.precioConsulta),
     notaPrecio: a.precioNota,
     nombre: a.nombre,
     razonSocial: a.razonSocial,

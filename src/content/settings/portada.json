@@ -18,8 +18,8 @@
       "eyebrow": "Horarios de atención",
       "titulo": "Atención hematológica también los sábados",
       "tituloSinSabado": "{sabado} · Atención hematológica especializada",
-      "texto": "Atención presencial en Ñuñoa y por telemedicina. Consulta particular {precio}. {notaPrecio}",
-      "botonLabel": "Ver precios",
+      "texto": "Atención presencial en Ñuñoa y por telemedicina. {notaPrecio}",
+      "botonLabel": "Pago y reembolso",
       "botonDestino": "precios"
     }
   ],
@@ -46,8 +46,8 @@
     },
     {
       "icono": "info",
-      "titulo": "Precios y modalidades de atención",
-      "texto": "Consulta los valores y las condiciones de nuestra atención médica.",
+      "titulo": "Pago y reembolso",
+      "texto": "Atención particular, con boleta para solicitar reembolso.",
       "destino": "precios"
     },
     {

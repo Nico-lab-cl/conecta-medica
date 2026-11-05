@@ -278,7 +278,6 @@ const settings = defineCollection({
     telefono: pendiente(),
     whatsapp: pendiente(),
     redes: z.array(z.object({ red: z.string(), url: z.string().url() })).default([]),
-    precioConsulta: z.number(),
     precioNota: z.string(),
     avisoUrgencias: z.object({
       titulo: z.string(),
@@ -322,7 +321,7 @@ const settings = defineCollection({
    de la consulta, la comuna, cuántas preguntas hay publicadas. Si se copiaran
    como texto fijo al CMS, cambiar el precio en "Datos de la clínica" dejaría
    la portada mintiendo —que es exactamente el problema que el pie de sitio ya
-   tuvo—. Por eso el texto admite marcadores entre llaves, {precio} o {comuna},
+   tuvo—. Por eso el texto admite marcadores entre llaves, {notaPrecio} o {comuna},
    que se reemplazan al renderizar con el dato real. La lista completa y su
    expansión están en src/lib/portada.ts. */
 const homepage = defineCollection({

@@ -9,9 +9,7 @@ import AvisoUrgencias from '../../components/notices/AvisoUrgencias.astro';
 import BotonAgendar from '../../components/actions/BotonAgendar.astro';
 import BotonWhatsApp from '../../components/actions/BotonWhatsApp.astro';
 import { RUTAS, migas } from '../../lib/rutas';
-import { precioCLP, ajustes } from '../../lib/contenido';
 
-const a = await ajustes();
 const ruta = migas({ label: 'Telemedicina' });
 
 const SI = [
@@ -131,8 +129,8 @@ const PASOS = [
 
   <section class="seccion seccion-alt">
     <div class="contenedor cierre">
-      <h2>Consulta por telemedicina: {precioCLP(a.precioConsulta)}</h2>
-      <p>El mismo valor que la presencial. Sin derivación previa.</p>
+      <h2>Agenda tu consulta por telemedicina</h2>
+      <p>Ves el valor de la prestación al elegir tu hora. Sin derivación previa.</p>
       <div class="acciones">
         <BotonAgendar tam="lg" />
         <BotonWhatsApp origen="telemedicina" />

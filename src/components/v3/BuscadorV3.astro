@@ -18,9 +18,8 @@
       cargado. Manda a contacto, que sí existe. */
 import Icono from '../core/Icono.astro';
 import { RUTAS } from '../../lib/rutas';
-import { serviciosActivos, faqsPublicables, ajustes, precioCLP } from '../../lib/contenido';
+import { serviciosActivos, faqsPublicables } from '../../lib/contenido';
 
-const a = await ajustes();
 const servicios = await serviciosActivos();
 const faqs = await faqsPublicables();
 
@@ -35,8 +34,8 @@ const catalogo: Entrada[] = [
   })),
   { t: 'Telemedicina en todo Chile', k: 'MODALIDAD', href: RUTAS.telemedicina },
   {
-    t: `Precio de la consulta particular · ${precioCLP(a.precioConsulta)}`,
-    k: 'PRECIOS',
+    t: 'Pago, boleta y reembolso',
+    k: 'PAGO',
     href: RUTAS.precios,
   },
   { t: 'Solicitar una hora', k: 'AGENDA', href: RUTAS.agendar },

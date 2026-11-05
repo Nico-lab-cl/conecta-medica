@@ -59,16 +59,15 @@ desde **Contenido → Portada del sitio**. Ahí está:
 
 ### Los textos entre llaves no son un error
 
-Va a ver cosas como `Consulta particular {precio}, precio conocido antes de
-atenderte`. Eso de `{precio}` es un hueco que el sitio rellena solo con el
-valor real al publicar. Sirve para que, cuando usted cambie el precio en *Datos
-de la clínica*, la portada no se quede anunciando el anterior.
+Va a ver cosas como `Atención presencial en {comuna} y por telemedicina`. Eso de
+`{comuna}` es un hueco que el sitio rellena solo con el dato real al publicar.
+Sirve para que, cuando usted cambie un dato en *Datos de la clínica*, la
+portada no se quede anunciando el anterior.
 
 Los huecos que puede usar:
 
 | Escriba | Sale publicado |
 |---|---|
-| `{precio}` | el valor de la consulta, con formato: $50.000 |
 | `{notaPrecio}` | la nota sobre previsión |
 | `{comuna}` | Ñuñoa |
 | `{ciudad}` | Santiago |
@@ -129,15 +128,14 @@ excepción, claro.
 
 ---
 
-## 5. Cambiar el precio de la consulta
+## 5. Los precios
 
-1. **Configuración → Datos de la clínica**
-2. Busque *Valor de la consulta*
-3. Escriba el número **sin puntos ni signo peso**: `55000`, no `$55.000`
-4. Guarde
+Desde noviembre de 2026 el sitio no publica precios: el valor depende de la
+prestación y el paciente lo ve en TotalMed al elegir su hora. Los valores se
+cambian allá, no en este panel.
 
-El precio se actualiza solo en las cinco páginas donde aparece. No hay que
-buscarlo uno por uno.
+Lo que sí se edita acá es la *Nota sobre previsión* (**Configuración → Datos de
+la clínica**), que aparece en la página *Pago y reembolso* y en la portada.
 
 ---
 

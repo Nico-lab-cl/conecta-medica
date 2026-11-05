@@ -32,7 +32,7 @@
 import BotonAgendar from '../actions/BotonAgendar.astro';
 import Icono from '../core/Icono.astro';
 import { RUTAS } from '../../lib/rutas';
-import { ajustes, pais, precioCLP, hayDirectorioDeEquipo } from '../../lib/contenido';
+import { ajustes, pais, hayDirectorioDeEquipo } from '../../lib/contenido';
 
 interface Props {
   /** Ruta de la página actual, para marcar el ítem de menú. */
@@ -69,7 +69,7 @@ const nav = [
 const utilidad = [
   { label: 'Conecta Hematología', href: RUTAS.unidad },
   { label: 'Telemedicina', href: RUTAS.telemedicina },
-  { label: 'Precios', href: RUTAS.precios },
+  { label: 'Pago y reembolso', href: RUTAS.precios },
   { label: 'Información para pacientes', href: RUTAS.pacientes },
 ];
 
@@ -135,7 +135,7 @@ const ubicacion = `${cl.direccion.comuna}, ${cl.direccion.ciudad} · Telemedicin
         ))
       }
       <div class="movil-cta"><BotonAgendar tam="md" anchoCompleto etiqueta="Agendar hora" /></div>
-      <p class="movil-nota">Atención solo particular · consulta {precioCLP(a.precioConsulta)}</p>
+      <p class="movil-nota">Atención particular · boleta para reembolso</p>
     </nav>
   </div>
 </header>

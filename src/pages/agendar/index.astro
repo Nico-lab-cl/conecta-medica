@@ -20,7 +20,7 @@ import Icono from '../../components/core/Icono.astro';
 import AvisoUrgencias from '../../components/notices/AvisoUrgencias.astro';
 import '../../styles/formulario.css';
 import { RUTAS, migas } from '../../lib/rutas';
-import { ajustes, pais, horarioLegible, precioCLP } from '../../lib/contenido';
+import { ajustes, pais, horarioLegible } from '../../lib/contenido';
 
 const a = await ajustes();
 const cl = (await pais('cl')).data;
@@ -53,7 +53,7 @@ const destinoDirecto = a.agendamiento.modo === 'enlace' ? a.agendamiento.src : n
 ) : (
 <Pagina
   titulo="Agendar hora — Clínica Conecta"
-  descripcion="Solicita tu hora de hematología, presencial en Ñuñoa o por telemedicina. Consulta particular $50.000, sin derivación previa."
+  descripcion="Solicita tu hora de hematología, presencial en Ñuñoa o por telemedicina. Atención particular, sin derivación previa."
   ruta={RUTAS.agendar}
   actual={RUTAS.agendar}
   eyebrow="Agendar"
@@ -106,7 +106,7 @@ const destinoDirecto = a.agendamiento.modo === 'enlace' ? a.agendamiento.src : n
           <ul class="datos">
             <li>
               <Icono nombre="info" tam={20} color="var(--color-blue)" />
-              <span>Consulta {precioCLP(a.precioConsulta)}, atención solo particular.</span>
+              <span>Atención particular. El valor depende de la prestación y lo ves al elegir tu hora.</span>
             </li>
             <li>
               <Icono nombre="check" tam={20} color="var(--color-blue)" />

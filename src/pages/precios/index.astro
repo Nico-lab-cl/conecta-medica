@@ -1,17 +1,16 @@
 ---
 import { FOTO_PAGINA } from '../../lib/imagenes';
 import Pagina from '../../layouts/Pagina.astro';
-import BloquePrecio from '../../components/content/BloquePrecio.astro';
 import NotaInfo from '../../components/notices/NotaInfo.astro';
 import Icono from '../../components/core/Icono.astro';
 import BotonAgendar from '../../components/actions/BotonAgendar.astro';
 import BotonWhatsApp from '../../components/actions/BotonWhatsApp.astro';
 import { RUTAS, migas } from '../../lib/rutas';
-import { ajustes, pais, precioCLP } from '../../lib/contenido';
+import { ajustes, pais } from '../../lib/contenido';
 
 const a = await ajustes();
 const cl = (await pais('cl')).data;
-const ruta = migas({ label: 'Precios' });
+const ruta = migas({ label: 'Pago y reembolso' });
 
 const incluye = [
   'El tiempo de la consulta con el médico',
@@ -27,13 +26,13 @@ const noIncluye = [
 ---
 
 <Pagina
-  titulo="Precio de la consulta hematológica — $50.000"
-  descripcion="Valor de la consulta, qué incluye y por qué la atención es particular sin convenios. Sabes cuánto vas a pagar antes de llegar."
+  titulo="Pago, boleta y reembolso"
+  descripcion="Qué incluye la consulta, cómo funciona la boleta para pedir reembolso y por qué la atención es particular. El valor de cada prestación lo ves al agendar."
   ruta={RUTAS.precios}
   actual={RUTAS.precios}
-  eyebrow="Precios"
-  h1="Un solo precio, publicado"
-  bajada="Publicamos el valor porque saber cuánto vas a pagar antes de llegar es parte de una atención decente, no un detalle administrativo."
+  eyebrow="Pago y reembolso"
+  h1="Cómo funciona el pago de tu atención"
+  bajada="El valor depende de la prestación que necesites, y lo ves al elegir tu hora, antes de confirmarla."
   migas={ruta}
   foto={FOTO_PAGINA.precios}
   imagenOg="/og/precios.jpg"
@@ -41,7 +40,7 @@ const noIncluye = [
 
   <section class="seccion">
     <div class="contenedor">
-      <BloquePrecio nota="Consulta hematología" />
+      <p class="nota-prevision">{a.precioNota}</p>
 
       <div class="dos">
         <div>
@@ -107,7 +106,7 @@ const noIncluye = [
           <div class="pendiente">
             <NotaInfo titulo="Medios de pago y política de anulación">
               Estamos terminando de definir los medios de pago aceptados y la política de anulación.
-              Prefirimos no publicarlos hasta tenerlos confirmados: si tienes dudas antes de
+              Preferimos no publicarlos hasta tenerlos confirmados: si tienes dudas antes de
               agendar, escríbenos y te respondemos.
             </NotaInfo>
           </div>
@@ -118,8 +117,8 @@ const noIncluye = [
 
   <section class="seccion">
     <div class="contenedor cierre">
-      <h2>La consulta cuesta {precioCLP(a.precioConsulta)}</h2>
-      <p>Puedes pedir hora sin derivación previa.</p>
+      <h2>El valor lo ves al agendar</h2>
+      <p>Al elegir tu hora ves el valor de la prestación. No necesitas derivación previa.</p>
       <div class="acciones">
         <BotonAgendar tam="lg" />
         <BotonWhatsApp origen="precios" />
@@ -129,6 +128,11 @@ const noIncluye = [
 </Pagina>
 
 <style>
+  .nota-prevision {
+    max-width: 60ch;
+    font-size: var(--text-body-lg);
+    line-height: 1.6;
+  }
   .dos {
     display: grid;
     gap: var(--space-10);

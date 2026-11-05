@@ -45,9 +45,9 @@ export default config({
        src/pages/index.astro y sólo se podía cambiar tocando código.
 
        Los textos aceptan MARCADORES entre llaves, que se rellenan solos con los
-       datos reales al publicar: {precio}, {notaPrecio}, {comuna}, {ciudad},
-       {referencia}, {preguntas}, {sabado}, {nombre}, {razonSocial}. Así, si el
-       precio cambia en "Datos de la clínica", la portada no queda mintiendo.
+       datos reales al publicar: {notaPrecio}, {comuna}, {ciudad},
+       {referencia}, {preguntas}, {sabado}, {nombre}, {razonSocial}. Así, si la
+       nota de previsión cambia en "Datos de la clínica", la portada no queda mintiendo.
        Un marcador mal escrito no se imprime en crudo: desaparece. */
     portada: singleton({
       label: 'Portada del sitio',
@@ -74,7 +74,7 @@ export default config({
               options: [
                 { label: 'Agendar hora', value: 'agendar' },
                 { label: 'Telemedicina', value: 'telemedicina' },
-                { label: 'Precios', value: 'precios' },
+                { label: 'Pago y reembolso', value: 'precios' },
                 { label: 'Preguntas frecuentes', value: 'preguntas' },
                 { label: 'Qué llevar a la consulta', value: 'que-llevar' },
                 { label: 'Contacto', value: 'contacto' },
@@ -121,7 +121,7 @@ export default config({
               options: [
                 { label: 'Agendar hora', value: 'agendar' },
                 { label: 'Telemedicina', value: 'telemedicina' },
-                { label: 'Precios', value: 'precios' },
+                { label: 'Pago y reembolso', value: 'precios' },
                 { label: 'Preguntas frecuentes', value: 'preguntas' },
                 { label: 'Qué llevar a la consulta', value: 'que-llevar' },
                 { label: 'Contacto', value: 'contacto' },
@@ -222,7 +222,6 @@ export default config({
           description:
             'Con código de país, por ejemplo 56912345678. Mientras esté vacío, los botones de WhatsApp NO aparecen en el sitio. Nunca ponemos un número de ejemplo.',
         }),
-        precioConsulta: fields.number({ label: 'Valor de la consulta (pesos, sin puntos)' }),
         precioNota: fields.text({ label: 'Nota sobre previsión', multiline: true }),
         compromisos: fields.array(fields.text({ label: 'Compromiso' }), {
           label: 'Compromisos con el paciente',
