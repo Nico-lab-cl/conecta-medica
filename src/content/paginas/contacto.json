@@ -1,25 +1,21 @@
 {
   "seo": {
-    "titulo": "Contacto y cómo llegar — Clínica Conecta, Ñuñoa",
-    "descripcion": "Solicita tu hora, escríbenos por WhatsApp o revisa cómo llegar al Edificio New Egaña desde Metro Plaza Egaña."
+    "titulo": "Contacto y reserva de horas en Ñuñoa | Clínica Conecta",
+    "descripcion": "Agenda tu consulta en Clínica Conecta. Elige tu hora de atención presencial en Ñuñoa o por telemedicina. Nuestro equipo está disponible para resolver tus dudas."
   },
   "cabecera": {
-    "eyebrow": "Contacto",
-    "titulo": "Pide tu hora",
-    "bajada": "Completa el formulario y te contactamos dentro del próximo día hábil. No pedimos síntomas ni antecedentes: eso se conversa en la consulta.",
-    "foto": null,
-    "fotoAlt": null
+    "eyebrow": "CONTACTO Y AGENDAMIENTO",
+    "titulo": "Tu próxima consulta comienza aquí",
+    "bajada": "Elige la modalidad de atención que prefieras y reserva tu hora directamente desde nuestra agenda en línea. Si necesitas orientación o tienes alguna consulta, nuestro equipo estará encantado de ayudarte por WhatsApp."
   },
-  "otrasFormas": "Otras formas de contacto",
-  "dondeEstamos": "Dónde estamos",
+  "otrasFormas": "¿Necesitas orientación?",
+  "dondeEstamos": "Encuéntranos en Ñuñoa",
   "barrio": {
-    "foto": null,
-    "fotoAlt": null,
-    "pie": "El barrio, a pasos de Metro Plaza Egaña."
+    "pie": "Estamos en el sector de Plaza Egaña, a pasos del Metro y con excelentes conexiones de transporte."
   },
   "comoLlegar": {
     "titulo": "Cómo llegar",
-    "texto": "La estación Plaza Egaña de la Línea 4 queda a pocos metros del edificio. Es la forma más simple de llegar."
+    "texto": "Nos encontramos en el Edificio New Egaña, en Ñuñoa, a pasos de la estación Plaza Egaña del Metro (líneas 3 y 4).\n\n[Ver ubicación en Google Maps](https://www.google.com/maps/dir/?api=1&destination=Av.%20Americo%20Vespucio%20291%2C%20Nunoa%2C%20Chile)"
   },
   "horarios": "Horarios"
 }
